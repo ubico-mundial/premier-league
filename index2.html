@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typer Premier League</title>
+    <link rel="icon" type="image/jpeg" href="https://i.ibb.co/Qv1dF627/ubc.png">
+    <script src="https://cdn.jsdelivr.net/npm/@twemoji/api@14.1.0/dist/twemoji.min.js" crossorigin="anonymous"></script>
+    <style>
+        :root { --primary: #38003c; --accent: #00ff87; --bg: #f6f6f6; --card: #ffffff; --text: #333333; --danger: #ff4a4a; --text-light: #ffffff; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .container { max-width: 600px; width: 100%; box-sizing: border-box; }
+        
+        h1, h2, h3 { text-align: center; color: var(--primary); margin-bottom: 5px; }
+        .header-banner { background: var(--primary); color: var(--text-light); padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .header-banner h1 { color: var(--accent); margin: 0; font-size: 26px; }
+        
+        .group-header-active { background: var(--primary); color: var(--accent); font-weight: bold; padding: 12px; border-radius: 6px; margin: 15px 0; text-align: center; font-size: 18px; border: 2px solid var(--primary); }
+        .card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; box-sizing: border-box; border: 1px solid #e0e0e0; }
+        
+        input, button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
+        input[type="text"] { background: #fff; color: #333; font-size: 16px; text-align: center; border: 2px solid var(--primary); }
+        button { background: var(--primary); color: var(--accent); font-weight: bold; cursor: pointer; font-size: 16px; border: none; transition: 0.2s; }
+        button:disabled { background: #a0aec0; color: #fff; cursor: not-allowed; box-shadow: none !important; }
+        button:hover:not(:disabled) { filter: brightness(1.2); }
+        .hidden { display: none !important; }
+        
+        #loading-screen { text-align: center; padding: 40px 20px; }
+        .spinner { border: 4px solid rgba(0,0,0,0.1); width: 42px; height: 42px; border-radius: 50%; border-left-color: var(--primary); animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .match-row { display: flex; align-items: center; justify-content: space-between; margin: 12px 0; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0; }
+        .match-info { display: flex; flex-direction: column; width: 65%; }
+        .match-teams { font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; color: var(--primary); }
+        .match-date { font-size: 11px; color: #718096; margin-top: 3px; }
+        .locked-text { color: var(--danger); font-weight: bold; }
+        .submitted-text { color: #028a5a; font-weight: bold; }
+        
+        .score-inputs { display: flex; gap: 8px; align-items: center; }
+        .score-inputs input { width: 42px; text-align: center; margin: 0; padding: 6px; background: #edf2f7; color: #333; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 16px; font-weight: bold; }
+        .score-inputs input:disabled { background: #e2e8f0; color: #a0aec0; cursor: not-allowed; }
+        
+        .success-box { background: rgba(0, 255, 135, 0.1); border: 2px dashed var(--primary); color: var(--primary); text-align: center; padding: 15px; border-radius: 8px; margin-top: 25px; font-weight: bold; font-size: 16px; }
+        
+        .progress-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; background: var(--primary); padding: 8px; border-radius: 6px; margin-bottom: 15px; box-sizing: border-box; }
+        .progress-step { color: #fff; background: rgba(255,255,255,0.1); cursor: pointer; padding: 10px 0; border-radius: 4px; transition: background 0.2s; text-align: center; font-size: 13px; font-weight: bold; }
+        .progress-step:hover:not(.step-locked) { background: rgba(255,255,255,0.2); }
+        .progress-step.active { color: var(--primary); background: var(--accent); }
+        .progress-step.step-locked { color: #718096; background: #2d3748; cursor: not-allowed; opacity: 0.4; }
+
+        /* Style Wyboru Strzelców */
+        .scroers-intro { text-align: center; margin-bottom: 15px; font-size: 14px; }
+        .slots-container { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .scorer-slot { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #edf2f7; border-radius: 6px; font-weight: bold; font-size: 14px; border: 1px dashed var(--primary); cursor: pointer; }
+        .scorer-slot span { color: var(--primary); }
+        .teams-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
+        .team-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border: 1px solid #cbd5e0; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: bold; text-align: center; }
+        .team-btn:hover { border-color: var(--primary); background: rgba(56, 0, 60, 0.05); }
+        .team-logo-placeholder { font-size: 24px; margin-bottom: 4px; }
+        
+        .players-list-container { margin-top: 15px; background: #edf2f7; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e0; }
+        .players-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+        .player-btn { background: #fff; border: 1px solid #cbd5e0; padding: 8px; text-align: left; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; color: #333; width: 100%; margin: 0; }
+        .player-btn:hover { background: var(--primary); color: var(--accent); }
+
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px 8px; text-align: center; border-bottom: 1px solid #cbd5e0; font-size: 13px; }
+        th { color: var(--accent); background: var(--primary); font-weight: 600; }
+        .leaderboard-table { min-width: 100% !important; }
+        .rank-badge { font-weight: bold; display: inline-block; width: 24px; height: 24px; line-height: 24px; border-radius: 50%; background: #38003c; color: #00ff87; text-align: center; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-banner">
+        <h1>🏆 TYPER PREMIER LEAGUE ⚽</h1>
+        <p style="margin: 5px 0 0 0; font-weight: 500;">Sezon Zasadniczy — Nowa Karta (Sheet2)</p>
+    </div>
+
+    <div id="loading-screen" class="card">
+        <h2>Wczytywanie systemu...</h2>
+        <div class="spinner"></div>
+    </div>
+
+    <div id="login-screen" class="card hidden">
+        <h2>Wpisz swój Nick, aby wejść do gry:</h2>
+        <input type="text" id="nick-input" placeholder="np. Kicker99...">
+        <button id="login-btn" onclick="loginUser()">Dołącz do Gry</button>
+    </div>
+
+    <div id="app-screen" class="hidden">
+        <!-- Panel Główny Typowania -->
+        <div class="card" id="prediction-card">
+            <h3>Gracz: <span id="user-display" style="color:var(--primary)"></span></h3>
+            <div class="progress-bar" id="steps-bar"></div>
+            <div id="group-title" class="group-header-active"></div>
+            
+            <!-- ETAP 1: MECZE -->
+            <div id="step-matches-view">
+                <div id="matches-list">Ładowanie meczów...</div>
+                <div id="submit-container">
+                    <button id="next-stage-btn" onclick="goToScorersStage()" disabled>Wypełnij wszystkie mecze tej kolejki</button>
+                </div>
+            </div>
+
+            <!-- ETAP 2: STRZELCY -->
+            <div id="step-scorers-view" class="hidden">
+                <h4 style="margin: 0 0 10px 0; color: var(--primary);">🎯 Krok 2: Wybierz 5 strzelców na tę kolejkę</h4>
+                <p class="scroers-intro">Wybierz kolejno wolne sloty, a następnie kliknij w herb drużyny, by rozwinąć listę zawodników.</p>
+                
+                <div class="slots-container" id="slots-summary">
+                    <div class="scorer-slot" id="slot-0" onclick="activeSlot(0)">Slot 1: <span>Wybierz zawodnika...</span></div>
+                    <div class="scorer-slot" id="slot-1" onclick="activeSlot(1)">Slot 2: <span>Wybierz zawodnika...</span></div>
+                    <div class="scorer-slot" id="slot-2" onclick="activeSlot(2)">Slot 3: <span>Wybierz zawodnika...</span></div>
+                    <div class="scorer-slot" id="slot-3" onclick="activeSlot(3)">Slot 4: <span>Wybierz zawodnika...</span></div>
+                    <div class="scorer-slot" id="slot-4" onclick="activeSlot(4)">Slot 5: <span>Wybierz zawodnika...</span></div>
+                </div>
+
+                <div id="teams-selector-zone">
+                    <h5 style="margin:0; text-align:center;">Kliknij w herb drużyny:</h5>
+                    <div class="teams-grid" id="teams-logos-grid"></div>
+                </div>
+
+                <div id="players-list-zone" class="players-list-container hidden">
+                    <h5 style="margin:0;" id="selected-team-title">Zawodnicy drużyny:</h5>
+                    <div class="players-grid" id="players-buttons-grid"></div>
+                </div>
+
+                <button id="final-submit-btn" onclick="submitEntireRound()" style="margin-top:20px; background:#028a5a; color:white;" disabled>💾 Zapisz kompletne typy na tę kolejkę</button>
+                <button onclick="backToMatches()" style="background:#718096; color:white; font-size:12px; padding:6px; margin-top:10px;">⬅ Powrót do edycji meczów</button>
+            </div>
+        </div>
+
+        <!-- Tabela Wyników / Generalna -->
+        <div class="card">
+            <h2>🏆 Klasyfikacja Generalna (Premier League)</h2>
+            <div class="table-container">
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">Poz.</th>
+                            <th style="text-align: left; padding-left: 15px;">Gracz</th>
+                            <th style="width: 100px;">Punkty</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body">
+                        <tr><td colspan="3">Pobieranie aktualnych wyników z bazy danych...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // URL Twego Skryptu Google Apps Script (Wklej go poniżej między cudzysłowy)
+    const API_URL = "PROSZE_TUTAJ_WKLEIC_URL_Z_GOOGLE_APPS_SCRIPT";
+    const KEY_NAME = "sheet2"; // Przełączenie na nową kartę Premier League
+
+    const roundsOrder = ["Kolejka 1", "Kolejka 2", "Kolejka 3", "Kolejka 4", "Kolejka 5"];
+    let currentRoundIndex = 0; 
+    let localDraftScores = {}; 
+    let selectedScorers = [null, null, null, null, null]; 
+    let currentActiveSlotIndex = 0;
+
+    // Baza Emotek/Klubów i Zawodników
+    const teamMeta = {
+        "Arsenal": { logo: "🔴", players: ["Bukayo Saka", "Martin Ødegaard", "Kai Havertz", "Declan Rice", "William Saliba", "Gabriel Magalhães"] },
+        "Manchester City": { logo: "🔵", players: ["Erling Haaland", "Kevin De Bruyne", "Phil Foden", "Bernardo Silva", "Rodri", "Josko Gvardiol"] },
+        "Liverpool": { logo: "🔴", players: ["Mohamed Salah", "Luis Díaz", "Darwin Núñez", "Diogo Jota", "Alexis Mac Allister", "Virgil van Dijk", "Trent Alexander-Arnold"] },
+        "Chelsea": { logo: "🔵", players: ["Cole Palmer", "Nicolas Jackson", "Christopher Nkunku", "Noni Madueke", "Enzo Fernández"] },
+        "Manchester United": { logo: "👹", players: ["Bruno Fernandes", "Marcus Rashford", "Alejandro Garnacho", "Rasmus Højlund"] },
+        "Tottenham Hotspur": { logo: "⚪", players: ["Heung-min Son", "Dominic Solanke", "Dejan Kulusevski", "James Maddison"] },
+        "Aston Villa": { logo: "🦁", players: ["Ollie Watkins", "Leon Bailey", "John McGinn", "Jhon Durán"] },
+        "Newcastle United": { logo: "⚫", players: ["Alexander Isak", "Anthony Gordon", "Bruno Guimarães", "Kieran Trippier"] },
+        "Everton": { logo: "🔵", players: ["Dominic Calvert-Lewin", "Dwight McNeil"] },
+        "Crystal Palace": { logo: "🦅", players: ["Jean-Philippe Mateta", "Eberechi Eze"] },
+        "Nottingham Forest": { logo: "🌳", players: ["Chris Wood", "Morgan Gibbs-White"] },
+        "Brentford": { logo: "🐝", players: ["Bryan Mbeumo", "Yoane Wissa"] },
+        "Brighton": { logo: "🔵", players: ["Danny Welbeck", "Joao Pedro"] },
+        "AFC Bournemouth": { logo: "🍒", players: ["Antoine Semenyo", "Evanilson"] },
+        "Fulham": { logo: "⚪", players: ["Raúl Jiménez", "Alex Iwobi"] },
+        "Coventry City": { logo: "🩵", players: ["Ellis Simms", "Haji Wright"] },
+        "Hull City": { logo: "🐯", players: ["Striker A", "Winger B"] },
+        "Ipswich Town": { logo: "🚜", players: ["Liam Delap", "Omari Hutchinson"] },
+        "Sunderland": { logo: "🔴", players: ["Romaine Mundle", "Patrick Roberts"] },
+        "Leeds United": { logo: "⚪", players: ["Mateo Joseph", "Wilfried Gnonto"] }
+    };
+
+    // Oficjalny Terminarz[cite: 2]
+    const allMatches = [
+        // KOLEJKA 1[cite: 2]
+        { id: "M1_1", round: "Kolejka 1", t1: "Arsenal", t2: "Coventry City", lock: "2026-08-21T21:00:00" },
+        { id: "M1_2", round: "Kolejka 1", t1: "Hull City", t2: "Manchester United", lock: "2026-08-21T21:00:00" },
+        { id: "M1_3", round: "Kolejka 1", t1: "Everton", t2: "Crystal Palace", lock: "2026-08-21T21:00:00" },
+        { id: "M1_4", round: "Kolejka 1", t1: "Ipswich Town", t2: "Sunderland", lock: "2026-08-21T21:00:00" },
+        { id: "M1_5", round: "Kolejka 1", t1: "Nottingham Forest", t2: "Leeds United", lock: "2026-08-21T21:00:00" },
+        { id: "M1_6", round: "Kolejka 1", t1: "Brentford", t2: "Tottenham Hotspur", lock: "2026-08-21T21:00:00" },
+        { id: "M1_7", round: "Kolejka 1", t1: "Brighton", t2: "Aston Villa", lock: "2026-08-21T21:00:00" },
+        { id: "M1_8", round: "Kolejka 1", t1: "Manchester City", t2: "AFC Bournemouth", lock: "2026-08-21T21:00:00" },
+        { id: "M1_9", round: "Kolejka 1", t1: "Newcastle United", t2: "Liverpool", lock: "2026-08-21T21:00:00" },
+        { id: "M1_10", round: "Kolejka 1", t1: "Fulham", t2: "Chelsea", lock: "2026-08-21T21:00:00" },
+
+        // KOLEJKA 2[cite: 2]
+        { id: "M2_1", round: "Kolejka 2", t1: "Sunderland", t2: "Arsenal", lock: "2026-08-29T16:00:00" },
+        { id: "M2_2", round: "Kolejka 2", t1: "Nottingham Forest", t2: "Tottenham Hotspur", lock: "2026-08-29T16:00:00" },
+        { id: "M2_3", round: "Kolejka 2", t1: "Newcastle United", t2: "Aston Villa", lock: "2026-08-29T16:00:00" },
+        { id: "M2_4", round: "Kolejka 2", t1: "Manchester United", t2: "AFC Bournemouth", lock: "2026-08-29T16:00:00" },
+        { id: "M2_5", round: "Kolejka 2", t1: "Manchester City", t2: "Brentford", lock: "2026-08-29T16:00:00" },
+        { id: "M2_6", round: "Kolejka 2", t1: "Liverpool", t2: "Brighton", lock: "2026-08-29T16:00:00" },
+        { id: "M2_7", round: "Kolejka 2", t1: "Leeds United", t2: "Chelsea", lock: "2026-08-29T16:00:00" },
+        { id: "M2_8", round: "Kolejka 2", t1: "Ipswich Town", t2: "Coventry City", lock: "2026-08-29T16:00:00" },
+        { id: "M2_9", round: "Kolejka 2", t1: "Hull City", t2: "Crystal Palace", lock: "2026-08-29T16:00:00" },
+        { id: "M2_10", round: "Kolejka 2", t1: "Fulham", t2: "Everton", lock: "2026-08-29T16:00:00" }
+    ];
+
+    function isRoundSubmittedByPlayer(roundName) {
+        const nick = localStorage.getItem('typerNick') || "";
+        return localStorage.getItem(`submitted_${roundName.replace(" ", "")}_${nick.toLowerCase()}`) === "true";
+    }
+
+    async function initApp() {
+        document.getElementById('loading-screen').classList.add('hidden');
+        const savedNick = localStorage.getItem('typerNick');
+        
+        // Zawsze ładuj ranking przy starcie aplikacji
+        loadLeaderboard();
+        
+        if (savedNick) { 
+            showApp(savedNick);
+        } else {
+            document.getElementById('login-screen').classList.remove('hidden');
+        }
+    }
+    window.onload = initApp;
+
+    function loginUser() {
+        const nickInput = document.getElementById('nick-input');
+        const nick = nickInput.value.trim();
+        if (nick.length < 3) return alert('Nick musi mieć min. 3 znaki!');
+        localStorage.setItem('typerNick', nick);
+        document.getElementById('login-screen').classList.add('hidden');
+        showApp(nick);
+    }
+
+    function showApp(nick) {
+        document.getElementById('app-screen').classList.remove('hidden');
+        document.getElementById('user-display').innerText = nick;
+        renderProgressBar();
+        renderActiveRound();
+        buildTeamsGrid();
+        activeSlot(0);
+    }
+
+    function renderProgressBar() {
+        const bar = document.getElementById('steps-bar');
+        bar.innerHTML = "";
+        roundsOrder.forEach((r, idx) => {
+            const span = document.createElement('span');
+            const isDone = isRoundSubmittedByPlayer(r);
+            span.className = `progress-step ${idx === currentRoundIndex ? 'active' : ''}`;
+            span.innerText = isDone ? `${r} ✓` : r; 
+            span.onclick = () => changeRound(idx);
+            bar.appendChild(span);
+        });
+    }
+
+    function changeRound(targetIndex) {
+        saveCurrentInputsToDraft();
+        currentRoundIndex = targetIndex;
+        selectedScorers = [null, null, null, null, null];
+        renderProgressBar();
+        renderActiveRound();
+        backToMatches();
+    }
+
+    function saveCurrentInputsToDraft() {
+        const currentRound = roundsOrder[currentRoundIndex];
+        if (isRoundSubmittedByPlayer(currentRound)) return;
+        const rows = document.querySelectorAll('.match-row');
+        rows.forEach(row => {
+            const id = row.getAttribute('data-id');
+            const homeInput = row.querySelector('.home-team');
+            const awayInput = row.querySelector('.away-team');
+            if(homeInput && awayInput) {
+                localDraftScores[`home-${id}`] = homeInput.value;
+                localDraftScores[`away-${id}`] = awayInput.value;
+            }
+        });
+    }
+
+    function renderActiveRound() {
+        const currentRound = roundsOrder[currentRoundIndex];
+        document.getElementById('group-title').innerText = `⚽ RUNDA TYPOWANIA: ${currentRound.toUpperCase()}`;
+        
+        const container = document.getElementById('matches-list');
+        container.innerHTML = "";
+        
+        const roundMatches = allMatches.filter(m => m.round === currentRound);
+        if(roundMatches.length === 0) return;
+
+        const firstMatchLockTime = new Date(roundMatches[0].lock);
+        const now = new Date();
+        const isRoundLocked = (now >= firstMatchLockTime) || isRoundSubmittedByPlayer(currentRound);
+
+        roundMatches.forEach((match) => {
+            const div = document.createElement('div');
+            div.className = "match-row";
+            div.setAttribute('data-id', match.id);
+            
+            const savedHome = localDraftScores[`home-${match.id}`] || "";
+            const savedAway = localDraftScores[`away-${match.id}`] || "";
+            const f1 = teamMeta[match.t1]?.logo || "⚽";
+            const f2 = teamMeta[match.t2]?.logo || "⚽";
+
+            let statusMessage = `⏰ Start kolejki: ${roundMatches[0].lock.replace('T', ' ').substring(0,16)}`;
+            if (isRoundLocked) {
+                statusMessage = `<span class="locked-text">🔒 Zablokowane (Kolejka ruszyła lub wysłano)</span>`;
+            }
+
+            div.innerHTML = `
+                <div class="match-info">
+                    <span class="match-teams">${f1} ${match.t1} - ${f2} ${match.t2}</span>
+                    <span class="match-date">${statusMessage}</span>
+                </div>
+                <div class="score-inputs">
+                    <input type="number" class="home-team" min="0" placeholder="-" value="${savedHome}" ${isRoundLocked ? 'disabled' : ''} oninput="validateMatchesCompletion()">
+                    <span>:</span>
+                    <input type="number" class="away-team" min="0" placeholder="-" value="${savedAway}" ${isRoundLocked ? 'disabled' : ''} oninput="validateMatchesCompletion()">
+                </div>
+            `;
+            container.appendChild(div);
+        });
+        validateMatchesCompletion();
+    }
+
+    function validateMatchesCompletion() {
+        const currentRound = roundsOrder[currentRoundIndex];
+        const btn = document.getElementById('next-stage-btn');
+        
+        if(isRoundSubmittedByPlayer(currentRound)) {
+            document.getElementById('submit-container').innerHTML = `<div class="success-box">⭐ Ta kolejka została pomyślnie wysłana!</div>`;
+            return;
+        }
+
+        const rows = document.querySelectorAll('.match-row');
+        let allFilled = true;
+        rows.forEach(row => {
+            const home = row.querySelector('.home-team').value;
+            const away = row.querySelector('.away-team').value;
+            if(home === "" || away === "") allFilled = false;
+        });
+
+        if(allFilled) {
+            btn.removeAttribute('disabled');
+            btn.innerText = "Przejdź do wyboru strzelców ➔";
+        } else {
+            btn.setAttribute('disabled', 'true');
+            btn.innerText = "Uzupełnij wszystkie 10 wyników meczów";
+        }
+    }
+
+    function goToScorersStage() {
+        saveCurrentInputsToDraft();
+        document.getElementById('step-matches-view').classList.add('hidden');
+        document.getElementById('step-scorers-view').classList.remove('hidden');
+        updateScorersUI();
+    }
+
+    function backToMatches() {
+        document.getElementById('step-scorers-view').classList.add('hidden');
+        document.getElementById('step-matches-view').classList.remove('hidden');
+        renderActiveRound();
+    }
+
+    function buildTeamsGrid() {
+        const grid = document.getElementById('teams-logos-grid');
+        grid.innerHTML = "";
+        Object.keys(teamMeta).forEach(teamName => {
+            const btn = document.createElement('div');
+            btn.className = "team-btn";
+            btn.innerHTML = `<div class="team-logo-placeholder">${teamMeta[teamName].logo}</div><div>${teamName}</div>`;
+            btn.onclick = () => showPlayersForTeam(teamName);
+            grid.appendChild(btn);
+        });
+    }
+
+    function showPlayersForTeam(teamName) {
+        document.getElementById('players-list-zone').classList.remove('hidden');
+        document.getElementById('selected-team-title').innerText = `Skład zespołu: ${teamName}`;
+        
+        const grid = document.getElementById('players-buttons-grid');
+        grid.innerHTML = "";
+        
+        const players = teamMeta[teamName].players || [];
+        players.forEach(player => {
+            const btn = document.createElement('button');
+            btn.className = "player-btn";
+            btn.innerText = player;
+            btn.onclick = () => selectPlayerForActiveSlot(player, teamName);
+            grid.appendChild(btn);
+        });
+    }
+
+    function activeSlot(idx) {
+        currentActiveSlotIndex = idx;
+        for(let i=0; i<5; i++) {
+            document.getElementById(`slot-${i}`).style.borderColor = (i === idx) ? '#00ff87' : '#38003c';
+            document.getElementById(`slot-${i}`).style.background = (i === idx) ? '#e6fff4' : '#edf2f7';
+        }
+    }
+
+    function selectPlayerForActiveSlot(playerName, teamName) {
+        selectedScorers[currentActiveSlotIndex] = { player: playerName, team: teamName };
+        updateScorersUI();
+        
+        let nextSlot = selectedScorers.findIndex(s => s === null);
+        if(nextSlot !== -1) {
+            activeSlot(nextSlot);
+        }
+    }
+
+    function updateScorersUI() {
+        selectedScorers.forEach((data, idx) => {
+            const slotSpan = document.querySelector(`#slot-${idx} span`);
+            if(data) {
+                slotSpan.innerHTML = `${teamMeta[data.team].logo} <b>${data.player}</b> (${data.team})`;
+            } else {
+                slotSpan.innerText = "Wybierz zawodnika...";
+            }
+        });
+
+        const finalBtn = document.getElementById('final-submit-btn');
+        const allScorersSelected = selectedScorers.every(s => s !== null);
+        if(allScorersSelected) {
+            finalBtn.removeAttribute('disabled');
+        } else {
+            finalBtn.setAttribute('disabled', 'true');
+        }
+    }
+
+    async function submitEntireRound() {
+        const currentRound = roundsOrder[currentRoundIndex];
+        const nick = localStorage.getItem('typerNick');
+
+        const updateData = { 
+            "gracz": nick,
+            "kolejka": currentRound,
+            "strzelcy": selectedScorers.map(s => `${s.player} (${s.team})`).join(", ")
+        };
+
+        const roundMatches = allMatches.filter(m => m.round === currentRound);
+        roundMatches.forEach(m => {
+            updateData[m.id] = `${localDraftScores[`home-${m.id}`]}:${localDraftScores[`away-${m.id}`]}`;
+        });
+
+        try {
+            const finalBtn = document.getElementById('final-submit-btn');
+            finalBtn.setAttribute('disabled', 'true');
+            finalBtn.innerText = "Wysyłanie do bazy danych...";
+
+            await fetch(API_URL, { method: 'POST', body: JSON.stringify(updateData) });
+
+            localStorage.setItem(`submitted_${currentRound.replace(" ", "")}_${nick.toLowerCase()}`, "true");
+            alert(`Twoje typy na ${currentRound} zostały pomyślnie zapisane w sheet2! 🚀`);
+            
+            location.reload();
+        } catch (error) {
+            alert('Wystąpił błąd podczas zapisu: ' + error.message);
+            document.getElementById('final-submit-btn').removeAttribute('disabled');
+        }
+    }
+
+    // POBIERANIE DANYCH DO TABELI GLOBALNEJ Z ARKUSZA GOOGLE (SHEET2)
+    async function loadLeaderboard() {
+        const tbody = document.getElementById('leaderboard-body');
+        try {
+            // Pobieranie danych w formacie JSON z Google Apps Script GET
+            const response = await fetch(`${API_URL}?action=getLeaderboard`);
+            if (!response.ok) throw new Error("Błąd sieci");
+            
+            const data = await response.json();
+            
+            if (!data || data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3">Brak zarejestrowanych punktów w bazie. Wpisz oficjalne wyniki w arkusz!</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = "";
+            data.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="rank-badge">${index + 1}</span></td>
+                    <td style="text-align: left; padding-left: 15px; font-weight: bold; color: var(--primary);">${row.gracz}</td>
+                    <td style="font-weight: bold; color: #028a5a; font-size: 15px;">${row.punkty} pkt</td>
+                `;
+                tbody.innerHTML += tr.outerHTML;
+            });
+        } catch (error) {
+            tbody.innerHTML = `<tr><td colspan="3" style="color:var(--danger)">Nie udało się załadować rankingu (Upewnij się, że wkleiłeś poprawny URL skryptu API)</td></tr>`;
+        }
+    }
+</script>
+</body>
+</html>
