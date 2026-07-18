@@ -31,7 +31,7 @@
 
         .match-row { display: flex; align-items: center; justify-content: space-between; margin: 12px 0; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0; }
         .match-info { display: flex; flex-direction: column; width: 65%; }
-        .match-teams { font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; color: var(--primary); }
+        .match-teams { font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px; color: var(--primary); flex-wrap: wrap; }
         .match-date { font-size: 11px; color: #718096; margin-top: 3px; }
         .locked-text { color: var(--danger); font-weight: bold; }
         .submitted-text { color: #028a5a; font-weight: bold; }
@@ -52,11 +52,10 @@
         .scroers-intro { text-align: center; margin-bottom: 15px; font-size: 14px; }
         .slots-container { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
         .scorer-slot { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #edf2f7; border-radius: 6px; font-weight: bold; font-size: 14px; border: 1px dashed var(--primary); cursor: pointer; }
-        .scorer-slot span { color: var(--primary); }
+        .scorer-slot span { color: var(--primary); display: flex; align-items: center; }
         .teams-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
         .team-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border: 1px solid #cbd5e0; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: bold; text-align: center; }
         .team-btn:hover { border-color: var(--primary); background: rgba(56, 0, 60, 0.05); }
-        .team-logo-placeholder { font-size: 24px; margin-bottom: 4px; }
         
         .players-list-container { margin-top: 15px; background: #edf2f7; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e0; }
         .players-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
@@ -101,7 +100,7 @@
             <div id="step-matches-view">
                 <div id="matches-list">Ładowanie meczów...</div>
                 <div id="submit-container">
-                    <button id="next-stage-btn" onclick="goToScorersStage()" disabled>Wypełnij wszystkie mecze tej kolejki</button>
+                    <button id="next-stage-btn" onclick="goToScorersStage()" disabled>Uzupełnij wszystkie 10 wyników meczów</button>
                 </div>
             </div>
 
@@ -155,9 +154,9 @@
 </div>
 
 <script>
-    // URL Twego Skryptu Google Apps Script (Wklej go poniżej między cudzysłowy)
+    // ⚠️ TUTAJ WKLEJ SWÓJ URL WYGENEROWANY Z GOOGLE APPS SCRIPT
     const API_URL = "PROSZE_TUTAJ_WKLEIC_URL_Z_GOOGLE_APPS_SCRIPT";
-    const KEY_NAME = "sheet2"; // Przełączenie na nową kartę Premier League
+    const KEY_NAME = "sheet2"; 
 
     const roundsOrder = ["Kolejka 1", "Kolejka 2", "Kolejka 3", "Kolejka 4", "Kolejka 5"];
     let currentRoundIndex = 0; 
@@ -165,28 +164,28 @@
     let selectedScorers = [null, null, null, null, null]; 
     let currentActiveSlotIndex = 0;
 
-    // Baza Emotek/Klubów i Zawodników
+    // Baza Klubów z oficjalnymi, zewnętrznymi herbami graficznymi (zamiast emotek)
     const teamMeta = {
-        "Arsenal": { logo: "🔴", players: ["Bukayo Saka", "Martin Ødegaard", "Kai Havertz", "Declan Rice", "William Saliba", "Gabriel Magalhães"] },
-        "Manchester City": { logo: "🔵", players: ["Erling Haaland", "Kevin De Bruyne", "Phil Foden", "Bernardo Silva", "Rodri", "Josko Gvardiol"] },
-        "Liverpool": { logo: "🔴", players: ["Mohamed Salah", "Luis Díaz", "Darwin Núñez", "Diogo Jota", "Alexis Mac Allister", "Virgil van Dijk", "Trent Alexander-Arnold"] },
-        "Chelsea": { logo: "🔵", players: ["Cole Palmer", "Nicolas Jackson", "Christopher Nkunku", "Noni Madueke", "Enzo Fernández"] },
-        "Manchester United": { logo: "👹", players: ["Bruno Fernandes", "Marcus Rashford", "Alejandro Garnacho", "Rasmus Højlund"] },
-        "Tottenham Hotspur": { logo: "⚪", players: ["Heung-min Son", "Dominic Solanke", "Dejan Kulusevski", "James Maddison"] },
-        "Aston Villa": { logo: "🦁", players: ["Ollie Watkins", "Leon Bailey", "John McGinn", "Jhon Durán"] },
-        "Newcastle United": { logo: "⚫", players: ["Alexander Isak", "Anthony Gordon", "Bruno Guimarães", "Kieran Trippier"] },
-        "Everton": { logo: "🔵", players: ["Dominic Calvert-Lewin", "Dwight McNeil"] },
-        "Crystal Palace": { logo: "🦅", players: ["Jean-Philippe Mateta", "Eberechi Eze"] },
-        "Nottingham Forest": { logo: "🌳", players: ["Chris Wood", "Morgan Gibbs-White"] },
-        "Brentford": { logo: "🐝", players: ["Bryan Mbeumo", "Yoane Wissa"] },
-        "Brighton": { logo: "🔵", players: ["Danny Welbeck", "Joao Pedro"] },
-        "AFC Bournemouth": { logo: "🍒", players: ["Antoine Semenyo", "Evanilson"] },
-        "Fulham": { logo: "⚪", players: ["Raúl Jiménez", "Alex Iwobi"] },
-        "Coventry City": { logo: "🩵", players: ["Ellis Simms", "Haji Wright"] },
-        "Hull City": { logo: "🐯", players: ["Striker A", "Winger B"] },
-        "Ipswich Town": { logo: "🚜", players: ["Liam Delap", "Omari Hutchinson"] },
-        "Sunderland": { logo: "🔴", players: ["Romaine Mundle", "Patrick Roberts"] },
-        "Leeds United": { logo: "⚪", players: ["Mateo Joseph", "Wilfried Gnonto"] }
+        "Arsenal": { logo: "https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg", players: ["Bukayo Saka", "Martin Ødegaard", "Kai Havertz", "Declan Rice", "William Saliba", "Gabriel Magalhães"] },
+        "Manchester City": { logo: "https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg", players: ["Erling Haaland", "Kevin De Bruyne", "Phil Foden", "Bernardo Silva", "Rodri", "Josko Gvardiol"] },
+        "Liverpool": { logo: "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg", players: ["Mohamed Salah", "Luis Díaz", "Darwin Núñez", "Diogo Jota", "Alexis Mac Allister", "Virgil van Dijk", "Trent Alexander-Arnold"] },
+        "Chelsea": { logo: "https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg", players: ["Cole Palmer", "Nicolas Jackson", "Christopher Nkunku", "Noni Madueke", "Enzo Fernández"] },
+        "Manchester United": { logo: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg", players: ["Bruno Fernandes", "Marcus Rashford", "Alejandro Garnacho", "Rasmus Højlund"] },
+        "Tottenham Hotspur": { logo: "https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg", players: ["Heung-min Son", "Dominic Solanke", "Dejan Kulusevski", "James Maddison"] },
+        "Aston Villa": { logo: "https://upload.wikimedia.org/wikipedia/en/9/9f/Aston_Villa_FC_crest.svg", players: ["Ollie Watkins", "Leon Bailey", "John McGinn", "Jhon Durán"] },
+        "Newcastle United": { logo: "https://upload.wikimedia.org/wikipedia/en/5/56/Newcastle_United_Badge.svg", players: ["Alexander Isak", "Anthony Gordon", "Bruno Guimarães", "Kieran Trippier"] },
+        "Everton": { logo: "https://upload.wikimedia.org/wikipedia/en/7/7c/Everton_FC_crest.svg", players: ["Dominic Calvert-Lewin", "Dwight McNeil"] },
+        "Crystal Palace": { logo: "https://upload.wikimedia.org/wikipedia/en/a/a7/Crystal_Palace_FC_crest.svg", players: ["Jean-Philippe Mateta", "Eberechi Eze"] },
+        "Nottingham Forest": { logo: "https://upload.wikimedia.org/wikipedia/en/e/e5/Nottingham_Forest_F.C._logo.svg", players: ["Chris Wood", "Morgan Gibbs-White"] },
+        "Brentford": { logo: "https://upload.wikimedia.org/wikipedia/en/2/2a/Brentford_FC_crest.svg", players: ["Bryan Mbeumo", "Yoane Wissa"] },
+        "Brighton": { logo: "https://upload.wikimedia.org/wikipedia/en/f/fd/Brighton_%26_Hove_Albion_FC_crest.svg", players: ["Danny Welbeck", "Joao Pedro"] },
+        "AFC Bournemouth": { logo: "https://upload.wikimedia.org/wikipedia/en/e/e5/AFC_Bournemouth_%282013%29.svg", players: ["Antoine Semenyo", "Evanilson"] },
+        "Fulham": { logo: "https://upload.wikimedia.org/wikipedia/en/c/c2/Fulham_FC_shield.svg", players: ["Raúl Jiménez", "Alex Iwobi"] },
+        "Coventry City": { logo: "https://upload.wikimedia.org/wikipedia/en/9/94/Coventry_City_FC_logo.svg", players: ["Ellis Simms", "Haji Wright"] },
+        "Hull City": { logo: "https://upload.wikimedia.org/wikipedia/en/5/54/Hull_City_A.F.C._logo.svg", players: ["Striker A", "Winger B"] },
+        "Ipswich Town": { logo: "https://upload.wikimedia.org/wikipedia/en/4/43/Ipswich_Town_FC_crest.svg", players: ["Liam Delap", "Omari Hutchinson"] },
+        "Sunderland": { logo: "https://upload.wikimedia.org/wikipedia/en/7/77/Sunderland_AFC_crest.svg", players: ["Romaine Mundle", "Patrick Roberts"] },
+        "Leeds United": { logo: "https://upload.wikimedia.org/wikipedia/en/5/54/Leeds_United_F.C._logo.svg", players: ["Mateo Joseph", "Wilfried Gnonto"] }
     };
 
     // Oficjalny Terminarz[cite: 2]
@@ -225,7 +224,6 @@
         document.getElementById('loading-screen').classList.add('hidden');
         const savedNick = localStorage.getItem('typerNick');
         
-        // Zawsze ładuj ranking przy starcie aplikacji
         loadLeaderboard();
         
         if (savedNick) { 
@@ -312,8 +310,10 @@
             
             const savedHome = localDraftScores[`home-${match.id}`] || "";
             const savedAway = localDraftScores[`away-${match.id}`] || "";
-            const f1 = teamMeta[match.t1]?.logo || "⚽";
-            const f2 = teamMeta[match.t2]?.logo || "⚽";
+            
+            // Integracja herbów obrazkowych ze stylem
+            const f1 = `<img src="${teamMeta[match.t1]?.logo || ''}" style="width:20px; height:20px; object-fit:contain; vertical-align:middle;">`;
+            const f2 = `<img src="${teamMeta[match.t2]?.logo || ''}" style="width:20px; height:20px; object-fit:contain; vertical-align:middle;">`;
 
             let statusMessage = `⏰ Start kolejki: ${roundMatches[0].lock.replace('T', ' ').substring(0,16)}`;
             if (isRoundLocked) {
@@ -326,14 +326,30 @@
                     <span class="match-date">${statusMessage}</span>
                 </div>
                 <div class="score-inputs">
-                    <input type="number" class="home-team" min="0" placeholder="-" value="${savedHome}" ${isRoundLocked ? 'disabled' : ''} oninput="validateMatchesCompletion()">
+                    <input type="number" class="home-team score-field" min="0" placeholder="-" value="${savedHome}" ${isRoundLocked ? 'disabled' : ''} oninput="handleAutoAdvance(this)">
                     <span>:</span>
-                    <input type="number" class="away-team" min="0" placeholder="-" value="${savedAway}" ${isRoundLocked ? 'disabled' : ''} oninput="validateMatchesCompletion()">
+                    <input type="number" class="away-team score-field" min="0" placeholder="-" value="${savedAway}" ${isRoundLocked ? 'disabled' : ''} oninput="handleAutoAdvance(this)">
                 </div>
             `;
             container.appendChild(div);
         });
         validateMatchesCompletion();
+    }
+
+    // Funkcja inteligentnego autofocusu (przeskakiwania kursora)
+    function handleAutoAdvance(currentInput) {
+        validateMatchesCompletion();
+
+        if (currentInput.value === "") return;
+
+        const allInputs = Array.from(document.querySelectorAll('.score-field:not([disabled])'));
+        const currentIndex = allInputs.indexOf(currentInput);
+
+        if (currentIndex !== -1 && currentIndex < allInputs.length - 1) {
+            const nextInput = allInputs[currentIndex + 1];
+            nextInput.focus();
+            nextInput.select();
+        }
     }
 
     function validateMatchesCompletion() {
@@ -381,7 +397,7 @@
         Object.keys(teamMeta).forEach(teamName => {
             const btn = document.createElement('div');
             btn.className = "team-btn";
-            btn.innerHTML = `<div class="team-logo-placeholder">${teamMeta[teamName].logo}</div><div>${teamName}</div>`;
+            btn.innerHTML = `<img src="${teamMeta[teamName].logo}" style="width:32px; height:32px; object-fit:contain; margin-bottom:4px;"><div>${teamName}</div>`;
             btn.onclick = () => showPlayersForTeam(teamName);
             grid.appendChild(btn);
         });
@@ -426,7 +442,7 @@
         selectedScorers.forEach((data, idx) => {
             const slotSpan = document.querySelector(`#slot-${idx} span`);
             if(data) {
-                slotSpan.innerHTML = `${teamMeta[data.team].logo} <b>${data.player}</b> (${data.team})`;
+                slotSpan.innerHTML = `<img src="${teamMeta[data.team].logo}" style="width:18px; height:18px; object-fit:contain; vertical-align:middle; margin-right:5px;"> <b>${data.player}</b> (${data.team})`;
             } else {
                 slotSpan.innerText = "Wybierz zawodnika...";
             }
@@ -473,11 +489,9 @@
         }
     }
 
-    // POBIERANIE DANYCH DO TABELI GLOBALNEJ Z ARKUSZA GOOGLE (SHEET2)
     async function loadLeaderboard() {
         const tbody = document.getElementById('leaderboard-body');
         try {
-            // Pobieranie danych w formacie JSON z Google Apps Script GET
             const response = await fetch(`${API_URL}?action=getLeaderboard`);
             if (!response.ok) throw new Error("Błąd sieci");
             
