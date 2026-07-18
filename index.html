@@ -214,28 +214,28 @@
         document.getElementById('theme-btn').innerText = isDark ? "☀️ Jasny" : "🌙 Ciemny";
     }
 
-    // Nowe, stabilne linki PNG prosto z bazy football-logos.cc dla Premier League
+    // W pełni zaktualizowane, poprawne linki z domeny football-logos.cc
     const teamMeta = {
-        "Arsenal": { logo: "https://football-logos.cc/logos/england/english-premier-league/arsenal_fc_logo.png", players: ["Bukayo Saka", "Martin Ødegaard", "Kai Havertz", "Declan Rice", "William Saliba", "Gabriel Magalhães"] },
-        "Manchester City": { logo: "https://football-logos.cc/logos/england/english-premier-league/manchester_city_fc_logo.png", players: ["Erling Haaland", "Kevin De Bruyne", "Phil Foden", "Bernardo Silva", "Rodri", "Josko Gvardiol"] },
-        "Liverpool": { logo: "https://football-logos.cc/logos/england/english-premier-league/liverpool_fc_logo.png", players: ["Mohamed Salah", "Luis Díaz", "Darwin Núñez", "Diogo Jota", "Alexis Mac Allister", "Virgil van Dijk", "Trent Alexander-Arnold"] },
-        "Chelsea": { logo: "https://football-logos.cc/logos/england/english-premier-league/chelsea_fc_logo.png", players: ["Cole Palmer", "Nicolas Jackson", "Christopher Nkunku", "Noni Madueke", "Enzo Fernández"] },
-        "Manchester United": { logo: "https://football-logos.cc/logos/england/english-premier-league/manchester_united_fc_logo.png", players: ["Bruno Fernandes", "Marcus Rashford", "Alejandro Garnacho", "Rasmus Højlund"] },
-        "Tottenham Hotspur": { logo: "https://football-logos.cc/logos/england/english-premier-league/tottenham_hotspur_fc_logo.png", players: ["Heung-min Son", "Dominic Solanke", "Dejan Kulusevski", "James Maddison"] },
-        "Aston Villa": { logo: "https://football-logos.cc/logos/england/english-premier-league/aston_villa_fc_logo.png", players: ["Ollie Watkins", "Leon Bailey", "John McGinn", "Jhon Durán"] },
-        "Newcastle United": { logo: "https://football-logos.cc/logos/england/english-premier-league/newcastle_united_fc_logo.png", players: ["Alexander Isak", "Anthony Gordon", "Bruno Guimarães", "Kieran Trippier"] },
-        "Everton": { logo: "https://football-logos.cc/logos/england/english-premier-league/everton_fc_logo.png", players: ["Dominic Calvert-Lewin", "Dwight McNeil"] },
-        "Crystal Palace": { logo: "https://football-logos.cc/logos/england/english-premier-league/crystal_palace_fc_logo.png", players: ["Jean-Philippe Mateta", "Eberechi Eze"] },
-        "Nottingham Forest": { logo: "https://football-logos.cc/logos/england/english-premier-league/nottingham_forest_fc_logo.png", players: ["Chris Wood", "Morgan Gibbs-White"] },
-        "Brentford": { logo: "https://football-logos.cc/logos/england/english-premier-league/brentford_fc_logo.png", players: ["Bryan Mbeumo", "Yoane Wissa"] },
-        "Brighton": { logo: "https://football-logos.cc/logos/england/english-premier-league/brighton_hove_albion_fc_logo.png", players: ["Danny Welbeck", "Joao Pedro"] },
-        "AFC Bournemouth": { logo: "https://football-logos.cc/logos/england/english-premier-league/afc_bournemouth_logo.png", players: ["Antoine Semenyo", "Evanilson"] },
-        "Fulham": { logo: "https://football-logos.cc/logos/england/english-premier-league/fulham_fc_logo.png", players: ["Raúl Jiménez", "Alex Iwobi"] },
-        "Coventry City": { logo: "https://football-logos.cc/logos/england/english-premier-league/coventry_city_fc_logo.png", players: ["Ellis Simms", "Haji Wright"] },
-        "Hull City": { logo: "https://football-logos.cc/logos/england/english-premier-league/hull_city_afc_logo.png", players: ["Striker A", "Winger B"] },
-        "Ipswich Town": { logo: "https://football-logos.cc/logos/england/english-premier-league/ipswich_town_fc_logo.png", players: ["Liam Delap", "Omari Hutchinson"] },
-        "Sunderland": { logo: "https://football-logos.cc/logos/england/english-premier-league/sunderland_afc_logo.png", players: ["Romaine Mundle", "Patrick Roberts"] },
-        "Leeds United": { logo: "https://football-logos.cc/logos/england/english-premier-league/leeds_united_fc_logo.png", players: ["Mateo Joseph", "Wilfried Gnonto"] }
+        "Arsenal": { logo: "https://football-logos.cc/logos/england/arsenal/logo.png", players: ["Bukayo Saka", "Martin Ødegaard", "Kai Havertz", "Declan Rice", "William Saliba", "Gabriel Magalhães"] },
+        "Manchester City": { logo: "https://football-logos.cc/logos/england/manchester-city/logo.png", players: ["Erling Haaland", "Kevin De Bruyne", "Phil Foden", "Bernardo Silva", "Rodri", "Josko Gvardiol"] },
+        "Liverpool": { logo: "https://football-logos.cc/logos/england/liverpool/logo.png", players: ["Mohamed Salah", "Luis Díaz", "Darwin Núñez", "Diogo Jota", "Alexis Mac Allister", "Virgil van Dijk", "Trent Alexander-Arnold"] },
+        "Chelsea": { logo: "https://football-logos.cc/logos/england/chelsea/logo.png", players: ["Cole Palmer", "Nicolas Jackson", "Christopher Nkunku", "Noni Madueke", "Enzo Fernández"] },
+        "Manchester United": { logo: "https://football-logos.cc/logos/england/manchester-united/logo.png", players: ["Bruno Fernandes", "Marcus Rashford", "Alejandro Garnacho", "Rasmus Højlund"] },
+        "Tottenham Hotspur": { logo: "https://football-logos.cc/logos/england/tottenham-hotspur/logo.png", players: ["Heung-min Son", "Dominic Solanke", "Dejan Kulusevski", "James Maddison"] },
+        "Aston Villa": { logo: "https://football-logos.cc/logos/england/aston-villa/logo.png", players: ["Ollie Watkins", "Leon Bailey", "John McGinn", "Jhon Durán"] },
+        "Newcastle United": { logo: "https://football-logos.cc/logos/england/newcastle-united/logo.png", players: ["Alexander Isak", "Anthony Gordon", "Bruno Guimarães", "Kieran Trippier"] },
+        "Everton": { logo: "https://football-logos.cc/logos/england/everton/logo.png", players: ["Dominic Calvert-Lewin", "Dwight McNeil"] },
+        "Crystal Palace": { logo: "https://football-logos.cc/logos/england/crystal-palace/logo.png", players: ["Jean-Philippe Mateta", "Eberechi Eze"] },
+        "Nottingham Forest": { logo: "https://football-logos.cc/logos/england/nottingham-forest/logo.png", players: ["Chris Wood", "Morgan Gibbs-White"] },
+        "Brentford": { logo: "https://football-logos.cc/logos/england/brentford/logo.png", players: ["Bryan Mbeumo", "Yoane Wissa"] },
+        "Brighton": { logo: "https://football-logos.cc/logos/england/brighton-and-hove-albion/logo.png", players: ["Danny Welbeck", "Joao Pedro"] },
+        "AFC Bournemouth": { logo: "https://football-logos.cc/logos/england/bournemouth/logo.png", players: ["Antoine Semenyo", "Evanilson"] },
+        "Fulham": { logo: "https://football-logos.cc/logos/england/fulham/logo.png", players: ["Raúl Jiménez", "Alex Iwobi"] },
+        "Coventry City": { logo: "https://football-logos.cc/logos/england/coventry-city/logo.png", players: ["Ellis Simms", "Haji Wright"] },
+        "Hull City": { logo: "https://football-logos.cc/logos/england/hull-city/logo.png", players: ["Striker A", "Winger B"] },
+        "Ipswich Town": { logo: "https://football-logos.cc/logos/england/ipswich-town/logo.png", players: ["Liam Delap", "Omari Hutchinson"] },
+        "Sunderland": { logo: "https://football-logos.cc/logos/england/sunderland/logo.png", players: ["Romaine Mundle", "Patrick Roberts"] },
+        "Leeds United": { logo: "https://football-logos.cc/logos/england/leeds-united/logo.png", players: ["Mateo Joseph", "Wilfried Gnonto"] }
     };
 
     const allMatches = [
