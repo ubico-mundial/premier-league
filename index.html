@@ -50,8 +50,11 @@
         .card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; box-sizing: border-box; border: 1px solid var(--border); }
         
         input, button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
+        input[type="number"] { -moz-appearance: textfield; }
+        input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input[type="text"] { background: var(--card); color: var(--text); font-size: 16px; text-align: center; border: 2px solid var(--accent); }
         button { background: #38003c; color: var(--accent); font-weight: bold; cursor: pointer; font-size: 16px; border: 1px solid var(--accent); }
+        .btn-change-nick { width: auto; padding: 4px 8px; font-size: 12px; display: inline-block; margin-left: 10px; background: transparent; color: var(--danger); border: 1px solid var(--danger); }
         .hidden { display: none !important; }
         
         .match-row { display: flex; align-items: center; justify-content: space-between; margin: 12px 0; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
@@ -95,7 +98,9 @@
 
     <div id="app-screen" class="hidden">
         <div class="card">
-            <h3>Gracz: <span id="user-display" style="color:var(--accent)"></span></h3>
+            <h3>Gracz: <span id="user-display" style="color:var(--accent)"></span>
+                <button class="btn-change-nick" onclick="logoutUser()">Zmień Nick</button>
+            </h3>
             <div class="progress-bar" id="steps-bar"></div>
             <div id="group-title" class="group-header-active"></div>
             
@@ -105,7 +110,7 @@
 
         <div class="card">
             <h3>📊 PODGLĄD TYPÓW GRACZY</h3>
-            <p style="font-size: 12px; text-align: center; color: #888;">Typy innych pojawią się dopiero po Twoim obstawieniu ORAZ po rozpoczęciu danego meczu.</p>
+            <p style="font-size: 12px; text-align: center; color: #888;">Typy innych pojawią się dopiero po Twoim obstawieniu ORAZ po rozpoczęciu meczu.</p>
             <div class="legend">
                 <span><span class="legend-box" style="background:var(--exact-match)"></span> Dokładny wynik</span>
                 <span><span class="legend-box" style="background:var(--winner-match)"></span> Trafiony zwycięzca</span>
@@ -159,11 +164,28 @@
         { id: "M1_10", round: "Kolejka 1", t1: "Fulham", t2: "Chelsea", lock: "2026-08-21T21:00:00", realScore: "" }
     ];
 
+    // 1. ZAPAMIĘTYWANIE MOTYWU
+    function applySavedTheme() {
+        const theme = localStorage.getItem('typerTheme') || 'light';
+        const btn = document.getElementById('theme-btn');
+        if (theme === 'dark') {
+            document.body.classList.add('dark-mode');
+            btn.innerText = "☀️ Jasny";
+        } else {
+            document.body.classList.remove('dark-mode');
+            btn.innerText = "🌙 Ciemny";
+        }
+    }
+
     function toggleTheme() {
         document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('typerTheme', isDark ? 'dark' : 'light');
+        document.getElementById('theme-btn').innerText = isDark ? "☀️ Jasny" : "🌙 Ciemny";
     }
 
     function windowInit() {
+        applySavedTheme();
         loadLeaderboard();
         const savedNick = localStorage.getItem('typerNick');
         if (savedNick) showApp(savedNick);
@@ -175,6 +197,14 @@
         if (nick.length < 3) return alert('Nick musi mieć min. 3 znaki!');
         localStorage.setItem('typerNick', nick);
         showApp(nick);
+    }
+
+    // 2. ZMIANA NICKU (WYLOGOWANIE)
+    function logoutUser() {
+        if (confirm("Czy na pewno chcesz zmienić nick / wylogować się?")) {
+            localStorage.removeItem('typerNick');
+            location.reload();
+        }
     }
 
     async function showApp(nick) {
@@ -231,13 +261,25 @@
                     <span class="match-date">${isMatchLocked ? '🔒 Zablokowane' : '⏰ ' + match.lock.replace('T', ' ').substring(0,16)}</span>
                 </div>
                 <div class="score-inputs">
-                    <input type="number" class="home-team" data-id="${match.id}" value="${savedHome}" ${isMatchLocked ? 'disabled' : ''}>
+                    <input type="number" class="home-team" data-id="${match.id}" value="${savedHome}" ${isMatchLocked ? 'disabled' : ''} oninput="autoTab(this)">
                     <span>:</span>
-                    <input type="number" class="away-team" data-id="${match.id}" value="${savedAway}" ${isMatchLocked ? 'disabled' : ''}>
+                    <input type="number" class="away-team" data-id="${match.id}" value="${savedAway}" ${isMatchLocked ? 'disabled' : ''} oninput="autoTab(this)">
                 </div>
             `;
             container.appendChild(div);
         });
+    }
+
+    // 3. AUTOMATYCZNE PRZESKAKIWANIE DO NASTĘPNEGO POLA
+    function autoTab(input) {
+        if (input.value.length >= 1) {
+            const inputs = Array.from(document.querySelectorAll('.score-inputs input:not([disabled])'));
+            const currentIndex = inputs.indexOf(input);
+            if (currentIndex >= 0 && currentIndex < inputs.length - 1) {
+                inputs[currentIndex + 1].focus();
+                inputs[currentIndex + 1].select();
+            }
+        }
     }
 
     async function fetchUserPredictions() {
@@ -323,12 +365,10 @@
                     let matchClass = "";
                     let displayPred = rawPred;
 
-                    // Zasada ukrywania: Pokaż typ tylko jeśli to TY LUB jeśli mecz się już rozpoczął
                     if (!isCurrentPlayer && !isMatchStarted) {
                         displayPred = "🔒";
                     }
 
-                    // Porównywanie i kolorowanie (tylko po rozpoczęciu i gdy znamy wynik)
                     if (isMatchStarted && m.realScore && rawPred !== "-") {
                         const [rh, ra] = m.realScore.split(':').map(Number);
                         const [ph, pa] = rawPred.split(':').map(Number);
