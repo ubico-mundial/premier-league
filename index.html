@@ -17,8 +17,11 @@
             --border: #e0e0e0;
             --input-bg: #edf2f7;
             --input-text: #333333;
-            --slot-bg: #edf2f7;
-            --slot-active: #e6fff4;
+            
+            --exact-match: #28a745; 
+            --exact-text: #ffffff;
+            --winner-match: #ffc107; 
+            --winner-text: #000000;
         }
 
         body.dark-mode {
@@ -28,69 +31,51 @@
             --border: #4a2850;
             --input-bg: #2d1830;
             --input-text: #ffffff;
-            --slot-bg: #2d1830;
-            --slot-active: #153a28;
+            --exact-match: #1e7e34;
+            --winner-match: #d39e00;
         }
 
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; transition: background 0.3s, color 0.3s; }
-        .container { max-width: 600px; width: 100%; box-sizing: border-box; position: relative; }
+        .container { max-width: 900px; width: 100%; box-sizing: border-box; position: relative; }
         
-        .theme-toggle { position: absolute; top: 15px; right: 15px; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); color: var(--accent); padding: 8px 12px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: bold; width: auto; margin: 0; transition: 0.2s; }
-        .theme-toggle:hover { background: rgba(255, 255, 255, 0.3); }
+        .theme-toggle { position: absolute; top: 15px; right: 15px; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); color: var(--accent); padding: 8px 12px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: bold; width: auto; margin: 0; }
 
         h1, h2, h3 { text-align: center; color: var(--primary); margin-bottom: 5px; }
         body.dark-mode h1, body.dark-mode h2, body.dark-mode h3 { color: var(--accent); }
         
-        .header-banner { background: #38003c; color: var(--text-light); padding: 25px 20px 20px 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid var(--border); }
+        .header-banner { background: #38003c; color: var(--text-light); padding: 25px 20px 20px 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .header-banner h1 { color: var(--accent); margin: 0; font-size: 26px; }
         
         .group-header-active { background: #38003c; color: var(--accent); font-weight: bold; padding: 12px; border-radius: 6px; margin: 15px 0; text-align: center; font-size: 18px; border: 2px solid var(--accent); }
-        .card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; box-sizing: border-box; border: 1px solid var(--border); transition: background 0.3s, border-color 0.3s; }
+        .card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; box-sizing: border-box; border: 1px solid var(--border); }
         
         input, button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
         input[type="text"] { background: var(--card); color: var(--text); font-size: 16px; text-align: center; border: 2px solid var(--accent); }
-        button { background: #38003c; color: var(--accent); font-weight: bold; cursor: pointer; font-size: 16px; border: 1px solid var(--accent); transition: 0.2s; }
-        button:disabled { background: #a0aec0; color: #fff; cursor: not-allowed; box-shadow: none !important; border: none; }
-        button:hover:not(:disabled) { filter: brightness(1.2); }
+        button { background: #38003c; color: var(--accent); font-weight: bold; cursor: pointer; font-size: 16px; border: 1px solid var(--accent); }
         .hidden { display: none !important; }
         
-        #loading-screen { text-align: center; padding: 40px 20px; }
-        .spinner { border: 4px solid rgba(0,0,0,0.1); width: 42px; height: 42px; border-radius: 50%; border-left-color: var(--accent); animation: spin 1s linear infinite; margin: 20px auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
         .match-row { display: flex; align-items: center; justify-content: space-between; margin: 12px 0; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
         .match-info { display: flex; flex-direction: column; width: 65%; }
         .match-teams { font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px; color: var(--text); flex-wrap: wrap; }
         .match-date { font-size: 11px; color: #888888; margin-top: 3px; }
-        .locked-text { color: var(--danger); font-weight: bold; }
         
         .score-inputs { display: flex; gap: 8px; align-items: center; }
-        .score-inputs input { width: 42px; text-align: center; margin: 0; padding: 6px; background: var(--input-bg); color: var(--input-text); border: 1px solid var(--border); border-radius: 4px; font-size: 16px; font-weight: bold; transition: background 0.3s; }
-        .score-inputs input:disabled { background: #a0aec0; color: #333; cursor: not-allowed; opacity: 0.5; }
+        .score-inputs input { width: 42px; text-align: center; margin: 0; padding: 6px; background: var(--input-bg); color: var(--input-text); border: 1px solid var(--border); border-radius: 4px; font-size: 16px; font-weight: bold; }
         
-        .progress-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; background: #38003c; padding: 8px; border-radius: 6px; margin-bottom: 15px; box-sizing: border-box; border: 1px solid var(--border); }
-        .progress-step { color: #fff; background: rgba(255,255,255,0.1); cursor: pointer; padding: 10px 0; border-radius: 4px; transition: background 0.2s; text-align: center; font-size: 13px; font-weight: bold; }
-        .progress-step:hover:not(.step-locked) { background: rgba(255,255,255,0.2); }
+        .progress-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; background: #38003c; padding: 8px; border-radius: 6px; margin-bottom: 15px; }
+        .progress-step { color: #fff; background: rgba(255,255,255,0.1); cursor: pointer; padding: 10px 0; border-radius: 4px; text-align: center; font-size: 13px; font-weight: bold; }
         .progress-step.active { color: #38003c; background: var(--accent); }
 
-        .scroers-intro { text-align: center; margin-bottom: 15px; font-size: 14px; }
-        .slots-container { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
-        .scorer-slot { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: var(--slot-bg); border-radius: 6px; font-weight: bold; font-size: 14px; border: 1px dashed var(--accent); cursor: pointer; transition: background 0.3s; }
-        .scorer-slot span { color: var(--text); display: flex; align-items: center; }
-        .teams-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
-        .team-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--card); border: 1px solid var(--border); padding: 10px; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: bold; text-align: center; color: var(--text); }
-        .team-btn:hover { border-color: var(--accent); background: rgba(0, 255, 137, 0.05); }
-        
-        .players-list-container { margin-top: 15px; background: var(--slot-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border); }
-        .players-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-        .player-btn { background: var(--card); border: 1px solid var(--border); padding: 8px; text-align: left; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text); width: 100%; margin: 0; }
-        .player-btn:hover { background: var(--accent); color: #38003c; font-weight: bold; }
-
         .table-container { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 12px 8px; text-align: center; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text); }
-        th { color: var(--accent); background: #38003c; font-weight: 600; border-bottom: 2px solid var(--accent); }
-        .rank-badge { font-weight: bold; display: inline-block; width: 24px; height: 24px; line-height: 24px; border-radius: 50%; background: #38003c; color: var(--accent); text-align: center; font-size: 12px; border: 1px solid var(--accent); }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; white-space: nowrap; }
+        th, td { padding: 10px 6px; text-align: center; border: 1px solid var(--border); font-size: 12px; color: var(--text); }
+        th { color: var(--accent); background: #38003c; font-weight: 600; }
+        
+        .tag-exact { background-color: var(--exact-match) !important; color: var(--exact-text) !important; font-weight: bold; }
+        .tag-winner { background-color: var(--winner-match) !important; color: var(--winner-text) !important; font-weight: bold; }
+        
+        .legend { display: flex; gap: 15px; justify-content: center; font-size: 12px; margin-bottom: 10px; }
+        .legend-box { width: 15px; height: 15px; display: inline-block; vertical-align: middle; border-radius: 3px; }
     </style>
 </head>
 <body>
@@ -100,74 +85,52 @@
 
     <div class="header-banner">
         <h1>🏆 TYPER PREMIER LEAGUE ⚽</h1>
-        <p style="margin: 5px 0 0 0; font-weight: 500;">— Karta (Sheet2)</p>
     </div>
 
-    <div id="loading-screen" class="card">
-        <h2>Wczytywanie systemu...</h2>
-        <div class="spinner"></div>
-    </div>
-
-    <div id="login-screen" class="card hidden">
+    <div id="login-screen" class="card">
         <h2>Wpisz swój Nick, aby wejść do gry:</h2>
-        <input type="text" id="nick-input" placeholder="np. MikroPytek...">
-        <button id="login-btn" onclick="loginUser()">Dołącz do Gry</button>
+        <input type="text" id="nick-input" placeholder="np. MójNick...">
+        <button onclick="loginUser()">Dołącz do Gry</button>
     </div>
 
     <div id="app-screen" class="hidden">
-        <div class="card" id="prediction-card">
+        <div class="card">
             <h3>Gracz: <span id="user-display" style="color:var(--accent)"></span></h3>
             <div class="progress-bar" id="steps-bar"></div>
             <div id="group-title" class="group-header-active"></div>
             
-            <div id="step-matches-view">
-                <div id="matches-list">Pobieranie meczów i Twoich typów...</div>
-                <div id="submit-container">
-                    <button id="quick-save-btn" onclick="submitEntireRound()" style="background:#028a5a; color:white; margin-bottom:8px;">💾 Zapisz wpisane mecze nowymi wartościami</button>
-                    <button id="next-stage-btn" onclick="goToScorersStage()">Przejdź do wyboru strzelców (opcjonalnie) ➔</button>
-                </div>
+            <div id="matches-list">Pobieranie meczów...</div>
+            <button id="quick-save-btn" onclick="submitEntireRound()" style="background:#028a5a; color:white; margin-top:15px;">💾 Zapisz swoje typy</button>
+        </div>
+
+        <div class="card">
+            <h3>📊 PODGLĄD TYPÓW GRACZY</h3>
+            <p style="font-size: 12px; text-align: center; color: #888;">Typy innych pojawią się dopiero po Twoim obstawieniu ORAZ po rozpoczęciu danego meczu.</p>
+            <div class="legend">
+                <span><span class="legend-box" style="background:var(--exact-match)"></span> Dokładny wynik</span>
+                <span><span class="legend-box" style="background:var(--winner-match)"></span> Trafiony zwycięzca</span>
             </div>
-
-            <div id="step-scorers-view" class="hidden">
-                <h4 style="margin: 0 0 10px 0; color: var(--accent);">🎯 Krok 2: Wybierz 5 strzelców na tę kolejkę</h4>
-                <p class="scroers-intro">Wybierz kolejno wolne sloty, a następnie kliknij w herb drużyny, by rozwinąć listę zawodników.</p>
-                
-                <div class="slots-container" id="slots-summary">
-                    <div class="scorer-slot" id="slot-0" onclick="activeSlot(0)">Slot 1: <span>Wybierz zawodnika...</span></div>
-                    <div class="scorer-slot" id="slot-1" onclick="activeSlot(1)">Slot 2: <span>Wybierz zawodnika...</span></div>
-                    <div class="scorer-slot" id="slot-2" onclick="activeSlot(2)">Slot 3: <span>Wybierz zawodnika...</span></div>
-                    <div class="scorer-slot" id="slot-3" onclick="activeSlot(3)">Slot 4: <span>Wybierz zawodnika...</span></div>
-                    <div class="scorer-slot" id="slot-4" onclick="activeSlot(4)">Slot 5: <span>Wybierz zawodnika...</span></div>
-                </div>
-
-                <div id="teams-selector-zone">
-                    <h5 style="margin:0; text-align:center;">Kliknij w herb drużyny:</h5>
-                    <div class="teams-grid" id="teams-logos-grid"></div>
-                </div>
-
-                <div id="players-list-zone" class="players-list-container hidden">
-                    <h5 style="margin:0;" id="selected-team-title">Zawodnicy drużyny:</h5>
-                    <div class="players-grid" id="players-buttons-grid"></div>
-                </div>
-
-                <button id="final-submit-btn" onclick="submitEntireRound()" style="margin-top:20px; background:#028a5a; color:white; border:none;">💾 Zapisz komplet (Mecze + Strzelcy)</button>
-                <button onclick="backToMatches()" style="background:#718096; color:white; font-size:12px; padding:6px; margin-top:10px; border:none;">⬅ Powrót do edycji meczów</button>
+            <div class="table-container">
+                <table id="all-predictions-table">
+                    <thead><tr id="all-preds-header"><th>Gracz</th></tr></thead>
+                    <tbody id="all-preds-body"><tr><td>Ładowanie typów...</td></tr></tbody>
+                </table>
             </div>
         </div>
 
         <div class="card">
-            <h2>🏆 Klasyfikacja Generalna (Premier League)</h2>
+            <h2>🏆 Klasyfikacja Generalna (sheet2)</h2>
             <div class="table-container">
                 <table>
                     <thead>
                         <tr>
-                            <th style="width: 60px;">Poz.</th>
+                            <th style="width: 50px;">Poz.</th>
                             <th style="text-align: left; padding-left: 15px;">Gracz</th>
-                            <th style="width: 100px;">Punkty</th>
+                            <th style="width: 80px;">Punkty</th>
                         </tr>
                     </thead>
                     <tbody id="leaderboard-body">
-                        <tr><td colspan="3">Pobieranie aktualnych wyników z bazy danych...</td></tr>
+                        <tr><td colspan="3">Pobieranie wyników...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -181,135 +144,47 @@
     const roundsOrder = ["Kolejka 1", "Kolejka 2", "Kolejka 3", "Kolejka 4", "Kolejka 5"];
     let currentRoundIndex = 0; 
     let localDraftScores = {}; 
-    let selectedScorers = [null, null, null, null, null]; 
-    let currentActiveSlotIndex = 0;
-
-    function initTheme() {
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        if (savedTheme === 'dark') {
-            document.body.classList.add('dark-mode');
-            document.getElementById('theme-btn').innerText = "☀️ Jasny";
-        }
-    }
-
-    function toggleTheme() {
-        const isDark = document.body.classList.toggle('dark-mode');
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        document.getElementById('theme-btn').innerText = isDark ? "☀️ Jasny" : "🌙 Ciemny";
-    }
-
-    const teamMeta = {
-        "Arsenal": { logo: "logos/england_arsenal_64x64.football-logos.cc.png", players: ["Bukayo Saka", "Martin Ødegaard", "Kai Havertz", "Declan Rice", "William Saliba"] },
-        "Manchester City": { logo: "logos/england_manchester-city_64x64.football-logos.cc.png", players: ["Erling Haaland", "Kevin De Bruyne", "Phil Foden", "Bernardo Silva"] },
-        "Liverpool": { logo: "logos/england_liverpool_64x64.football-logos.cc.png", players: ["Mohamed Salah", "Luis Díaz", "Darwin Núñez", "Diogo Jota"] },
-        "Chelsea": { logo: "logos/england_chelsea_64x64.football-logos.cc.png", players: ["Cole Palmer", "Nicolas Jackson", "Christopher Nkunku"] },
-        "Manchester United": { logo: "logos/england_manchester-united_64x64.football-logos.cc.png", players: ["Bruno Fernandes", "Marcus Rashford", "Alejandro Garnacho"] },
-        "Tottenham Hotspur": { logo: "logos/england_tottenham_64x64.football-logos.cc.png", players: ["Heung-min Son", "Dominic Solanke", "Dejan Kulusevski"] },
-        "Aston Villa": { logo: "logos/england_aston-villa_64x64.football-logos.cc.png", players: ["Ollie Watkins", "Leon Bailey", "John McGinn"] },
-        "Newcastle United": { logo: "logos/england_newcastle_64x64.football-logos.cc.png", players: ["Alexander Isak", "Anthony Gordon", "Bruno Guimarães"] },
-        "Everton": { logo: "logos/england_everton_64x64.football-logos.cc.png", players: ["Dominic Calvert-Lewin", "Dwight McNeil"] },
-        "Crystal Palace": { logo: "logos/england_crystal-palace_64x64.football-logos.cc.png", players: ["Jean-Philippe Mateta", "Eberechi Eze"] },
-        "Nottingham Forest": { logo: "logos/england_nottingham-forest_64x64.football-logos.cc.png", players: ["Chris Wood", "Morgan Gibbs-White"] },
-        "Brentford": { logo: "logos/england_brentford_64x64.football-logos.cc.png", players: ["Bryan Mbeumo", "Yoane Wissa"] },
-        "Brighton": { logo: "logos/england_brighton_64x64.football-logos.cc.png", players: ["Danny Welbeck", "Joao Pedro"] },
-        "AFC Bournemouth": { logo: "logos/england_bournemouth_64x64.football-logos.cc.png", players: ["Antoine Semenyo", "Evanilson"] },
-        "Fulham": { logo: "logos/england_fulham_64x64.football-logos.cc.png", players: ["Raúl Jiménez", "Alex Iwobi"] },
-        "Coventry City": { logo: "logos/england_coventry-city_64x64.football-logos.cc.png", players: ["Ellis Simms", "Haji Wright"] },
-        "Hull City": { logo: "logos/england_hull-city_64x64.football-logos.cc.png", players: ["Striker A", "Winger B"] },
-        "Ipswich Town": { logo: "logos/england_ipswich_64x64.football-logos.cc.png", players: ["Liam Delap", "Omari Hutchinson"] },
-        "Sunderland": { logo: "logos/england_sunderland_64x64.football-logos.cc.png", players: ["Romaine Mundle", "Patrick Roberts"] },
-        "Leeds United": { logo: "logos/england_leeds-united_64x64.football-logos.cc.png", players: ["Mateo Joseph", "Wilfried Gnonto"] }
-    };
+    let currentUserHasSubmittedRound = false;
 
     const allMatches = [
-        { id: "M1_1", round: "Kolejka 1", t1: "Arsenal", t2: "Coventry City", lock: "2026-08-21T21:00:00" },
-        { id: "M1_2", round: "Kolejka 1", t1: "Hull City", t2: "Manchester United", lock: "2026-08-21T21:00:00" },
-        { id: "M1_3", round: "Kolejka 1", t1: "Everton", t2: "Crystal Palace", lock: "2026-08-21T21:00:00" },
-        { id: "M1_4", round: "Kolejka 1", t1: "Ipswich Town", t2: "Sunderland", lock: "2026-08-21T21:00:00" },
-        { id: "M1_5", round: "Kolejka 1", t1: "Nottingham Forest", t2: "Leeds United", lock: "2026-08-21T21:00:00" },
-        { id: "M1_6", round: "Kolejka 1", t1: "Brentford", t2: "Tottenham Hotspur", lock: "2026-08-21T21:00:00" },
-        { id: "M1_7", round: "Kolejka 1", t1: "Brighton", t2: "Aston Villa", lock: "2026-08-21T21:00:00" },
-        { id: "M1_8", round: "Kolejka 1", t1: "Manchester City", t2: "AFC Bournemouth", lock: "2026-08-21T21:00:00" },
-        { id: "M1_9", round: "Kolejka 1", t1: "Newcastle United", t2: "Liverpool", lock: "2026-08-21T21:00:00" },
-        { id: "M1_10", round: "Kolejka 1", t1: "Fulham", t2: "Chelsea", lock: "2026-08-21T21:00:00" },
-
-        { id: "M2_1", round: "Kolejka 2", t1: "Sunderland", t2: "Arsenal", lock: "2026-08-29T16:00:00" },
-        { id: "M2_2", round: "Kolejka 2", t1: "Nottingham Forest", t2: "Tottenham Hotspur", lock: "2026-08-29T16:00:00" },
-        { id: "M2_3", round: "Kolejka 2", t1: "Newcastle United", t2: "Aston Villa", lock: "2026-08-29T16:00:00" },
-        { id: "M2_4", round: "Kolejka 2", t1: "Manchester United", t2: "AFC Bournemouth", lock: "2026-08-29T16:00:00" },
-        { id: "M2_5", round: "Kolejka 2", t1: "Manchester City", t2: "Brentford", lock: "2026-08-29T16:00:00" },
-        { id: "M2_6", round: "Kolejka 2", t1: "Liverpool", t2: "Brighton", lock: "2026-08-29T16:00:00" },
-        { id: "M2_7", round: "Kolejka 2", t1: "Leeds United", t2: "Chelsea", lock: "2026-08-29T16:00:00" },
-        { id: "M2_8", round: "Kolejka 2", t1: "Ipswich Town", t2: "Coventry City", lock: "2026-08-29T16:00:00" },
-        { id: "M2_9", round: "Kolejka 2", t1: "Hull City", t2: "Crystal Palace", lock: "2026-08-29T16:00:00" },
-        { id: "M2_10", round: "Kolejka 2", t1: "Fulham", t2: "Everton", lock: "2026-08-29T16:00:00" }
+        { id: "M1_1", round: "Kolejka 1", t1: "Arsenal", t2: "Coventry City", lock: "2026-08-21T21:00:00", realScore: "" },
+        { id: "M1_2", round: "Kolejka 1", t1: "Hull City", t2: "Manchester United", lock: "2026-08-21T21:00:00", realScore: "" },
+        { id: "M1_3", round: "Kolejka 1", t1: "Everton", t2: "Crystal Palace", lock: "2026-08-21T21:00:00", realScore: "" },
+        { id: "M1_4", round: "Kolejka 1", t1: "Ipswich Town", t2: "Sunderland", lock: "2026-08-21T21:00:00", realScore: "" },
+        { id: "M1_5", round: "Kolejka 1", t1: "Nottingham Forest", t2: "Leeds United", lock: "2026-08-21T21:00:00", realScore: "" },
+        { id: "M1_6", round: "Kolejka 1", t1: "Brentford", t2: "Tottenham Hotspur", lock: "2026-08-21T21:00:00", realScore: "" },
+        { id: "M1_7", round: "Kolejka 1", t1: "Brighton", t2: "Aston Villa", lock: "2026-08-21T21:00:00", realScore: "" },
+        { id: "M1_8", round: "Kolejka 1", t1: "Manchester City", t2: "AFC Bournemouth", lock: "2026-08-21T21:00:00", realScore: "" },
+        { id: "M1_9", round: "Kolejka 1", t1: "Newcastle United", t2: "Liverpool", lock: "2026-08-21T21:00:00", realScore: "" },
+        { id: "M1_10", round: "Kolejka 1", t1: "Fulham", t2: "Chelsea", lock: "2026-08-21T21:00:00", realScore: "" }
     ];
 
-    function initApp() {
-        initTheme(); 
-        document.getElementById('loading-screen').classList.add('hidden');
-        loadLeaderboard();
-
-        const savedNick = localStorage.getItem('typerNick');
-        if (savedNick) {
-            showApp(savedNick);
-        } else {
-            document.getElementById('login-screen').classList.remove('hidden');
-        }
+    function toggleTheme() {
+        document.body.classList.toggle('dark-mode');
     }
-    window.onload = initApp;
+
+    function windowInit() {
+        loadLeaderboard();
+        const savedNick = localStorage.getItem('typerNick');
+        if (savedNick) showApp(savedNick);
+    }
+    window.onload = windowInit;
 
     function loginUser() {
-        const nickInput = document.getElementById('nick-input');
-        const nick = nickInput.value.trim();
+        const nick = document.getElementById('nick-input').value.trim();
         if (nick.length < 3) return alert('Nick musi mieć min. 3 znaki!');
-        
         localStorage.setItem('typerNick', nick);
-        document.getElementById('login-screen').classList.add('hidden');
         showApp(nick);
     }
 
-    function logoutUser() {
-        localStorage.removeItem('typerNick');
-        document.getElementById('app-screen').classList.add('hidden');
-        document.getElementById('login-screen').classList.remove('hidden');
-        document.getElementById('nick-input').value = "";
-    }
-
     async function showApp(nick) {
+        document.getElementById('login-screen').classList.add('hidden');
         document.getElementById('app-screen').classList.remove('hidden');
-        document.getElementById('user-display').innerHTML = `${nick} <button onclick="logoutUser()" style="display:inline-block; width:auto; padding:2px 8px; font-size:11px; margin-left:10px; background:#ff4a4a; color:white; border:none;">Zmień nick</button>`;
+        document.getElementById('user-display').innerText = nick;
         renderProgressBar();
         await fetchUserPredictions();
         renderActiveRound();
-        buildTeamsGrid();
-        activeSlot(0);
-    }
-
-    async function fetchUserPredictions() {
-        const nick = localStorage.getItem('typerNick');
-        const currentRound = roundsOrder[currentRoundIndex];
-        if (!nick) return;
-
-        try {
-            const response = await fetch(`${API_URL}?action=getUserPredictions&gracz=${encodeURIComponent(nick)}&kolejka=${encodeURIComponent(currentRound)}`);
-            const data = await response.json();
-
-            if (data) {
-                const roundMatches = allMatches.filter(m => m.round === currentRound);
-                roundMatches.forEach(m => {
-                    if (data[m.id]) {
-                        const parts = data[m.id].toString().split(':');
-                        if (parts.length === 2) {
-                            localDraftScores[`home-${m.id}`] = parts[0];
-                            localDraftScores[`away-${m.id}`] = parts[1];
-                        }
-                    }
-                });
-            }
-        } catch (e) {
-            console.log("Brak zapisanych typów lub błąd sieci:", e);
-        }
+        loadAllPredictionsTable();
     }
 
     function renderProgressBar() {
@@ -324,231 +199,176 @@
         });
     }
 
-    async function changeRound(targetIndex) {
-        saveCurrentInputsToDraft();
-        currentRoundIndex = targetIndex;
-        selectedScorers = [null, null, null, null, null];
+    async function changeRound(idx) {
+        currentRoundIndex = idx;
         localDraftScores = {};
+        currentUserHasSubmittedRound = false;
         renderProgressBar();
         await fetchUserPredictions();
         renderActiveRound();
-        backToMatches();
-    }
-
-    function saveCurrentInputsToDraft() {
-        const rows = document.querySelectorAll('.match-row');
-        rows.forEach(row => {
-            const id = row.getAttribute('data-id');
-            const homeInput = row.querySelector('.home-team');
-            const awayInput = row.querySelector('.away-team');
-            if(homeInput && awayInput) {
-                localDraftScores[`home-${id}`] = homeInput.value;
-                localDraftScores[`away-${id}`] = awayInput.value;
-            }
-        });
+        loadAllPredictionsTable();
     }
 
     function renderActiveRound() {
         const currentRound = roundsOrder[currentRoundIndex];
         document.getElementById('group-title').innerText = `⚽ RUNDA TYPOWANIA: ${currentRound.toUpperCase()}`;
-        
         const container = document.getElementById('matches-list');
         container.innerHTML = "";
         
         const roundMatches = allMatches.filter(m => m.round === currentRound);
-        if(roundMatches.length === 0) return;
-
         const now = new Date();
 
         roundMatches.forEach((match) => {
             const div = document.createElement('div');
             div.className = "match-row";
-            div.setAttribute('data-id', match.id);
-            
-            const savedHome = localDraftScores[`home-${match.id}`] !== undefined ? localDraftScores[`home-${match.id}`] : "";
-            const savedAway = localDraftScores[`away-${match.id}`] !== undefined ? localDraftScores[`away-${match.id}`] : "";
-            
-            const f1 = `<img src="${teamMeta[match.t1]?.logo || ''}" style="width:20px; height:20px; object-fit:contain; vertical-align:middle;">`;
-            const f2 = `<img src="${teamMeta[match.t2]?.logo || ''}" style="width:20px; height:20px; object-fit:contain; vertical-align:middle;">`;
-
-            const matchLockTime = new Date(match.lock);
-            const isMatchLocked = (now >= matchLockTime);
-
-            let statusMessage = `⏰ Start: ${match.lock.replace('T', ' ').substring(0,16)}`;
-            if (isMatchLocked) {
-                statusMessage = `<span class="locked-text">🔒 Zablokowane (Mecz rozpoczął się)</span>`;
-            }
+            const savedHome = localDraftScores[`home-${match.id}`] || "";
+            const savedAway = localDraftScores[`away-${match.id}`] || "";
+            const isMatchLocked = (now >= new Date(match.lock));
 
             div.innerHTML = `
                 <div class="match-info">
-                    <span class="match-teams">${f1} ${match.t1} - ${f2} ${match.t2}</span>
-                    <span class="match-date">${statusMessage}</span>
+                    <span class="match-teams">${match.t1} - ${match.t2}</span>
+                    <span class="match-date">${isMatchLocked ? '🔒 Zablokowane' : '⏰ ' + match.lock.replace('T', ' ').substring(0,16)}</span>
                 </div>
                 <div class="score-inputs">
-                    <input type="number" class="home-team score-field" min="0" placeholder="-" value="${savedHome}" ${isMatchLocked ? 'disabled' : ''} oninput="handleAutoAdvance(this)">
+                    <input type="number" class="home-team" data-id="${match.id}" value="${savedHome}" ${isMatchLocked ? 'disabled' : ''}>
                     <span>:</span>
-                    <input type="number" class="away-team score-field" min="0" placeholder="-" value="${savedAway}" ${isMatchLocked ? 'disabled' : ''} oninput="handleAutoAdvance(this)">
+                    <input type="number" class="away-team" data-id="${match.id}" value="${savedAway}" ${isMatchLocked ? 'disabled' : ''}>
                 </div>
             `;
             container.appendChild(div);
         });
     }
 
-    function handleAutoAdvance(currentInput) {
-        saveCurrentInputsToDraft();
-        if (currentInput.value === "") return;
-
-        const allInputs = Array.from(document.querySelectorAll('.score-field:not([disabled])'));
-        const currentIndex = allInputs.indexOf(currentInput);
-
-        if (currentIndex !== -1 && currentIndex < allInputs.length - 1) {
-            const nextInput = allInputs[currentIndex + 1];
-            nextInput.focus();
-            nextInput.select();
-        }
-    }
-
-    function goToScorersStage() {
-        saveCurrentInputsToDraft();
-        document.getElementById('step-matches-view').classList.add('hidden');
-        document.getElementById('step-scorers-view').classList.remove('hidden');
-        updateScorersUI();
-    }
-
-    function backToMatches() {
-        document.getElementById('step-scorers-view').classList.add('hidden');
-        document.getElementById('step-matches-view').classList.remove('hidden');
-        renderActiveRound();
-    }
-
-    function buildTeamsGrid() {
-        const grid = document.getElementById('teams-logos-grid');
-        grid.innerHTML = "";
-        Object.keys(teamMeta).forEach(teamName => {
-            const btn = document.createElement('div');
-            btn.className = "team-btn";
-            btn.innerHTML = `<img src="${teamMeta[teamName].logo}" style="width:32px; height:32px; object-fit:contain; margin-bottom:4px;"><div>${teamName}</div>`;
-            btn.onclick = () => showPlayersForTeam(teamName);
-            grid.appendChild(btn);
-        });
-    }
-
-    function showPlayersForTeam(teamName) {
-        document.getElementById('players-list-zone').classList.remove('hidden');
-        document.getElementById('selected-team-title').innerText = `Skład zespołu: ${teamName}`;
-        
-        const grid = document.getElementById('players-buttons-grid');
-        grid.innerHTML = "";
-        
-        const players = teamMeta[teamName].players || [];
-        players.forEach(player => {
-            const btn = document.createElement('button');
-            btn.className = "player-btn";
-            btn.innerText = player;
-            btn.onclick = () => selectPlayerForActiveSlot(player, teamName);
-            grid.appendChild(btn);
-        });
-    }
-
-    function activeSlot(idx) {
-        currentActiveSlotIndex = idx;
-        const isDark = document.body.classList.contains('dark-mode');
-        for(let i=0; i<5; i++) {
-            document.getElementById(`slot-${i}`).style.borderColor = (i === idx) ? '#00ff87' : (isDark ? '#4a2850' : '#38003c');
-            document.getElementById(`slot-${i}`).style.background = (i === idx) ? (isDark ? '#153a28' : '#e6fff4') : (isDark ? '#2d1830' : '#edf2f7');
-        }
-    }
-
-    function selectPlayerForActiveSlot(playerName, teamName) {
-        selectedScorers[currentActiveSlotIndex] = { player: playerName, team: teamName };
-        updateScorersUI();
-        
-        let nextSlot = selectedScorers.findIndex(s => s === null);
-        if(nextSlot !== -1) {
-            activeSlot(nextSlot);
-        }
-    }
-
-    function updateScorersUI() {
-        selectedScorers.forEach((data, idx) => {
-            const slotSpan = document.querySelector(`#slot-${idx} span`);
-            if(data) {
-                slotSpan.innerHTML = `<img src="${teamMeta[data.team].logo}" style="width:18px; height:18px; object-fit:contain; vertical-align:middle; margin-right:5px;"> <b>${data.player}</b> (${data.team})`;
-            } else {
-                slotSpan.innerText = "Wybierz zawodnika...";
+    async function fetchUserPredictions() {
+        const nick = localStorage.getItem('typerNick');
+        const currentRound = roundsOrder[currentRoundIndex];
+        try {
+            const res = await fetch(`${API_URL}?action=getUserPredictions&gracz=${encodeURIComponent(nick)}&kolejka=${encodeURIComponent(currentRound)}`);
+            const data = await res.json();
+            if (data && Object.keys(data).length > 0) {
+                currentUserHasSubmittedRound = true;
+                allMatches.filter(m => m.round === currentRound).forEach(m => {
+                    if (data[m.id]) {
+                        const p = data[m.id].toString().split(':');
+                        if (p.length === 2) {
+                            localDraftScores[`home-${m.id}`] = p[0];
+                            localDraftScores[`away-${m.id}`] = p[1];
+                        }
+                    }
+                });
             }
-        });
+        } catch (e) {}
     }
 
     async function submitEntireRound() {
-        saveCurrentInputsToDraft();
-        const currentRound = roundsOrder[currentRoundIndex];
         const nick = localStorage.getItem('typerNick');
+        const currentRound = roundsOrder[currentRoundIndex];
+        const updateData = { "gracz": nick, "kolejka": currentRound };
 
-        if (!nick) {
-            alert('Nie znaleziono nicku. Zaloguj się ponownie.');
-            return logoutUser();
-        }
-
-        const updateData = { 
-            "gracz": nick,
-            "kolejka": currentRound
-        };
-
-        const hasScorers = selectedScorers.some(s => s !== null);
-        if (hasScorers) {
-            updateData["strzelcy"] = selectedScorers.filter(s => s !== null).map(s => `${s.player} (${s.team})`).join(", ");
-        }
-
-        const roundMatches = allMatches.filter(m => m.round === currentRound);
-        roundMatches.forEach(m => {
-            const h = localDraftScores[`home-${m.id}`];
-            const a = localDraftScores[`away-${m.id}`];
-            if (h !== undefined && a !== undefined && h !== "" && a !== "") {
-                updateData[m.id] = `${h}:${a}`;
+        document.querySelectorAll('.match-row').forEach(row => {
+            const h = row.querySelector('.home-team');
+            const a = row.querySelector('.away-team');
+            if (h && a && h.value !== "" && a.value !== "") {
+                updateData[h.getAttribute('data-id')] = `${h.value}:${a.value}`;
             }
         });
 
         try {
-            const btn1 = document.getElementById('quick-save-btn');
-            const btn2 = document.getElementById('final-submit-btn');
-            if(btn1) btn1.innerText = "Wysyłanie...";
-            if(btn2) btn2.innerText = "Wysyłanie...";
-
+            document.getElementById('quick-save-btn').innerText = "Zapisywanie...";
             await fetch(API_URL, { method: 'POST', body: JSON.stringify(updateData) });
-
-            alert(`Typy zostały pomyślnie zapisane! 🚀`);
+            alert("Typy pomyślnie zapisane!");
             location.reload();
-        } catch (error) {
-            alert('Błąd zapisu: ' + error.message);
+        } catch (e) {
+            alert("Błąd zapisu!");
+        }
+    }
+
+    async function loadAllPredictionsTable() {
+        const currentRound = roundsOrder[currentRoundIndex];
+        const currentNick = localStorage.getItem('typerNick');
+        const headerRow = document.getElementById('all-preds-header');
+        const tbody = document.getElementById('all-preds-body');
+        const roundMatches = allMatches.filter(m => m.round === currentRound);
+        const now = new Date();
+
+        headerRow.innerHTML = "<th>Gracz</th>";
+        roundMatches.forEach(m => {
+            headerRow.innerHTML += `<th>${m.t1.substring(0,3)} - ${m.t2.substring(0,3)}<br><small>(${m.realScore || '?-?'})</small></th>`;
+        });
+
+        if (!currentUserHasSubmittedRound) {
+            tbody.innerHTML = `<tr><td colspan="${roundMatches.length + 1}"><b>Obstaw i zapisz przynajmniej 1 mecz w tej kolejce, aby zobaczyć typy innych!</b></td></tr>`;
+            return;
+        }
+
+        try {
+            const res = await fetch(`${API_URL}?action=getAllPredictions&kolejka=${encodeURIComponent(currentRound)}`, { redirect: 'follow' });
+            const playersData = await res.json();
+
+            if (!playersData || playersData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${roundMatches.length + 1}">Brak zarejestrowanych typów.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = "";
+            playersData.forEach(p => {
+                const tr = document.createElement('tr');
+                const isCurrentPlayer = (p.gracz === currentNick);
+                tr.innerHTML = `<td style="font-weight:bold; text-align:left;">${p.gracz} ${isCurrentPlayer ? '(Ty)' : ''}</td>`;
+
+                roundMatches.forEach(m => {
+                    const rawPred = p.typy[m.id] || "-";
+                    const isMatchStarted = (now >= new Date(m.lock));
+                    let matchClass = "";
+                    let displayPred = rawPred;
+
+                    // Zasada ukrywania: Pokaż typ tylko jeśli to TY LUB jeśli mecz się już rozpoczął
+                    if (!isCurrentPlayer && !isMatchStarted) {
+                        displayPred = "🔒";
+                    }
+
+                    // Porównywanie i kolorowanie (tylko po rozpoczęciu i gdy znamy wynik)
+                    if (isMatchStarted && m.realScore && rawPred !== "-") {
+                        const [rh, ra] = m.realScore.split(':').map(Number);
+                        const [ph, pa] = rawPred.split(':').map(Number);
+
+                        if (!isNaN(rh) && !isNaN(ra) && !isNaN(ph) && !isNaN(pa)) {
+                            if (rh === ph && ra === pa) {
+                                matchClass = "tag-exact";
+                            } else if ((rh > ra && ph > pa) || (rh < ra && ph < pa) || (rh === ra && ph === pa)) {
+                                matchClass = "tag-winner";
+                            }
+                        }
+                    }
+
+                    tr.innerHTML += `<td class="${matchClass}">${displayPred}</td>`;
+                });
+                tbody.appendChild(tr);
+            });
+
+        } catch (e) {
+            tbody.innerHTML = `<tr><td colspan="${roundMatches.length + 1}">Nie udało się załadować tabeli typów.</td></tr>`;
         }
     }
 
     async function loadLeaderboard() {
         const tbody = document.getElementById('leaderboard-body');
         try {
-            const response = await fetch(`${API_URL}?action=getLeaderboard`);
-            if (!response.ok) throw new Error("Błąd sieci");
+            const res = await fetch(`${API_URL}?action=getLeaderboard`, { redirect: 'follow' });
+            const data = await res.json();
             
-            const data = await response.json();
-            
-            if (!data || data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3">Brak zarejestrowanych punktów w bazie.</td></tr>`;
-                return;
-            }
-
             tbody.innerHTML = "";
-            data.forEach((row, index) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><span class="rank-badge">${index + 1}</span></td>
-                    <td style="text-align: left; padding-left: 15px; font-weight: bold; color: var(--text);">${row.gracz}</td>
-                    <td style="font-weight: bold; color: #028a5a; font-size: 15px;">${row.punkty} pkt</td>
-                `;
-                tbody.innerHTML += tr.outerHTML;
+            data.forEach((row, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><b>${idx + 1}</b></td>
+                        <td style="text-align: left; padding-left: 15px; font-weight: bold;">${row.gracz}</td>
+                        <td style="font-weight: bold; color: #028a5a;">${row.punkty} pkt</td>
+                    </tr>`;
             });
-        } catch (error) {
-            tbody.innerHTML = `<tr><td colspan="3" style="color:var(--danger)">Nie udało się załadować rankingu</td></tr>`;
+        } catch (e) {
+            tbody.innerHTML = `<tr><td colspan="3" style="color:red">Błąd ładowania klasyfikacji</td></tr>`;
         }
     }
 </script>
