@@ -1,7 +1,181 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typer Premier League</title>
+    <link rel="icon" type="image/jpeg" href="https://i.ibb.co/Qv1dF627/ubc.png">
+    <style>
+        :root { 
+            --primary: #38003c; 
+            --accent: #00ff87; 
+            --bg: #f6f6f6; 
+            --card: #ffffff; 
+            --text: #333333; 
+            --danger: #ff4a4a; 
+            --text-light: #ffffff; 
+            --border: #e0e0e0;
+            --input-bg: #edf2f7;
+            --input-text: #333333;
+            --slot-bg: #edf2f7;
+            --slot-active: #e6fff4;
+        }
+
+        body.dark-mode {
+            --bg: #120014; 
+            --card: #1f1124; 
+            --text: #f6f6f6; 
+            --border: #4a2850;
+            --input-bg: #2d1830;
+            --input-text: #ffffff;
+            --slot-bg: #2d1830;
+            --slot-active: #153a28;
+        }
+
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; transition: background 0.3s, color 0.3s; }
+        .container { max-width: 600px; width: 100%; box-sizing: border-box; position: relative; }
+        
+        .theme-toggle { position: absolute; top: 15px; right: 15px; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); color: var(--accent); padding: 8px 12px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: bold; width: auto; margin: 0; transition: 0.2s; }
+        .theme-toggle:hover { background: rgba(255, 255, 255, 0.3); }
+
+        h1, h2, h3 { text-align: center; color: var(--primary); margin-bottom: 5px; }
+        body.dark-mode h1, body.dark-mode h2, body.dark-mode h3 { color: var(--accent); }
+        
+        .header-banner { background: #38003c; color: var(--text-light); padding: 25px 20px 20px 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid var(--border); }
+        .header-banner h1 { color: var(--accent); margin: 0; font-size: 26px; }
+        
+        .group-header-active { background: #38003c; color: var(--accent); font-weight: bold; padding: 12px; border-radius: 6px; margin: 15px 0; text-align: center; font-size: 18px; border: 2px solid var(--accent); }
+        .card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; box-sizing: border-box; border: 1px solid var(--border); transition: background 0.3s, border-color 0.3s; }
+        
+        input, button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
+        input[type="text"] { background: var(--card); color: var(--text); font-size: 16px; text-align: center; border: 2px solid var(--accent); }
+        button { background: #38003c; color: var(--accent); font-weight: bold; cursor: pointer; font-size: 16px; border: 1px solid var(--accent); transition: 0.2s; }
+        button:disabled { background: #a0aec0; color: #fff; cursor: not-allowed; box-shadow: none !important; border: none; }
+        button:hover:not(:disabled) { filter: brightness(1.2); }
+        .hidden { display: none !important; }
+        
+        #loading-screen { text-align: center; padding: 40px 20px; }
+        .spinner { border: 4px solid rgba(0,0,0,0.1); width: 42px; height: 42px; border-radius: 50%; border-left-color: var(--accent); animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .match-row { display: flex; align-items: center; justify-content: space-between; margin: 12px 0; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+        .match-info { display: flex; flex-direction: column; width: 65%; }
+        .match-teams { font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px; color: var(--text); flex-wrap: wrap; }
+        .match-date { font-size: 11px; color: #888888; margin-top: 3px; }
+        .locked-text { color: var(--danger); font-weight: bold; }
+        
+        .score-inputs { display: flex; gap: 8px; align-items: center; }
+        .score-inputs input { width: 42px; text-align: center; margin: 0; padding: 6px; background: var(--input-bg); color: var(--input-text); border: 1px solid var(--border); border-radius: 4px; font-size: 16px; font-weight: bold; transition: background 0.3s; }
+        .score-inputs input:disabled { background: #a0aec0; color: #333; cursor: not-allowed; opacity: 0.5; }
+        
+        .progress-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; background: #38003c; padding: 8px; border-radius: 6px; margin-bottom: 15px; box-sizing: border-box; border: 1px solid var(--border); }
+        .progress-step { color: #fff; background: rgba(255,255,255,0.1); cursor: pointer; padding: 10px 0; border-radius: 4px; transition: background 0.2s; text-align: center; font-size: 13px; font-weight: bold; }
+        .progress-step:hover:not(.step-locked) { background: rgba(255,255,255,0.2); }
+        .progress-step.active { color: #38003c; background: var(--accent); }
+
+        .scroers-intro { text-align: center; margin-bottom: 15px; font-size: 14px; }
+        .slots-container { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .scorer-slot { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: var(--slot-bg); border-radius: 6px; font-weight: bold; font-size: 14px; border: 1px dashed var(--accent); cursor: pointer; transition: background 0.3s; }
+        .scorer-slot span { color: var(--text); display: flex; align-items: center; }
+        .teams-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
+        .team-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--card); border: 1px solid var(--border); padding: 10px; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: bold; text-align: center; color: var(--text); }
+        .team-btn:hover { border-color: var(--accent); background: rgba(0, 255, 137, 0.05); }
+        
+        .players-list-container { margin-top: 15px; background: var(--slot-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border); }
+        .players-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+        .player-btn { background: var(--card); border: 1px solid var(--border); padding: 8px; text-align: left; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text); width: 100%; margin: 0; }
+        .player-btn:hover { background: var(--accent); color: #38003c; font-weight: bold; }
+
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px 8px; text-align: center; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text); }
+        th { color: var(--accent); background: #38003c; font-weight: 600; border-bottom: 2px solid var(--accent); }
+        .rank-badge { font-weight: bold; display: inline-block; width: 24px; height: 24px; line-height: 24px; border-radius: 50%; background: #38003c; color: var(--accent); text-align: center; font-size: 12px; border: 1px solid var(--accent); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">🌙 Ciemny</button>
+
+    <div class="header-banner">
+        <h1>🏆 TYPER PREMIER LEAGUE ⚽</h1>
+        <p style="margin: 5px 0 0 0; font-weight: 500;">— Karta (Sheet2)</p>
+    </div>
+
+    <div id="loading-screen" class="card">
+        <h2>Wczytywanie systemu...</h2>
+        <div class="spinner"></div>
+    </div>
+
+    <div id="login-screen" class="card hidden">
+        <h2>Wpisz swój Nick, aby wejść do gry:</h2>
+        <input type="text" id="nick-input" placeholder="np. MikroPytek...">
+        <button id="login-btn" onclick="loginUser()">Dołącz do Gry</button>
+    </div>
+
+    <div id="app-screen" class="hidden">
+        <div class="card" id="prediction-card">
+            <h3>Gracz: <span id="user-display" style="color:var(--accent)"></span></h3>
+            <div class="progress-bar" id="steps-bar"></div>
+            <div id="group-title" class="group-header-active"></div>
+            
+            <div id="step-matches-view">
+                <div id="matches-list">Ładowanie meczów...</div>
+                <div id="submit-container">
+                    <button id="next-stage-btn" onclick="goToScorersStage()" disabled>Uzupełnij wszystkie wyniki meczów</button>
+                </div>
+            </div>
+
+            <div id="step-scorers-view" class="hidden">
+                <h4 style="margin: 0 0 10px 0; color: var(--accent);">🎯 Krok 2: Wybierz 5 strzelców na tę kolejkę</h4>
+                <p class="scroers-intro">Wybierz kolejno wolne sloty, a następnie kliknij w herb drużyny, by rozwinąć listę zawodników.</p>
+                
+                <div class="slots-container" id="slots-summary">
+                    <div class="scorer-slot" id="slot-0" onclick="activeSlot(0)">Slot 1: <span>Wybierz zawodnika...</span></div>
+                    <div class="scorer-slot" id="slot-1" onclick="activeSlot(1)">Slot 2: <span>Wybierz zawodnika...</span></div>
+                    <div class="scorer-slot" id="slot-2" onclick="activeSlot(2)">Slot 3: <span>Wybierz zawodnika...</span></div>
+                    <div class="scorer-slot" id="slot-3" onclick="activeSlot(3)">Slot 4: <span>Wybierz zawodnika...</span></div>
+                    <div class="scorer-slot" id="slot-4" onclick="activeSlot(4)">Slot 5: <span>Wybierz zawodnika...</span></div>
+                </div>
+
+                <div id="teams-selector-zone">
+                    <h5 style="margin:0; text-align:center;">Kliknij w herb drużyny:</h5>
+                    <div class="teams-grid" id="teams-logos-grid"></div>
+                </div>
+
+                <div id="players-list-zone" class="players-list-container hidden">
+                    <h5 style="margin:0;" id="selected-team-title">Zawodnicy drużyny:</h5>
+                    <div class="players-grid" id="players-buttons-grid"></div>
+                </div>
+
+                <button id="final-submit-btn" onclick="submitEntireRound()" style="margin-top:20px; background:#028a5a; color:white; border:none;" disabled>💾 Zapisz / Zaktualizuj typy</button>
+                <button onclick="backToMatches()" style="background:#718096; color:white; font-size:12px; padding:6px; margin-top:10px; border:none;">⬅ Powrót do edycji meczów</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🏆 Klasyfikacja Generalna (Premier League)</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">Poz.</th>
+                            <th style="text-align: left; padding-left: 15px;">Gracz</th>
+                            <th style="width: 100px;">Punkty</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body">
+                        <tr><td colspan="3">Pobieranie aktualnych wyników z bazy danych...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-    // ⚠️ TUTAJ WKLEJ SWÓJ URL WYGENEROWANY Z GOOGLE APPS SCRIPT
     const API_URL = "https://script.google.com/macros/s/AKfycbyfD639ixNFql0ApKAtWPkSlnTfiQeRBgXSuq87eVBWFT739vGQvUuM9U5EaJRwdVUX7g/exec";
-    const KEY_NAME = "sheet2"; 
 
     const roundsOrder = ["Kolejka 1", "Kolejka 2", "Kolejka 3", "Kolejka 4", "Kolejka 5"];
     let currentRoundIndex = 0; 
@@ -9,7 +183,6 @@
     let selectedScorers = [null, null, null, null, null]; 
     let currentActiveSlotIndex = 0;
 
-    // Funkcja zarządzania trybem ciemnym
     function initTheme() {
         const savedTheme = localStorage.getItem('theme') || 'light';
         if (savedTheme === 'dark') {
@@ -25,14 +198,14 @@
     }
 
     const teamMeta = {
-        "Arsenal": { logo: "logos/england_arsenal_64x64.football-logos.cc.png", players: ["Bukayo Saka", "Martin Ødegaard", "Kai Havertz", "Declan Rice", "William Saliba", "Gabriel Magalhães"] },
-        "Manchester City": { logo: "logos/england_manchester-city_64x64.football-logos.cc.png", players: ["Erling Haaland", "Kevin De Bruyne", "Phil Foden", "Bernardo Silva", "Rodri", "Josko Gvardiol"] },
-        "Liverpool": { logo: "logos/england_liverpool_64x64.football-logos.cc.png", players: ["Mohamed Salah", "Luis Díaz", "Darwin Núñez", "Diogo Jota", "Alexis Mac Allister", "Virgil van Dijk", "Trent Alexander-Arnold"] },
-        "Chelsea": { logo: "logos/england_chelsea_64x64.football-logos.cc.png", players: ["Cole Palmer", "Nicolas Jackson", "Christopher Nkunku", "Noni Madueke", "Enzo Fernández"] },
-        "Manchester United": { logo: "logos/england_manchester-united_64x64.football-logos.cc.png", players: ["Bruno Fernandes", "Marcus Rashford", "Alejandro Garnacho", "Rasmus Højlund"] },
-        "Tottenham Hotspur": { logo: "logos/england_tottenham_64x64.football-logos.cc.png", players: ["Heung-min Son", "Dominic Solanke", "Dejan Kulusevski", "James Maddison"] },
-        "Aston Villa": { logo: "logos/england_aston-villa_64x64.football-logos.cc.png", players: ["Ollie Watkins", "Leon Bailey", "John McGinn", "Jhon Durán"] },
-        "Newcastle United": { logo: "logos/england_newcastle_64x64.football-logos.cc.png", players: ["Alexander Isak", "Anthony Gordon", "Bruno Guimarães", "Kieran Trippier"] },
+        "Arsenal": { logo: "logos/england_arsenal_64x64.football-logos.cc.png", players: ["Bukayo Saka", "Martin Ødegaard", "Kai Havertz", "Declan Rice", "William Saliba"] },
+        "Manchester City": { logo: "logos/england_manchester-city_64x64.football-logos.cc.png", players: ["Erling Haaland", "Kevin De Bruyne", "Phil Foden", "Bernardo Silva"] },
+        "Liverpool": { logo: "logos/england_liverpool_64x64.football-logos.cc.png", players: ["Mohamed Salah", "Luis Díaz", "Darwin Núñez", "Diogo Jota"] },
+        "Chelsea": { logo: "logos/england_chelsea_64x64.football-logos.cc.png", players: ["Cole Palmer", "Nicolas Jackson", "Christopher Nkunku"] },
+        "Manchester United": { logo: "logos/england_manchester-united_64x64.football-logos.cc.png", players: ["Bruno Fernandes", "Marcus Rashford", "Alejandro Garnacho"] },
+        "Tottenham Hotspur": { logo: "logos/england_tottenham_64x64.football-logos.cc.png", players: ["Heung-min Son", "Dominic Solanke", "Dejan Kulusevski"] },
+        "Aston Villa": { logo: "logos/england_aston-villa_64x64.football-logos.cc.png", players: ["Ollie Watkins", "Leon Bailey", "John McGinn"] },
+        "Newcastle United": { logo: "logos/england_newcastle_64x64.football-logos.cc.png", players: ["Alexander Isak", "Anthony Gordon", "Bruno Guimarães"] },
         "Everton": { logo: "logos/england_everton_64x64.football-logos.cc.png", players: ["Dominic Calvert-Lewin", "Dwight McNeil"] },
         "Crystal Palace": { logo: "logos/england_crystal-palace_64x64.football-logos.cc.png", players: ["Jean-Philippe Mateta", "Eberechi Eze"] },
         "Nottingham Forest": { logo: "logos/england_nottingham-forest_64x64.football-logos.cc.png", players: ["Chris Wood", "Morgan Gibbs-White"] },
@@ -57,25 +230,12 @@
         { id: "M1_7", round: "Kolejka 1", t1: "Brighton", t2: "Aston Villa", lock: "2026-08-21T21:00:00" },
         { id: "M1_8", round: "Kolejka 1", t1: "Manchester City", t2: "AFC Bournemouth", lock: "2026-08-21T21:00:00" },
         { id: "M1_9", round: "Kolejka 1", t1: "Newcastle United", t2: "Liverpool", lock: "2026-08-21T21:00:00" },
-        { id: "M1_10", round: "Kolejka 1", t1: "Fulham", t2: "Chelsea", lock: "2026-08-21T21:00:00" },
-
-        { id: "M2_1", round: "Kolejka 2", t1: "Sunderland", t2: "Arsenal", lock: "2026-08-29T16:00:00" },
-        { id: "M2_2", round: "Kolejka 2", t1: "Nottingham Forest", t2: "Tottenham Hotspur", lock: "2026-08-29T16:00:00" },
-        { id: "M2_3", round: "Kolejka 2", t1: "Newcastle United", t2: "Aston Villa", lock: "2026-08-29T16:00:00" },
-        { id: "M2_4", round: "Kolejka 2", t1: "Manchester United", t2: "AFC Bournemouth", lock: "2026-08-29T16:00:00" },
-        { id: "M2_5", round: "Kolejka 2", t1: "Manchester City", t2: "Brentford", lock: "2026-08-29T16:00:00" },
-        { id: "M2_6", round: "Kolejka 2", t1: "Liverpool", t2: "Brighton", lock: "2026-08-29T16:00:00" },
-        { id: "M2_7", round: "Kolejka 2", t1: "Leeds United", t2: "Chelsea", lock: "2026-08-29T16:00:00" },
-        { id: "M2_8", round: "Kolejka 2", t1: "Ipswich Town", t2: "Coventry City", lock: "2026-08-29T16:00:00" },
-        { id: "M2_9", round: "Kolejka 2", t1: "Hull City", t2: "Crystal Palace", lock: "2026-08-29T16:00:00" },
-        { id: "M2_10", round: "Kolejka 2", t1: "Fulham", t2: "Everton", lock: "2026-08-29T16:00:00" }
+        { id: "M1_10", round: "Kolejka 1", t1: "Fulham", t2: "Chelsea", lock: "2026-08-21T21:00:00" }
     ];
 
-    async function initApp() {
+    function initApp() {
         initTheme(); 
         document.getElementById('loading-screen').classList.add('hidden');
-        
-        // Czyszczenie starego zapisanego nicku, tak aby gracz ZAWSZE musiał podać go na nowo
         localStorage.removeItem('typerNick');
         
         loadLeaderboard();
@@ -88,9 +248,7 @@
         const nick = nickInput.value.trim();
         if (nick.length < 3) return alert('Nick musi mieć min. 3 znaki!');
         
-        // Zapis tymczasowy w pamięci podręcznej przeglądarki na czas bieżącej sesji
         sessionStorage.setItem('activeTyperNick', nick);
-        
         document.getElementById('login-screen').classList.add('hidden');
         showApp(nick);
     }
@@ -168,13 +326,12 @@
             const f1 = `<img src="${teamMeta[match.t1]?.logo || ''}" style="width:20px; height:20px; object-fit:contain; vertical-align:middle;">`;
             const f2 = `<img src="${teamMeta[match.t2]?.logo || ''}" style="width:20px; height:20px; object-fit:contain; vertical-align:middle;">`;
 
-            // Sprawdzanie czy KONKRETNY MECZ się rozpoczął
             const matchLockTime = new Date(match.lock);
             const isMatchLocked = (now >= matchLockTime);
 
             let statusMessage = `⏰ Start: ${match.lock.replace('T', ' ').substring(0,16)}`;
             if (isMatchLocked) {
-                statusMessage = `<span class="locked-text">🔒 Zablokowane (Mecz trwa / zakończony)</span>`;
+                statusMessage = `<span class="locked-text">🔒 Zablokowane (Mecz rozpoczął się)</span>`;
             }
 
             div.innerHTML = `
@@ -195,7 +352,6 @@
 
     function handleAutoAdvance(currentInput) {
         validateMatchesCompletion();
-
         if (currentInput.value === "") return;
 
         const allInputs = Array.from(document.querySelectorAll('.score-field:not([disabled])'));
@@ -331,14 +487,14 @@
         try {
             const finalBtn = document.getElementById('final-submit-btn');
             finalBtn.setAttribute('disabled', 'true');
-            finalBtn.innerText = "Wysyłanie / Aktualizacja bazy danych...";
+            finalBtn.innerText = "Wysyłanie / Aktualizacja...";
 
             await fetch(API_URL, { method: 'POST', body: JSON.stringify(updateData) });
 
-            alert(`Twoje typy na ${currentRound} zostały pomyślnie zapisane/zaktualizowane! 🚀`);
+            alert(`Typy na ${currentRound} zostały zapisane! 🚀`);
             location.reload();
         } catch (error) {
-            alert('Wystąpił błąd podczas zapisu: ' + error.message);
+            alert('Błąd zapisu: ' + error.message);
             document.getElementById('final-submit-btn').removeAttribute('disabled');
         }
     }
@@ -352,7 +508,7 @@
             const data = await response.json();
             
             if (!data || data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3">Brak zarejestrowanych punktów w bazie. Wpisz oficjalne wyniki w arkusz!</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="3">Brak zarejestrowanych punktów w bazie.</td></tr>`;
                 return;
             }
 
@@ -367,7 +523,9 @@
                 tbody.innerHTML += tr.outerHTML;
             });
         } catch (error) {
-            tbody.innerHTML = `<tr><td colspan="3" style="color:var(--danger)">Nie udało się załadować rankingu (Upewnij się, że wkleiłeś poprawny URL skryptu API)</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="3" style="color:var(--danger)">Nie udało się załadować rankingu</td></tr>`;
         }
     }
 </script>
+</body>
+</html>
