@@ -59,7 +59,8 @@
         
         .match-row { display: flex; align-items: center; justify-content: space-between; margin: 12px 0; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
         .match-info { display: flex; flex-direction: column; width: 65%; }
-        .match-teams { font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px; color: var(--text); flex-wrap: wrap; }
+        .match-teams { font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 6px; color: var(--text); flex-wrap: wrap; }
+        .team-logo { width: 22px; height: 22px; object-fit: contain; vertical-align: middle; }
         .match-date { font-size: 11px; color: #888888; margin-top: 3px; }
         
         .score-inputs { display: flex; gap: 8px; align-items: center; }
@@ -73,6 +74,7 @@
         table { width: 100%; border-collapse: collapse; margin-top: 10px; white-space: nowrap; }
         th, td { padding: 10px 6px; text-align: center; border: 1px solid var(--border); font-size: 12px; color: var(--text); }
         th { color: var(--accent); background: #38003c; font-weight: 600; }
+        .table-logo-header { display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 2px; }
         
         .tag-exact { background-color: var(--exact-match) !important; color: var(--exact-text) !important; font-weight: bold; }
         .tag-winner { background-color: var(--winner-match) !important; color: var(--winner-text) !important; font-weight: bold; }
@@ -146,6 +148,39 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbyfD639ixNFql0ApKAtWPkSlnTfiQeRBgXSuq87eVBWFT739vGQvUuM9U5EaJRwdVUX7g/exec";
 
+    // ŚCIEŻKA DO HERBÓW W REPOZYTORIUM GITHUB (RAW)
+    const GITHUB_LOGOS_URL = "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/logos/";
+
+    // SŁOWNIK PLIKÓW HERBÓW (Dopasuj nazwy plików .png z Twojego repozytorium)
+    const TEAM_LOGOS = {
+        "Arsenal": GITHUB_LOGOS_URL + "arsenal.png",
+        "Coventry City": GITHUB_LOGOS_URL + "coventry.png",
+        "Hull City": GITHUB_LOGOS_URL + "hull.png",
+        "Manchester United": GITHUB_LOGOS_URL + "manchester-united.png",
+        "Everton": GITHUB_LOGOS_URL + "everton.png",
+        "Crystal Palace": GITHUB_LOGOS_URL + "crystal-palace.png",
+        "Ipswich Town": GITHUB_LOGOS_URL + "ipswich.png",
+        "Sunderland": GITHUB_LOGOS_URL + "sunderland.png",
+        "Nottingham Forest": GITHUB_LOGOS_URL + "nottingham.png",
+        "Leeds United": GITHUB_LOGOS_URL + "leeds.png",
+        "Brentford": GITHUB_LOGOS_URL + "brentford.png",
+        "Tottenham Hotspur": GITHUB_LOGOS_URL + "tottenham.png",
+        "Brighton": GITHUB_LOGOS_URL + "brighton.png",
+        "Aston Villa": GITHUB_LOGOS_URL + "aston-villa.png",
+        "Manchester City": GITHUB_LOGOS_URL + "manchester-city.png",
+        "AFC Bournemouth": GITHUB_LOGOS_URL + "bournemouth.png",
+        "Newcastle United": GITHUB_LOGOS_URL + "newcastle.png",
+        "Liverpool": GITHUB_LOGOS_URL + "liverpool.png",
+        "Fulham": GITHUB_LOGOS_URL + "fulham.png",
+        "Chelsea": GITHUB_LOGOS_URL + "chelsea.png"
+    };
+
+    function getTeamLogoHtml(teamName) {
+        const logoUrl = TEAM_LOGOS[teamName];
+        if (!logoUrl) return "";
+        return `<img src="${logoUrl}" alt="${teamName}" class="team-logo" onerror="this.style.display='none'">`;
+    }
+
     const roundsOrder = ["Kolejka 1", "Kolejka 2", "Kolejka 3", "Kolejka 4", "Kolejka 5"];
     let currentRoundIndex = 0; 
     let localDraftScores = {}; 
@@ -164,7 +199,6 @@
         { id: "M1_10", round: "Kolejka 1", t1: "Fulham", t2: "Chelsea", lock: "2026-08-21T21:00:00", realScore: "" }
     ];
 
-    // 1. ZAPAMIĘTYWANIE MOTYWU
     function applySavedTheme() {
         const theme = localStorage.getItem('typerTheme') || 'light';
         const btn = document.getElementById('theme-btn');
@@ -199,7 +233,6 @@
         showApp(nick);
     }
 
-    // 2. ZMIANA NICKU (WYLOGOWANIE)
     function logoutUser() {
         if (confirm("Czy na pewno chcesz zmienić nick / wylogować się?")) {
             localStorage.removeItem('typerNick');
@@ -257,7 +290,9 @@
 
             div.innerHTML = `
                 <div class="match-info">
-                    <span class="match-teams">${match.t1} - ${match.t2}</span>
+                    <span class="match-teams">
+                        ${getTeamLogoHtml(match.t1)} ${match.t1} - ${getTeamLogoHtml(match.t2)} ${match.t2}
+                    </span>
                     <span class="match-date">${isMatchLocked ? '🔒 Zablokowane' : '⏰ ' + match.lock.replace('T', ' ').substring(0,16)}</span>
                 </div>
                 <div class="score-inputs">
@@ -270,7 +305,6 @@
         });
     }
 
-    // 3. AUTOMATYCZNE PRZESKAKIWANIE DO NASTĘPNEGO POLA
     function autoTab(input) {
         if (input.value.length >= 1) {
             const inputs = Array.from(document.querySelectorAll('.score-inputs input:not([disabled])'));
@@ -336,7 +370,13 @@
 
         headerRow.innerHTML = "<th>Gracz</th>";
         roundMatches.forEach(m => {
-            headerRow.innerHTML += `<th>${m.t1.substring(0,3)} - ${m.t2.substring(0,3)}<br><small>(${m.realScore || '?-?'})</small></th>`;
+            headerRow.innerHTML += `
+                <th>
+                    <div class="table-logo-header">
+                        ${getTeamLogoHtml(m.t1)} ${m.t1.substring(0,3)} - ${getTeamLogoHtml(m.t2)} ${m.t2.substring(0,3)}
+                    </div>
+                    <small>(${m.realScore || '?-?'})</small>
+                </th>`;
         });
 
         if (!currentUserHasSubmittedRound) {
