@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Typer Premier League</title>
     <link rel="icon" type="image/jpeg" href="https://i.ibb.co/Qv1dF627/ubc.png">
+    
+    <!-- Zapobiegamy mruganiu ekranu logowania przed załadowaniem JS -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('typerTheme');
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark-mode-init');
+            }
+        })();
+    </script>
+
     <style>
         :root { 
             --primary: #38003c; 
@@ -24,7 +35,7 @@
             --winner-text: #000000;
         }
 
-        body.dark-mode {
+        body.dark-mode, html.dark-mode-init body {
             --bg: #120014; 
             --card: #1f1124; 
             --text: #f6f6f6; 
@@ -62,6 +73,9 @@
         input[type="text"] { background: var(--card); color: var(--text); font-size: 16px; text-align: center; border: 2px solid var(--accent); }
         button { background: #38003c; color: var(--accent); font-weight: bold; cursor: pointer; font-size: 16px; border: 1px solid var(--accent); }
         .btn-change-nick { width: auto; padding: 4px 8px; font-size: 12px; display: inline-block; margin-left: 10px; background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+        
+        /* Domyślnie ukrywamy oba ekrany, aby uniknąć mrugania */
+        #login-screen, #app-screen { display: none; }
         .hidden { display: none !important; }
         
         .match-row { display: flex; align-items: center; justify-content: space-between; margin: 12px 0; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
@@ -106,7 +120,7 @@
         <button onclick="loginUser()">Dołącz do Gry</button>
     </div>
 
-    <div id="app-screen" class="hidden">
+    <div id="app-screen">
         <div class="card">
             <h3>Gracz: <span id="user-display" style="color:var(--accent)"></span>
                 <button class="btn-change-nick" onclick="logoutUser()">Zmień Nick</button>
@@ -241,7 +255,11 @@
     function windowInit() {
         applySavedTheme();
         const savedNick = localStorage.getItem('typerNick');
-        if (savedNick) showApp(savedNick);
+        if (savedNick) {
+            showApp(savedNick);
+        } else {
+            document.getElementById('login-screen').style.display = 'block';
+        }
     }
     window.onload = windowInit;
 
@@ -260,8 +278,8 @@
     }
 
     async function showApp(nick) {
-        document.getElementById('login-screen').classList.add('hidden');
-        document.getElementById('app-screen').classList.remove('hidden');
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app-screen').style.display = 'block';
         document.getElementById('user-display').innerText = nick;
         renderProgressBar();
         await fetchUserPredictions();
@@ -475,7 +493,6 @@
                 const roundPlayers = data.predictions[kolejkaName];
                 const roundScores = {};
 
-                // 1. Zliczanie podstawowych punktów za mecze
                 Object.keys(roundPlayers).forEach(player => {
                     if (!totalScores[player]) totalScores[player] = 0;
                     if (!roundScores[player]) roundScores[player] = 0;
@@ -501,7 +518,6 @@
                     });
                 });
 
-                // 2. Bonusy (150/100/50 pkt) naliczane TYLKO po zakończeniu całej kolejki
                 const roundMatches = allMatches.filter(m => m.round === kolejkaName);
                 const isRoundFinished = roundMatches.length > 0 && roundMatches.every(m => now >= new Date(m.lock));
 
