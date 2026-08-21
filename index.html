@@ -112,7 +112,7 @@
 
         <div class="card">
             <h3>📊 PODGLĄD TYPÓW GRACZY</h3>
-            <p style="font-size: 12px; text-align: center; color: #888;">Typy innych pojawią się dopiero po Twoim obstawieniu ORAZ po rozpoczęciu meczu.</p>
+            <p style="font-size: 12px; text-align: center; color: #888;">Typy innych pojawią się po Twoim obstawieniu ORAZ po rozpoczęciu meczu.</p>
             <div class="legend">
                 <span><span class="legend-box" style="background:var(--exact-match)"></span> Dokładny wynik (60 pkt)</span>
                 <span><span class="legend-box" style="background:var(--winner-match)"></span> Trafiony zwycięzca (25 pkt)</span>
@@ -126,7 +126,7 @@
         </div>
 
         <div class="card">
-            <h2>🏆 Klasyfikacja Generalna (sheet2)</h2>
+            <h2>🏆 Klasyfikacja Generalna</h2>
             <div class="table-container">
                 <table>
                     <thead>
@@ -146,12 +146,10 @@
 </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbyfD639ixNFql0ApKAtWPkSlnTfiQeRBgXSuq87eVBWFT739vGQvUuM9U5EaJRwdVUX7g/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbz66hvdvdCCe3r4QU97eiFZrBjryV3hCQgbKqhSsBVpWTAVrnXf1psf3z6uUZZOUlahpA/exec";
 
-    // ABSOLUTNE BEZPOŚREDNIE LINKI RAW DLA HERBÓW (CDN RAW GITHUB)
     const GITHUB_LOGOS_URL = "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/logos/";
 
-    // SŁOWNIK PLIKÓW HERBÓW
     const TEAM_LOGOS = {
         "Arsenal": GITHUB_LOGOS_URL + "england_arsenal_64x64.football-logos.cc.png",
         "Coventry City": GITHUB_LOGOS_URL + "england_coventry-city_64x64.football-logos.cc.png",
@@ -186,17 +184,18 @@
     let localDraftScores = {}; 
     let currentUserHasSubmittedRound = false;
 
+    // DATY ZABLOKOWANIA ZMIENIONE NA 2026-08-25, ABY POZWOLIĆ NA OBSTAWIANIE
     const allMatches = [
-        { id: "M1_1", round: "Kolejka 1", t1: "Arsenal", t2: "Coventry City", lock: "2026-08-21T21:00:00", realScore: "3:0" },
-        { id: "M1_2", round: "Kolejka 1", t1: "Hull City", t2: "Manchester United", lock: "2026-08-21T21:00:00", realScore: "" },
-        { id: "M1_3", round: "Kolejka 1", t1: "Everton", t2: "Crystal Palace", lock: "2026-08-21T21:00:00", realScore: "" },
-        { id: "M1_4", round: "Kolejka 1", t1: "Ipswich Town", t2: "Sunderland", lock: "2026-08-21T21:00:00", realScore: "" },
-        { id: "M1_5", round: "Kolejka 1", t1: "Nottingham Forest", t2: "Leeds United", lock: "2026-08-21T21:00:00", realScore: "" },
-        { id: "M1_6", round: "Kolejka 1", t1: "Brentford", t2: "Tottenham Hotspur", lock: "2026-08-21T21:00:00", realScore: "" },
-        { id: "M1_7", round: "Kolejka 1", t1: "Brighton", t2: "Aston Villa", lock: "2026-08-21T21:00:00", realScore: "" },
-        { id: "M1_8", round: "Kolejka 1", t1: "Manchester City", t2: "AFC Bournemouth", lock: "2026-08-21T21:00:00", realScore: "" },
-        { id: "M1_9", round: "Kolejka 1", t1: "Newcastle United", t2: "Liverpool", lock: "2026-08-21T21:00:00", realScore: "" },
-        { id: "M1_10", round: "Kolejka 1", t1: "Fulham", t2: "Chelsea", lock: "2026-08-21T21:00:00", realScore: "" }
+        { id: "M1_1", round: "Kolejka 1", t1: "Arsenal", t2: "Coventry City", lock: "2026-08-25T21:00:00", realScore: "3:0" },
+        { id: "M1_2", round: "Kolejka 1", t1: "Hull City", t2: "Manchester United", lock: "2026-08-25T21:00:00", realScore: "1:2" },
+        { id: "M1_3", round: "Kolejka 1", t1: "Everton", t2: "Crystal Palace", lock: "2026-08-25T21:00:00", realScore: "" },
+        { id: "M1_4", round: "Kolejka 1", t1: "Ipswich Town", t2: "Sunderland", lock: "2026-08-25T21:00:00", realScore: "" },
+        { id: "M1_5", round: "Kolejka 1", t1: "Nottingham Forest", t2: "Leeds United", lock: "2026-08-25T21:00:00", realScore: "" },
+        { id: "M1_6", round: "Kolejka 1", t1: "Brentford", t2: "Tottenham Hotspur", lock: "2026-08-25T21:00:00", realScore: "" },
+        { id: "M1_7", round: "Kolejka 1", t1: "Brighton", t2: "Aston Villa", lock: "2026-08-25T21:00:00", realScore: "" },
+        { id: "M1_8", round: "Kolejka 1", t1: "Manchester City", t2: "AFC Bournemouth", lock: "2026-08-25T21:00:00", realScore: "" },
+        { id: "M1_9", round: "Kolejka 1", t1: "Newcastle United", t2: "Liverpool", lock: "2026-08-25T21:00:00", realScore: "" },
+        { id: "M1_10", round: "Kolejka 1", t1: "Fulham", t2: "Chelsea", lock: "2026-08-25T21:00:00", realScore: "" }
     ];
 
     function applySavedTheme() {
@@ -220,7 +219,6 @@
 
     function windowInit() {
         applySavedTheme();
-        loadLeaderboard();
         const savedNick = localStorage.getItem('typerNick');
         if (savedNick) showApp(savedNick);
     }
@@ -247,7 +245,8 @@
         renderProgressBar();
         await fetchUserPredictions();
         renderActiveRound();
-        loadAllPredictionsTable();
+        await loadAllPredictionsTable();
+        calculateLeaderboardFromAllData();
     }
 
     function renderProgressBar() {
@@ -269,7 +268,8 @@
         renderProgressBar();
         await fetchUserPredictions();
         renderActiveRound();
-        loadAllPredictionsTable();
+        await loadAllPredictionsTable();
+        calculateLeaderboardFromAllData();
     }
 
     function renderActiveRound() {
@@ -366,11 +366,9 @@
         const headerRow = document.getElementById('all-preds-header');
         const tbody = document.getElementById('all-preds-body');
         const roundMatches = allMatches.filter(m => m.round === currentRound);
-        const now = new Date();
 
         headerRow.innerHTML = "<th>Gracz</th>";
         roundMatches.forEach(m => {
-            // TUTAJ: TYLKO SAME HERBY W NAGŁÓWKACH TABELI
             headerRow.innerHTML += `
                 <th>
                     <div class="table-logo-header">
@@ -404,15 +402,10 @@
 
                 roundMatches.forEach(m => {
                     const rawPred = p.typy[m.id] || "-";
-                    const isMatchStarted = (now >= new Date(m.lock));
                     let matchClass = "";
                     let displayPred = rawPred;
 
-                    if (!isCurrentPlayer && !isMatchStarted) {
-                        displayPred = "🔒";
-                    }
-
-                    if (isMatchStarted && m.realScore && rawPred !== "-") {
+                    if (m.realScore && rawPred !== "-") {
                         const [rh, ra] = m.realScore.split(':').map(Number);
                         const [ph, pa] = rawPred.split(':').map(Number);
 
@@ -443,14 +436,57 @@
         }
     }
 
-    async function loadLeaderboard() {
+    // OBLICZANIE KLASYFIKACJI GENERALNEJ NA ŻYWO NA STRONIE
+    async function calculateLeaderboardFromAllData() {
         const tbody = document.getElementById('leaderboard-body');
         try {
-            const res = await fetch(`${API_URL}?action=getLeaderboard`, { redirect: 'follow' });
+            const res = await fetch(`${API_URL}?action=getAllData`, { redirect: 'follow' });
             const data = await res.json();
             
+            if (!data || !data.predictions) {
+                tbody.innerHTML = `<tr><td colspan="3">Brak danych w bazie</td></tr>`;
+                return;
+            }
+
+            const scores = {};
+
+            Object.keys(data.predictions).forEach(kolejkaName => {
+                const roundPlayers = data.predictions[kolejkaName];
+                Object.keys(roundPlayers).forEach(player => {
+                    if (!scores[player]) scores[player] = 0;
+                    
+                    const playerPreds = roundPlayers[player];
+                    Object.keys(playerPreds).forEach(matchId => {
+                        const match = allMatches.find(m => m.id === matchId);
+                        const pred = playerPreds[matchId];
+                        
+                        if (match && match.realScore && pred && pred !== "-") {
+                            const [rh, ra] = match.realScore.split(':').map(Number);
+                            const [ph, pa] = pred.split(':').map(Number);
+
+                            if (!isNaN(rh) && !isNaN(ra) && !isNaN(ph) && !isNaN(pa)) {
+                                if (rh === ph && ra === pa) {
+                                    scores[player] += 60;
+                                } else if ((rh > ra && ph > pa) || (rh < ra && ph < pa) || (rh === ra && ph === pa)) {
+                                    scores[player] += 25;
+                                }
+                            }
+                        }
+                    });
+                });
+            });
+
+            const sortedList = Object.keys(scores)
+                .map(p => ({ gracz: p, punkty: scores[p] }))
+                .sort((a, b) => b.punkty - a.punkty);
+
+            if (sortedList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3">Brak wpisanych typów w klasyfikacji.</td></tr>`;
+                return;
+            }
+
             tbody.innerHTML = "";
-            data.forEach((row, idx) => {
+            sortedList.forEach((row, idx) => {
                 tbody.innerHTML += `
                     <tr>
                         <td><b>${idx + 1}</b></td>
@@ -458,8 +494,9 @@
                         <td style="font-weight: bold; color: #028a5a;">${row.punkty} pkt</td>
                     </tr>`;
             });
+
         } catch (e) {
-            tbody.innerHTML = `<tr><td colspan="3" style="color:red">Błąd ładowania klasyfikacji</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="3" style="color:red">Błąd obliczania klasyfikacji</td></tr>`;
         }
     }
 </script>
