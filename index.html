@@ -112,7 +112,7 @@
 
         <div class="card">
             <h3>📊 PODGLĄD TYPÓW GRACZY</h3>
-            <p style="font-size: 12px; text-align: center; color: #888;">Typy innych pojawią się po Twoim obstawieniu ORAZ po rozpoczęciu meczu.</p>
+            <p style="font-size: 12px; text-align: center; color: #888;">Typy innych pojawiają się dopiero po rozpoczęciu danego meczu.</p>
             <div class="legend">
                 <span><span class="legend-box" style="background:var(--exact-match)"></span> Dokładny wynik (60 pkt)</span>
                 <span><span class="legend-box" style="background:var(--winner-match)"></span> Trafiony zwycięzca (25 pkt)</span>
@@ -184,18 +184,31 @@
     let localDraftScores = {}; 
     let currentUserHasSubmittedRound = false;
 
-    // DATY ZABLOKOWANIA ZMIENIONE NA 2026-08-25, ABY POZWOLIĆ NA OBSTAWIANIE
+    // PEŁNY DOKŁADNY TERMINARZ 1 I 2 KOLEJKI
     const allMatches = [
-        { id: "M1_1", round: "Kolejka 1", t1: "Arsenal", t2: "Coventry City", lock: "2026-08-25T21:00:00", realScore: "3:0" },
-        { id: "M1_2", round: "Kolejka 1", t1: "Hull City", t2: "Manchester United", lock: "2026-08-25T21:00:00", realScore: "" },
-        { id: "M1_3", round: "Kolejka 1", t1: "Everton", t2: "Crystal Palace", lock: "2026-08-25T21:00:00", realScore: "" },
-        { id: "M1_4", round: "Kolejka 1", t1: "Ipswich Town", t2: "Sunderland", lock: "2026-08-25T21:00:00", realScore: "" },
-        { id: "M1_5", round: "Kolejka 1", t1: "Nottingham Forest", t2: "Leeds United", lock: "2026-08-25T21:00:00", realScore: "" },
-        { id: "M1_6", round: "Kolejka 1", t1: "Brentford", t2: "Tottenham Hotspur", lock: "2026-08-25T21:00:00", realScore: "" },
-        { id: "M1_7", round: "Kolejka 1", t1: "Brighton", t2: "Aston Villa", lock: "2026-08-25T21:00:00", realScore: "" },
-        { id: "M1_8", round: "Kolejka 1", t1: "Manchester City", t2: "AFC Bournemouth", lock: "2026-08-25T21:00:00", realScore: "" },
-        { id: "M1_9", round: "Kolejka 1", t1: "Newcastle United", t2: "Liverpool", lock: "2026-08-25T21:00:00", realScore: "" },
-        { id: "M1_10", round: "Kolejka 1", t1: "Fulham", t2: "Chelsea", lock: "2026-08-25T21:00:00", realScore: "" }
+        // KOLEJKA 1
+        { id: "M1_1", round: "Kolejka 1", t1: "Arsenal", t2: "Coventry City", lock: "2026-08-21T21:00:00", realScore: "3:0" },
+        { id: "M1_2", round: "Kolejka 1", t1: "Hull City", t2: "Manchester United", lock: "2026-08-22T13:30:00", realScore: "" },
+        { id: "M1_3", round: "Kolejka 1", t1: "Everton", t2: "Crystal Palace", lock: "2026-08-22T16:00:00", realScore: "" },
+        { id: "M1_4", round: "Kolejka 1", t1: "Ipswich Town", t2: "Sunderland", lock: "2026-08-22T16:00:00", realScore: "" },
+        { id: "M1_5", round: "Kolejka 1", t1: "Nottingham Forest", t2: "Leeds United", lock: "2026-08-22T16:00:00", realScore: "" },
+        { id: "M1_6", round: "Kolejka 1", t1: "Brentford", t2: "Tottenham Hotspur", lock: "2026-08-22T18:30:00", realScore: "" },
+        { id: "M1_7", round: "Kolejka 1", t1: "Brighton", t2: "Aston Villa", lock: "2026-08-23T15:00:00", realScore: "" },
+        { id: "M1_8", round: "Kolejka 1", t1: "Manchester City", t2: "AFC Bournemouth", lock: "2026-08-23T15:00:00", realScore: "" },
+        { id: "M1_9", round: "Kolejka 1", t1: "Newcastle United", t2: "Liverpool", lock: "2026-08-23T17:30:00", realScore: "" },
+        { id: "M1_10", round: "Kolejka 1", t1: "Fulham", t2: "Chelsea", lock: "2026-08-24T21:00:00", realScore: "" },
+
+        // KOLEJKA 2
+        { id: "M2_1", round: "Kolejka 2", t1: "Crystal Palace", t2: "Manchester City", lock: "2026-08-28T21:00:00", realScore: "" },
+        { id: "M2_2", round: "Kolejka 2", t1: "Liverpool", t2: "Nottingham Forest", lock: "2026-08-29T13:30:00", realScore: "" },
+        { id: "M2_3", round: "Kolejka 2", t1: "AFC Bournemouth", t2: "Everton", lock: "2026-08-29T16:00:00", realScore: "" },
+        { id: "M2_4", round: "Kolejka 2", t1: "Coventry City", t2: "Hull City", lock: "2026-08-29T16:00:00", realScore: "" },
+        { id: "M2_5", round: "Kolejka 2", t1: "Tottenham Hotspur", t2: "Newcastle United", lock: "2026-08-29T18:30:00", realScore: "" },
+        { id: "M2_6", round: "Kolejka 2", t1: "Chelsea", t2: "Brighton", lock: "2026-08-30T15:00:00", realScore: "" },
+        { id: "M2_7", round: "Kolejka 2", t1: "Leeds United", t2: "Brentford", lock: "2026-08-30T15:00:00", realScore: "" },
+        { id: "M2_8", round: "Kolejka 2", t1: "Sunderland", t2: "Fulham", lock: "2026-08-30T15:00:00", realScore: "" },
+        { id: "M2_9", round: "Kolejka 2", t1: "Manchester United", t2: "Ipswich Town", lock: "2026-08-30T17:30:00", realScore: "" },
+        { id: "M2_10", round: "Kolejka 2", t1: "Aston Villa", t2: "Arsenal", lock: "2026-08-31T21:00:00", realScore: "" }
     ];
 
     function applySavedTheme() {
@@ -286,6 +299,8 @@
             div.className = "match-row";
             const savedHome = localDraftScores[`home-${match.id}`] || "";
             const savedAway = localDraftScores[`away-${match.id}`] || "";
+            
+            // MECZ ZABLOKOWANY PO SFORSOWANIU GODZINY ROZPOCZĘCIA
             const isMatchLocked = (now >= new Date(match.lock));
 
             div.innerHTML = `
@@ -345,7 +360,7 @@
         document.querySelectorAll('.match-row').forEach(row => {
             const h = row.querySelector('.home-team');
             const a = row.querySelector('.away-team');
-            if (h && a && h.value !== "" && a.value !== "") {
+            if (h && a && h.value !== "" && a.value !== "" && !h.disabled) {
                 updateData[h.getAttribute('data-id')] = `${h.value}:${a.value}`;
             }
         });
@@ -366,6 +381,7 @@
         const headerRow = document.getElementById('all-preds-header');
         const tbody = document.getElementById('all-preds-body');
         const roundMatches = allMatches.filter(m => m.round === currentRound);
+        const now = new Date();
 
         headerRow.innerHTML = "<th>Gracz</th>";
         roundMatches.forEach(m => {
@@ -378,11 +394,6 @@
                 </th>`;
         });
         headerRow.innerHTML += "<th>Pkt (Runda)</th>";
-
-        if (!currentUserHasSubmittedRound) {
-            tbody.innerHTML = `<tr><td colspan="${roundMatches.length + 2}"><b>Obstaw i zapisz przynajmniej 1 mecz w tej kolejce, aby zobaczyć typy innych!</b></td></tr>`;
-            return;
-        }
 
         try {
             const res = await fetch(`${API_URL}?action=getAllPredictions&kolejka=${encodeURIComponent(currentRound)}`, { redirect: 'follow' });
@@ -402,20 +413,24 @@
 
                 roundMatches.forEach(m => {
                     const rawPred = p.typy[m.id] || "-";
+                    const isMatchStarted = (now >= new Date(m.lock));
                     let matchClass = "";
                     let displayPred = rawPred;
+
+                    // JEŚLI MATCH SIĘ NIE ZACZĄŁ I TO NIE SĄ TYPY LOGOWANEGO GRACZA - POKAZUJEMY KŁÓDKĘ 🔒
+                    if (!isCurrentPlayer && !isMatchStarted) {
+                        displayPred = "🔒";
+                    }
 
                     if (m.realScore && rawPred !== "-") {
                         const [rh, ra] = m.realScore.split(':').map(Number);
                         const [ph, pa] = rawPred.split(':').map(Number);
 
                         if (!isNaN(rh) && !isNaN(ra) && !isNaN(ph) && !isNaN(pa)) {
-                            // Dokładny wynik = 60 pkt
                             if (rh === ph && ra === pa) {
                                 matchClass = "tag-exact";
                                 roundPoints += 60;
                             } 
-                            // Trafiony zwycięzca / remis = 25 pkt
                             else if ((rh > ra && ph > pa) || (rh < ra && ph < pa) || (rh === ra && ph === pa)) {
                                 matchClass = "tag-winner";
                                 roundPoints += 25;
@@ -436,7 +451,6 @@
         }
     }
 
-    // OBLICZANIE KLASYFIKACJI GENERALNEJ NA ŻYWO NA STRONIE
     async function calculateLeaderboardFromAllData() {
         const tbody = document.getElementById('leaderboard-body');
         try {
