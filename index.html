@@ -121,9 +121,10 @@
             <div id="group-title" class="group-header-active"></div>
             
             <div id="step-matches-view">
-                <div id="matches-list">Ładowanie meczów...</div>
+                <div id="matches-list">Pobieranie meczów i Twoich typów...</div>
                 <div id="submit-container">
-                    <button id="next-stage-btn" onclick="goToScorersStage()" disabled>Uzupełnij wszystkie wyniki meczów</button>
+                    <button id="quick-save-btn" onclick="submitEntireRound()" style="background:#028a5a; color:white; margin-bottom:8px;">💾 Zapisz wpisane mecze nowymi wartościami</button>
+                    <button id="next-stage-btn" onclick="goToScorersStage()">Przejdź do wyboru strzelców (opcjonalnie) ➔</button>
                 </div>
             </div>
 
@@ -149,7 +150,7 @@
                     <div class="players-grid" id="players-buttons-grid"></div>
                 </div>
 
-                <button id="final-submit-btn" onclick="submitEntireRound()" style="margin-top:20px; background:#028a5a; color:white; border:none;" disabled>💾 Zapisz / Zaktualizuj typy</button>
+                <button id="final-submit-btn" onclick="submitEntireRound()" style="margin-top:20px; background:#028a5a; color:white; border:none;">💾 Zapisz komplet (Mecze + Strzelcy)</button>
                 <button onclick="backToMatches()" style="background:#718096; color:white; font-size:12px; padding:6px; margin-top:10px; border:none;">⬅ Powrót do edycji meczów</button>
             </div>
         </div>
@@ -175,7 +176,6 @@
 </div>
 
 <script>
-    // ⚠️ TUTAJ WKLEJ SWÓJ URL WYGENEROWANY Z GOOGLE APPS SCRIPT
     const API_URL = "PROSZE_TUTAJ_WKLEIC_URL_Z_GOOGLE_APPS_SCRIPT";
 
     const roundsOrder = ["Kolejka 1", "Kolejka 2", "Kolejka 3", "Kolejka 4", "Kolejka 5"];
@@ -248,12 +248,9 @@
     function initApp() {
         initTheme(); 
         document.getElementById('loading-screen').classList.add('hidden');
-        
         loadLeaderboard();
 
-        // Pobranie z pamięci trwałej przeglądarki
         const savedNick = localStorage.getItem('typerNick');
-        
         if (savedNick) {
             showApp(savedNick);
         } else {
@@ -267,7 +264,6 @@
         const nick = nickInput.value.trim();
         if (nick.length < 3) return alert('Nick musi mieć min. 3 znaki!');
         
-        // Trwałe zapamiętanie nicku
         localStorage.setItem('typerNick', nick);
         document.getElementById('login-screen').classList.add('hidden');
         showApp(nick);
@@ -280,13 +276,40 @@
         document.getElementById('nick-input').value = "";
     }
 
-    function showApp(nick) {
+    async function showApp(nick) {
         document.getElementById('app-screen').classList.remove('hidden');
         document.getElementById('user-display').innerHTML = `${nick} <button onclick="logoutUser()" style="display:inline-block; width:auto; padding:2px 8px; font-size:11px; margin-left:10px; background:#ff4a4a; color:white; border:none;">Zmień nick</button>`;
         renderProgressBar();
+        await fetchUserPredictions();
         renderActiveRound();
         buildTeamsGrid();
         activeSlot(0);
+    }
+
+    async function fetchUserPredictions() {
+        const nick = localStorage.getItem('typerNick');
+        const currentRound = roundsOrder[currentRoundIndex];
+        if (!nick) return;
+
+        try {
+            const response = await fetch(`${API_URL}?action=getUserPredictions&gracz=${encodeURIComponent(nick)}&kolejka=${encodeURIComponent(currentRound)}`);
+            const data = await response.json();
+
+            if (data) {
+                const roundMatches = allMatches.filter(m => m.round === currentRound);
+                roundMatches.forEach(m => {
+                    if (data[m.id]) {
+                        const parts = data[m.id].toString().split(':');
+                        if (parts.length === 2) {
+                            localDraftScores[`home-${m.id}`] = parts[0];
+                            localDraftScores[`away-${m.id}`] = parts[1];
+                        }
+                    }
+                });
+            }
+        } catch (e) {
+            console.log("Brak zapisanych typów lub błąd sieci:", e);
+        }
     }
 
     function renderProgressBar() {
@@ -301,11 +324,13 @@
         });
     }
 
-    function changeRound(targetIndex) {
+    async function changeRound(targetIndex) {
         saveCurrentInputsToDraft();
         currentRoundIndex = targetIndex;
         selectedScorers = [null, null, null, null, null];
+        localDraftScores = {};
         renderProgressBar();
+        await fetchUserPredictions();
         renderActiveRound();
         backToMatches();
     }
@@ -340,13 +365,12 @@
             div.className = "match-row";
             div.setAttribute('data-id', match.id);
             
-            const savedHome = localDraftScores[`home-${match.id}`] || "";
-            const savedAway = localDraftScores[`away-${match.id}`] || "";
+            const savedHome = localDraftScores[`home-${match.id}`] !== undefined ? localDraftScores[`home-${match.id}`] : "";
+            const savedAway = localDraftScores[`away-${match.id}`] !== undefined ? localDraftScores[`away-${match.id}`] : "";
             
             const f1 = `<img src="${teamMeta[match.t1]?.logo || ''}" style="width:20px; height:20px; object-fit:contain; vertical-align:middle;">`;
             const f2 = `<img src="${teamMeta[match.t2]?.logo || ''}" style="width:20px; height:20px; object-fit:contain; vertical-align:middle;">`;
 
-            // Blokowanie wyłącznie pojedynczych meczów, które już wystartowały
             const matchLockTime = new Date(match.lock);
             const isMatchLocked = (now >= matchLockTime);
 
@@ -368,11 +392,10 @@
             `;
             container.appendChild(div);
         });
-        validateMatchesCompletion();
     }
 
     function handleAutoAdvance(currentInput) {
-        validateMatchesCompletion();
+        saveCurrentInputsToDraft();
         if (currentInput.value === "") return;
 
         const allInputs = Array.from(document.querySelectorAll('.score-field:not([disabled])'));
@@ -382,26 +405,6 @@
             const nextInput = allInputs[currentIndex + 1];
             nextInput.focus();
             nextInput.select();
-        }
-    }
-
-    function validateMatchesCompletion() {
-        const btn = document.getElementById('next-stage-btn');
-        const rows = document.querySelectorAll('.match-row');
-        let allFilled = true;
-        
-        rows.forEach(row => {
-            const home = row.querySelector('.home-team').value;
-            const away = row.querySelector('.away-team').value;
-            if(home === "" || away === "") allFilled = false;
-        });
-
-        if(allFilled) {
-            btn.removeAttribute('disabled');
-            btn.innerText = "Przejdź do wyboru strzelców ➔";
-        } else {
-            btn.setAttribute('disabled', 'true');
-            btn.innerText = "Uzupełnij wszystkie wyniki meczów";
         }
     }
 
@@ -475,17 +478,10 @@
                 slotSpan.innerText = "Wybierz zawodnika...";
             }
         });
-
-        const finalBtn = document.getElementById('final-submit-btn');
-        const allScorersSelected = selectedScorers.every(s => s !== null);
-        if(allScorersSelected) {
-            finalBtn.removeAttribute('disabled');
-        } else {
-            finalBtn.setAttribute('disabled', 'true');
-        }
     }
 
     async function submitEntireRound() {
+        saveCurrentInputsToDraft();
         const currentRound = roundsOrder[currentRoundIndex];
         const nick = localStorage.getItem('typerNick');
 
@@ -496,27 +492,35 @@
 
         const updateData = { 
             "gracz": nick,
-            "kolejka": currentRound,
-            "strzelcy": selectedScorers.map(s => `${s.player} (${s.team})`).join(", ")
+            "kolejka": currentRound
         };
+
+        const hasScorers = selectedScorers.some(s => s !== null);
+        if (hasScorers) {
+            updateData["strzelcy"] = selectedScorers.filter(s => s !== null).map(s => `${s.player} (${s.team})`).join(", ");
+        }
 
         const roundMatches = allMatches.filter(m => m.round === currentRound);
         roundMatches.forEach(m => {
-            updateData[m.id] = `${localDraftScores[`home-${m.id}`]}:${localDraftScores[`away-${m.id}`]}`;
+            const h = localDraftScores[`home-${m.id}`];
+            const a = localDraftScores[`away-${m.id}`];
+            if (h !== undefined && a !== undefined && h !== "" && a !== "") {
+                updateData[m.id] = `${h}:${a}`;
+            }
         });
 
         try {
-            const finalBtn = document.getElementById('final-submit-btn');
-            finalBtn.setAttribute('disabled', 'true');
-            finalBtn.innerText = "Wysyłanie / Aktualizacja...";
+            const btn1 = document.getElementById('quick-save-btn');
+            const btn2 = document.getElementById('final-submit-btn');
+            if(btn1) btn1.innerText = "Wysyłanie...";
+            if(btn2) btn2.innerText = "Wysyłanie...";
 
             await fetch(API_URL, { method: 'POST', body: JSON.stringify(updateData) });
 
-            alert(`Typy na ${currentRound} zostały pomyślnie zapisane! 🚀`);
+            alert(`Typy zostały pomyślnie zapisane! 🚀`);
             location.reload();
         } catch (error) {
             alert('Błąd zapisu: ' + error.message);
-            document.getElementById('final-submit-btn').removeAttribute('disabled');
         }
     }
 
