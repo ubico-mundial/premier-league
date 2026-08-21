@@ -146,10 +146,10 @@
 </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbz66hvdvdCCe3r4QU97eiFZrBjryV3hCQgbKqhSsBVpWTAVrnXf1psf3z6uUZZOUlahpA/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbyfD639ixNFql0ApKAtWPkSlnTfiQeRBgXSuq87eVBWFT739vGQvUuM9U5EaJRwdVUX7g/exec";
 
-    // ŚCIEŻKA DO HERBÓW W REPOZYTORIUM GITHUB (RAW)
-    const GITHUB_LOGOS_URL = "https://github.com/ubico-mundial/premier-league/tree/main/logos/";
+    // ABSOLUTNE BEZPOŚREDNIE LINKI RAW DLA HERBÓW (CDN RAW GITHUB)
+    const GITHUB_LOGOS_URL = "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/logos/";
 
     // SŁOWNIK PLIKÓW HERBÓW
     const TEAM_LOGOS = {
@@ -178,7 +178,7 @@
     function getTeamLogoHtml(teamName) {
         const logoUrl = TEAM_LOGOS[teamName];
         if (!logoUrl) return "";
-        return `<img src="${logoUrl}" alt="${teamName}" class="team-logo" onerror="this.style.display='none'">`;
+        return `<img src="${logoUrl}" alt="${teamName}" title="${teamName}" class="team-logo" onerror="this.style.display='none'">`;
     }
 
     const roundsOrder = ["Kolejka 1", "Kolejka 2", "Kolejka 3", "Kolejka 4", "Kolejka 5"];
@@ -370,10 +370,11 @@
 
         headerRow.innerHTML = "<th>Gracz</th>";
         roundMatches.forEach(m => {
+            // TUTAJ: TYLKO SAME HERBY W NAGŁÓWKACH TABELI
             headerRow.innerHTML += `
                 <th>
                     <div class="table-logo-header">
-                        ${getTeamLogoHtml(m.t1)} ${m.t1.substring(0,3)} - ${getTeamLogoHtml(m.t2)} ${m.t2.substring(0,3)}
+                        ${getTeamLogoHtml(m.t1)} - ${getTeamLogoHtml(m.t2)}
                     </div>
                     <small>(${m.realScore || '?-?'})</small>
                 </th>`;
