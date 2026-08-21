@@ -148,7 +148,6 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbyfD639ixNFql0ApKAtWPkSlnTfiQeRBgXSuq87eVBWFT739vGQvUuM9U5EaJRwdVUX7g/exec";
 
-    // Użycie szybkiej sieci CDN dla serwisów z GitHub (rozwiązuje błędy braku dostępu i CORS)
     const GITHUB_LOGOS_URL = "https://cdn.jsdelivr.net/gh/ubico-mundial/premier-league@main/logos/";
 
     const TEAM_LOGOS = {
@@ -319,7 +318,10 @@
         const nick = localStorage.getItem('typerNick');
         const currentRound = roundsOrder[currentRoundIndex];
         try {
-            const res = await fetch(`${API_URL}?action=getUserPredictions&gracz=${encodeURIComponent(nick)}&kolejka=${encodeURIComponent(currentRound)}`);
+            const res = await fetch(`${API_URL}?action=getUserPredictions&gracz=${encodeURIComponent(nick)}&kolejka=${encodeURIComponent(currentRound)}`, {
+                method: "GET",
+                mode: "cors"
+            });
             const data = await res.json();
             if (data && Object.keys(data).length > 0) {
                 currentUserHasSubmittedRound = true;
@@ -353,7 +355,20 @@
 
         try {
             document.getElementById('quick-save-btn').innerText = "Zapisywanie...";
-            await fetch(API_URL, { method: 'POST', body: JSON.stringify(updateData) });
+            
+            // Konwersja danych na URLSearchParams zapobiega błędom CORS w Google Apps Script
+            const params = new URLSearchParams();
+            for (const key in updateData) {
+                params.append(key, updateData[key]);
+            }
+
+            await fetch(API_URL, { 
+                method: 'POST', 
+                mode: 'cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params
+            });
+
             alert("Typy pomyślnie zapisane!");
             location.reload();
         } catch (e) {
@@ -386,7 +401,10 @@
         }
 
         try {
-            const res = await fetch(`${API_URL}?action=getAllPredictions&kolejka=${encodeURIComponent(currentRound)}`);
+            const res = await fetch(`${API_URL}?action=getAllPredictions&kolejka=${encodeURIComponent(currentRound)}`, {
+                method: "GET",
+                mode: "cors"
+            });
             const playersData = await res.json();
 
             if (!playersData || playersData.length === 0) {
@@ -436,7 +454,10 @@
     async function loadLeaderboard() {
         const tbody = document.getElementById('leaderboard-body');
         try {
-            const res = await fetch(`${API_URL}?action=getLeaderboard`);
+            const res = await fetch(`${API_URL}?action=getLeaderboard`, {
+                method: "GET",
+                mode: "cors"
+            });
             const data = await res.json();
             
             tbody.innerHTML = "";
