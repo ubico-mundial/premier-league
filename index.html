@@ -74,7 +74,7 @@
         table { width: 100%; border-collapse: collapse; margin-top: 10px; white-space: nowrap; }
         th, td { padding: 10px 6px; text-align: center; border: 1px solid var(--border); font-size: 12px; color: var(--text); }
         th { color: var(--accent); background: #38003c; font-weight: 600; }
-        .table-logo-header { display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 2px; }
+        .table-logo-header { display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 2px; }
         
         .tag-exact { background-color: var(--exact-match) !important; color: var(--exact-text) !important; font-weight: bold; }
         .tag-winner { background-color: var(--winner-match) !important; color: var(--winner-text) !important; font-weight: bold; }
@@ -148,10 +148,9 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbyfD639ixNFql0ApKAtWPkSlnTfiQeRBgXSuq87eVBWFT739vGQvUuM9U5EaJRwdVUX7g/exec";
 
-    // ŚCIEŻKA DO HERBÓW W REPOZYTORIUM GITHUB (RAW)
-    const GITHUB_LOGOS_URL = "https://github.com/ubico-mundial/premier-league/tree/main/logos/";
+    // PRAWIDŁOWY BEZPOŚREDNI LINK DO EMBEDOWANIA PLIKÓW Z GITHUBA
+    const GITHUB_LOGOS_URL = "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/logos/";
 
-    // SŁOWNIK PLIKÓW HERBÓW (Dopasuj nazwy plików .png z Twojego repozytorium)
     const TEAM_LOGOS = {
         "Arsenal": GITHUB_LOGOS_URL + "england_arsenal_64x64.football-logos.cc.png",
         "Coventry City": GITHUB_LOGOS_URL + "england_coventry-city_64x64.football-logos.cc.png",
@@ -178,7 +177,7 @@
     function getTeamLogoHtml(teamName) {
         const logoUrl = TEAM_LOGOS[teamName];
         if (!logoUrl) return "";
-        return `<img src="${logoUrl}" alt="${teamName}" class="team-logo" onerror="this.style.display='none'">`;
+        return `<img src="${logoUrl}" alt="${teamName}" title="${teamName}" class="team-logo" onerror="this.style.display='none'">`;
     }
 
     const roundsOrder = ["Kolejka 1", "Kolejka 2", "Kolejka 3", "Kolejka 4", "Kolejka 5"];
@@ -373,7 +372,7 @@
             headerRow.innerHTML += `
                 <th>
                     <div class="table-logo-header">
-                        ${getTeamLogoHtml(m.t1)} ${m.t1.substring(0,3)} - ${getTeamLogoHtml(m.t2)} ${m.t2.substring(0,3)}
+                        ${getTeamLogoHtml(m.t1)} - ${getTeamLogoHtml(m.t2)}
                     </div>
                     <small>(${m.realScore || '?-?'})</small>
                 </th>`;
