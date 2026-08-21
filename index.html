@@ -135,7 +135,7 @@
 
         <div class="card">
             <h2>🏆 Klasyfikacja Generalna</h2>
-            <p style="font-size: 11px; text-align: center; color: #888; margin-top: -5px;">Pkt z meczów + Bonusy za kolejki (1. msc: +150, 2. msc: +100, 3. msc: +50)</p>
+            <p style="font-size: 11px; text-align: center; color: #888; margin-top: -5px;">Pkt z meczów + Bonusy za zakończone kolejki (1. msc: +150, 2. msc: +100, 3. msc: +50)</p>
             <div class="table-container">
                 <table>
                     <thead>
@@ -469,11 +469,13 @@
             }
 
             const totalScores = {};
+            const now = new Date();
 
             Object.keys(data.predictions).forEach(kolejkaName => {
                 const roundPlayers = data.predictions[kolejkaName];
                 const roundScores = {};
 
+                // 1. Zliczanie podstawowych punktów za mecze
                 Object.keys(roundPlayers).forEach(player => {
                     if (!totalScores[player]) totalScores[player] = 0;
                     if (!roundScores[player]) roundScores[player] = 0;
@@ -499,24 +501,29 @@
                     });
                 });
 
-                // NALICZANIE BONUSÓW ZA KOLEJKĘ (150 / 100 / 50 PKT)
-                const sortedRound = Object.keys(roundScores)
-                    .map(p => ({ player: p, score: roundScores[p] }))
-                    .sort((a, b) => b.score - a.score);
+                // 2. Bonusy (150/100/50 pkt) naliczane TYLKO po zakończeniu całej kolejki
+                const roundMatches = allMatches.filter(m => m.round === kolejkaName);
+                const isRoundFinished = roundMatches.length > 0 && roundMatches.every(m => now >= new Date(m.lock));
 
-                if (sortedRound.length > 0 && sortedRound[0].score > 0) {
-                    const topScore = sortedRound[0].score;
-                    sortedRound.filter(p => p.score === topScore).forEach(p => totalScores[p.player] += 150);
+                if (isRoundFinished) {
+                    const sortedRound = Object.keys(roundScores)
+                        .map(p => ({ player: p, score: roundScores[p] }))
+                        .sort((a, b) => b.score - a.score);
 
-                    const secondCandidates = sortedRound.filter(p => p.score < topScore);
-                    if (secondCandidates.length > 0 && secondCandidates[0].score > 0) {
-                        const secondScore = secondCandidates[0].score;
-                        secondCandidates.filter(p => p.score === secondScore).forEach(p => totalScores[p.player] += 100);
+                    if (sortedRound.length > 0 && sortedRound[0].score > 0) {
+                        const topScore = sortedRound[0].score;
+                        sortedRound.filter(p => p.score === topScore).forEach(p => totalScores[p.player] += 150);
 
-                        const thirdCandidates = secondCandidates.filter(p => p.score < secondScore);
-                        if (thirdCandidates.length > 0 && thirdCandidates[0].score > 0) {
-                            const thirdScore = thirdCandidates[0].score;
-                            thirdCandidates.filter(p => p.score === thirdScore).forEach(p => totalScores[p.player] += 50);
+                        const secondCandidates = sortedRound.filter(p => p.score < topScore);
+                        if (secondCandidates.length > 0 && secondCandidates[0].score > 0) {
+                            const secondScore = secondCandidates[0].score;
+                            secondCandidates.filter(p => p.score === secondScore).forEach(p => totalScores[p.player] += 100);
+
+                            const thirdCandidates = secondCandidates.filter(p => p.score < secondScore);
+                            if (thirdCandidates.length > 0 && thirdCandidates[0].score > 0) {
+                                const thirdScore = thirdCandidates[0].score;
+                                thirdCandidates.filter(p => p.score === thirdScore).forEach(p => totalScores[p.player] += 50);
+                            }
                         }
                     }
                 }
