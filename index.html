@@ -7,79 +7,138 @@
     <link rel="icon" type="image/jpeg" href="https://i.ibb.co/Qv1dF627/ubc.png">
     <style>
         :root { 
-            --primary: #38003c; --accent: #00ff87; --bg: #f6f6f6; --card: #ffffff; 
-            --text: #333333; --border: #e0e0e0; --input-bg: #edf2f7;
-            --exact-match: #28a745; --exact-text: #ffffff;
-            --winner-match: #ffc107; --winner-text: #000000;
+            --primary: #38003c; 
+            --accent: #00ff87; 
+            --bg: #f6f6f6; 
+            --card: #ffffff; 
+            --text: #333333; 
+            --danger: #ff4a4a; 
+            --text-light: #ffffff; 
+            --border: #e0e0e0;
+            --input-bg: #edf2f7;
+            --input-text: #333333;
+            
+            --exact-match: #28a745; 
+            --exact-text: #ffffff;
+            --winner-match: #ffc107; 
+            --winner-text: #000000;
         }
+
         body.dark-mode {
-            --bg: #120014; --card: #1f1124; --text: #f6f6f6; --border: #4a2850; --input-bg: #2d1830;
+            --bg: #120014; 
+            --card: #1f1124; 
+            --text: #f6f6f6; 
+            --border: #4a2850;
+            --input-bg: #2d1830;
+            --input-text: #ffffff;
+            --exact-match: #1e7e34;
+            --winner-match: #d39e00;
         }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .container { max-width: 900px; width: 100%; position: relative; }
-        .theme-toggle { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.2); color: var(--accent); border: 1px solid rgba(255,255,255,0.4); padding: 6px 12px; border-radius: 20px; cursor: pointer; }
-        .header-banner { background: #38003c; color: #fff; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; }
-        .header-banner h1 { color: var(--accent); margin: 0; font-size: 24px; }
-        .card { background: var(--card); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border); box-sizing: border-box; }
-        input, button { width: 100%; padding: 10px; margin-top: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
-        input[type="text"] { font-size: 16px; text-align: center; border: 2px solid var(--accent); background: var(--card); color: var(--text); }
-        button { background: #38003c; color: var(--accent); font-weight: bold; cursor: pointer; font-size: 16px; }
+
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; transition: background 0.3s, color 0.3s; }
+        .container { max-width: 900px; width: 100%; box-sizing: border-box; position: relative; }
+        
+        .theme-toggle { position: absolute; top: 15px; right: 15px; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); color: var(--accent); padding: 8px 12px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: bold; width: auto; margin: 0; }
+
+        h1, h2, h3 { text-align: center; color: var(--primary); margin-bottom: 5px; }
+        body.dark-mode h1, body.dark-mode h2, body.dark-mode h3 { color: var(--accent); }
+        
+        .header-banner { background: #38003c; color: var(--text-light); padding: 25px 20px 20px 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .header-banner h1 { color: var(--accent); margin: 0; font-size: 26px; }
+        
+        .group-header-active { background: #38003c; color: var(--accent); font-weight: bold; padding: 12px; border-radius: 6px; margin: 15px 0; text-align: center; font-size: 18px; border: 2px solid var(--accent); }
+        .card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; box-sizing: border-box; border: 1px solid var(--border); }
+        
+        input, button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
+        input[type="number"] { -moz-appearance: textfield; }
+        input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type="text"] { background: var(--card); color: var(--text); font-size: 16px; text-align: center; border: 2px solid var(--accent); }
+        button { background: #38003c; color: var(--accent); font-weight: bold; cursor: pointer; font-size: 16px; border: 1px solid var(--accent); }
+        .btn-change-nick { width: auto; padding: 4px 8px; font-size: 12px; display: inline-block; margin-left: 10px; background: transparent; color: var(--danger); border: 1px solid var(--danger); }
         .hidden { display: none !important; }
-        .match-row { display: flex; align-items: center; justify-content: space-between; margin: 10px 0; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+        
+        .match-row { display: flex; align-items: center; justify-content: space-between; margin: 12px 0; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
         .match-info { display: flex; flex-direction: column; width: 65%; }
-        .match-teams { font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 6px; }
-        .team-logo { width: 20px; height: 20px; object-fit: contain; }
-        .score-inputs { display: flex; gap: 6px; align-items: center; }
-        .score-inputs input { width: 38px; text-align: center; margin: 0; padding: 4px; background: var(--input-bg); color: var(--text); }
-        .progress-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; background: #38003c; padding: 6px; border-radius: 6px; margin-bottom: 15px; }
-        .progress-step { color: #fff; background: rgba(255,255,255,0.1); cursor: pointer; padding: 8px 0; border-radius: 4px; text-align: center; font-size: 12px; font-weight: bold; }
+        .match-teams { font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 6px; color: var(--text); flex-wrap: wrap; }
+        .team-logo { width: 22px; height: 22px; object-fit: contain; vertical-align: middle; }
+        .match-date { font-size: 11px; color: #888888; margin-top: 3px; }
+        
+        .score-inputs { display: flex; gap: 8px; align-items: center; }
+        .score-inputs input { width: 42px; text-align: center; margin: 0; padding: 6px; background: var(--input-bg); color: var(--input-text); border: 1px solid var(--border); border-radius: 4px; font-size: 16px; font-weight: bold; }
+        
+        .progress-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; background: #38003c; padding: 8px; border-radius: 6px; margin-bottom: 15px; }
+        .progress-step { color: #fff; background: rgba(255,255,255,0.1); cursor: pointer; padding: 10px 0; border-radius: 4px; text-align: center; font-size: 13px; font-weight: bold; }
         .progress-step.active { color: #38003c; background: var(--accent); }
+
         .table-container { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; white-space: nowrap; }
-        th, td { padding: 8px 4px; text-align: center; border: 1px solid var(--border); font-size: 12px; }
-        th { color: var(--accent); background: #38003c; }
+        th, td { padding: 10px 6px; text-align: center; border: 1px solid var(--border); font-size: 12px; color: var(--text); }
+        th { color: var(--accent); background: #38003c; font-weight: 600; }
+        .table-logo-header { display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 2px; }
+        
         .tag-exact { background-color: var(--exact-match) !important; color: var(--exact-text) !important; font-weight: bold; }
         .tag-winner { background-color: var(--winner-match) !important; color: var(--winner-text) !important; font-weight: bold; }
+        
+        .legend { display: flex; gap: 15px; justify-content: center; font-size: 12px; margin-bottom: 10px; }
+        .legend-box { width: 15px; height: 15px; display: inline-block; vertical-align: middle; border-radius: 3px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">🌙 Ciemny</button>
-    <div class="header-banner"><h1>🏆 TYPER PREMIER LEAGUE ⚽</h1></div>
+
+    <div class="header-banner">
+        <h1>🏆 TYPER PREMIER LEAGUE ⚽</h1>
+    </div>
 
     <div id="login-screen" class="card">
-        <h2>Podaj Swój Nick:</h2>
-        <input type="text" id="nick-input" placeholder="Wpisz nick...">
-        <button onclick="loginUser()">Dołącz</button>
+        <h2>Wpisz swój Nick, aby wejść do gry:</h2>
+        <input type="text" id="nick-input" placeholder="np. MójNick...">
+        <button onclick="loginUser()">Dołącz do Gry</button>
     </div>
 
     <div id="app-screen" class="hidden">
         <div class="card">
-            <h3>Gracz: <span id="user-display" style="color:var(--accent)"></span></h3>
+            <h3>Gracz: <span id="user-display" style="color:var(--accent)"></span>
+                <button class="btn-change-nick" onclick="logoutUser()">Zmień Nick</button>
+            </h3>
             <div class="progress-bar" id="steps-bar"></div>
-            <div id="matches-list">Ładowanie meczów...</div>
-            <button id="save-btn" onclick="submitEntireRound()" style="background:#028a5a; color:white; margin-top:15px;">💾 Zapisz Typy</button>
+            <div id="group-title" class="group-header-active"></div>
+            
+            <div id="matches-list">Pobieranie meczów...</div>
+            <button id="quick-save-btn" onclick="submitEntireRound()" style="background:#028a5a; color:white; margin-top:15px;">💾 Zapisz swoje typy</button>
         </div>
 
         <div class="card">
-            <h3>📊 Wszystkie Typy</h3>
+            <h3>📊 PODGLĄD TYPÓW GRACZY</h3>
+            <p style="font-size: 12px; text-align: center; color: #888;">Typy innych pojawią się dopiero po Twoim obstawieniu ORAZ po rozpoczęciu meczu.</p>
+            <div class="legend">
+                <span><span class="legend-box" style="background:var(--exact-match)"></span> Dokładny wynik (60 pkt)</span>
+                <span><span class="legend-box" style="background:var(--winner-match)"></span> Trafiony zwycięzca (25 pkt)</span>
+            </div>
             <div class="table-container">
-                <table>
+                <table id="all-predictions-table">
                     <thead><tr id="all-preds-header"><th>Gracz</th></tr></thead>
-                    <tbody id="all-preds-body"><tr><td>Ładowanie...</td></tr></tbody>
+                    <tbody id="all-preds-body"><tr><td>Ładowanie typów...</td></tr></tbody>
                 </table>
             </div>
         </div>
 
         <div class="card">
-            <h2>🏆 Tabela Liderów</h2>
+            <h2>🏆 Klasyfikacja Generalna (sheet2)</h2>
             <div class="table-container">
                 <table>
                     <thead>
-                        <tr><th>Poz.</th><th style="text-align:left; padding-left:10px;">Gracz</th><th>Punkty</th></tr>
+                        <tr>
+                            <th style="width: 50px;">Poz.</th>
+                            <th style="text-align: left; padding-left: 15px;">Gracz</th>
+                            <th style="width: 80px;">Punkty</th>
+                        </tr>
                     </thead>
-                    <tbody id="leaderboard-body"><tr><td colspan="3">Obliczanie wyników...</td></tr></tbody>
+                    <tbody id="leaderboard-body">
+                        <tr><td colspan="3">Pobieranie wyników...</td></tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -88,8 +147,11 @@
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbz66hvdvdCCe3r4QU97eiFZrBjryV3hCQgbKqhSsBVpWTAVrnXf1psf3z6uUZZOUlahpA/exec";
-    const GITHUB_LOGOS_URL = "https://cdn.jsdelivr.net/gh/ubico-mundial/premier-league@main/logos/";
 
+    // ŚCIEŻKA DO HERBÓW W REPOZYTORIUM GITHUB (RAW)
+    const GITHUB_LOGOS_URL = "https://github.com/ubico-mundial/premier-league/tree/main/logos/";
+
+    // SŁOWNIK PLIKÓW HERBÓW
     const TEAM_LOGOS = {
         "Arsenal": GITHUB_LOGOS_URL + "england_arsenal_64x64.football-logos.cc.png",
         "Coventry City": GITHUB_LOGOS_URL + "england_coventry-city_64x64.football-logos.cc.png",
@@ -113,41 +175,69 @@
         "Chelsea": GITHUB_LOGOS_URL + "england_chelsea_64x64.football-logos.cc.png"
     };
 
+    function getTeamLogoHtml(teamName) {
+        const logoUrl = TEAM_LOGOS[teamName];
+        if (!logoUrl) return "";
+        return `<img src="${logoUrl}" alt="${teamName}" class="team-logo" onerror="this.style.display='none'">`;
+    }
+
     const roundsOrder = ["Kolejka 1", "Kolejka 2", "Kolejka 3", "Kolejka 4", "Kolejka 5"];
     let currentRoundIndex = 0; 
-    let dbData = { predictions: {}, results: {} };
+    let localDraftScores = {}; 
+    let currentUserHasSubmittedRound = false;
 
     const allMatches = [
-        { id: "M1_1", round: "Kolejka 1", t1: "Arsenal", t2: "Coventry City", lock: "2026-08-21T21:00:00" },
-        { id: "M1_2", round: "Kolejka 1", t1: "Hull City", t2: "Manchester United", lock: "2026-08-21T21:00:00" },
-        { id: "M1_3", round: "Kolejka 1", t1: "Everton", t2: "Crystal Palace", lock: "2026-08-21T21:00:00" },
-        { id: "M1_4", round: "Kolejka 1", t1: "Ipswich Town", t2: "Sunderland", lock: "2026-08-21T21:00:00" },
-        { id: "M1_5", round: "Kolejka 1", t1: "Nottingham Forest", t2: "Leeds United", lock: "2026-08-21T21:00:00" },
-        { id: "M1_6", round: "Kolejka 1", t1: "Brentford", t2: "Tottenham Hotspur", lock: "2026-08-21T21:00:00" },
-        { id: "M1_7", round: "Kolejka 1", t1: "Brighton", t2: "Aston Villa", lock: "2026-08-21T21:00:00" },
-        { id: "M1_8", round: "Kolejka 1", t1: "Manchester City", t2: "AFC Bournemouth", lock: "2026-08-21T21:00:00" },
-        { id: "M1_9", round: "Kolejka 1", t1: "Newcastle United", t2: "Liverpool", lock: "2026-08-21T21:00:00" },
-        { id: "M1_10", round: "Kolejka 1", t1: "Fulham", t2: "Chelsea", lock: "2026-08-21T21:00:00" }
+        { id: "M1_1", round: "Kolejka 1", t1: "Arsenal", t2: "Coventry City", lock: "2026-08-21T21:00:00", realScore: "3:0" },
+        { id: "M1_2", round: "Kolejka 1", t1: "Hull City", t2: "Manchester United", lock: "2026-08-21T21:00:00", realScore: "" },
+        { id: "M1_3", round: "Kolejka 1", t1: "Everton", t2: "Crystal Palace", lock: "2026-08-21T21:00:00", realScore: "" },
+        { id: "M1_4", round: "Kolejka 1", t1: "Ipswich Town", t2: "Sunderland", lock: "2026-08-21T21:00:00", realScore: "" },
+        { id: "M1_5", round: "Kolejka 1", t1: "Nottingham Forest", t2: "Leeds United", lock: "2026-08-21T21:00:00", realScore: "" },
+        { id: "M1_6", round: "Kolejka 1", t1: "Brentford", t2: "Tottenham Hotspur", lock: "2026-08-21T21:00:00", realScore: "" },
+        { id: "M1_7", round: "Kolejka 1", t1: "Brighton", t2: "Aston Villa", lock: "2026-08-21T21:00:00", realScore: "" },
+        { id: "M1_8", round: "Kolejka 1", t1: "Manchester City", t2: "AFC Bournemouth", lock: "2026-08-21T21:00:00", realScore: "" },
+        { id: "M1_9", round: "Kolejka 1", t1: "Newcastle United", t2: "Liverpool", lock: "2026-08-21T21:00:00", realScore: "" },
+        { id: "M1_10", round: "Kolejka 1", t1: "Fulham", t2: "Chelsea", lock: "2026-08-21T21:00:00", realScore: "" }
     ];
 
-    function getLogoHtml(team) {
-        return TEAM_LOGOS[team] ? `<img src="${TEAM_LOGOS[team]}" class="team-logo">` : '';
+    function applySavedTheme() {
+        const theme = localStorage.getItem('typerTheme') || 'light';
+        const btn = document.getElementById('theme-btn');
+        if (theme === 'dark') {
+            document.body.classList.add('dark-mode');
+            btn.innerText = "☀️ Jasny";
+        } else {
+            document.body.classList.remove('dark-mode');
+            btn.innerText = "🌙 Ciemny";
+        }
     }
 
     function toggleTheme() {
         document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('typerTheme', isDark ? 'dark' : 'light');
+        document.getElementById('theme-btn').innerText = isDark ? "☀️ Jasny" : "🌙 Ciemny";
     }
 
-    window.onload = () => {
-        const nick = localStorage.getItem('typerNick');
-        if (nick) showApp(nick);
-    };
+    function windowInit() {
+        applySavedTheme();
+        loadLeaderboard();
+        const savedNick = localStorage.getItem('typerNick');
+        if (savedNick) showApp(savedNick);
+    }
+    window.onload = windowInit;
 
     function loginUser() {
         const nick = document.getElementById('nick-input').value.trim();
-        if (nick.length < 3) return alert('Nick za krótki!');
+        if (nick.length < 3) return alert('Nick musi mieć min. 3 znaki!');
         localStorage.setItem('typerNick', nick);
         showApp(nick);
+    }
+
+    function logoutUser() {
+        if (confirm("Czy na pewno chcesz zmienić nick / wylogować się?")) {
+            localStorage.removeItem('typerNick');
+            location.reload();
+        }
     }
 
     async function showApp(nick) {
@@ -155,7 +245,9 @@
         document.getElementById('app-screen').classList.remove('hidden');
         document.getElementById('user-display').innerText = nick;
         renderProgressBar();
-        await loadAllDataFromGoogle();
+        await fetchUserPredictions();
+        renderActiveRound();
+        loadAllPredictionsTable();
     }
 
     function renderProgressBar() {
@@ -165,54 +257,84 @@
             const span = document.createElement('span');
             span.className = `progress-step ${idx === currentRoundIndex ? 'active' : ''}`;
             span.innerText = r; 
-            span.onclick = () => { currentRoundIndex = idx; renderProgressBar(); renderAll(); };
+            span.onclick = () => changeRound(idx);
             bar.appendChild(span);
         });
     }
 
-    async function loadAllDataFromGoogle() {
-        try {
-            const res = await fetch(`${API_URL}?action=getAllData`);
-            dbData = await res.json();
-            renderAll();
-        } catch(e) {
-            console.error("Błąd pobierania danych:", e);
-        }
+    async function changeRound(idx) {
+        currentRoundIndex = idx;
+        localDraftScores = {};
+        currentUserHasSubmittedRound = false;
+        renderProgressBar();
+        await fetchUserPredictions();
+        renderActiveRound();
+        loadAllPredictionsTable();
     }
 
-    function renderAll() {
-        renderMatchesList();
-        renderAllPredsTable();
-        calculateAndRenderLeaderboard();
-    }
-
-    function renderMatchesList() {
-        const nick = localStorage.getItem('typerNick');
+    function renderActiveRound() {
         const currentRound = roundsOrder[currentRoundIndex];
+        document.getElementById('group-title').innerText = `⚽ RUNDA TYPOWANIA: ${currentRound.toUpperCase()}`;
         const container = document.getElementById('matches-list');
         container.innerHTML = "";
-        const matches = allMatches.filter(m => m.round === currentRound);
-        const userPreds = (dbData.predictions[currentRound] && dbData.predictions[currentRound][nick]) || {};
+        
+        const roundMatches = allMatches.filter(m => m.round === currentRound);
         const now = new Date();
 
-        matches.forEach(m => {
-            const pred = userPreds[m.id] ? userPreds[m.id].split(':') : ["", ""];
-            const isLocked = now >= new Date(m.lock);
-            
+        roundMatches.forEach((match) => {
             const div = document.createElement('div');
             div.className = "match-row";
+            const savedHome = localDraftScores[`home-${match.id}`] || "";
+            const savedAway = localDraftScores[`away-${match.id}`] || "";
+            const isMatchLocked = (now >= new Date(match.lock));
+
             div.innerHTML = `
                 <div class="match-info">
-                    <span class="match-teams">${getLogoHtml(m.t1)} ${m.t1} - ${getLogoHtml(m.t2)} ${m.t2}</span>
+                    <span class="match-teams">
+                        ${getTeamLogoHtml(match.t1)} ${match.t1} - ${getTeamLogoHtml(match.t2)} ${match.t2}
+                    </span>
+                    <span class="match-date">${isMatchLocked ? '🔒 Zablokowane' : '⏰ ' + match.lock.replace('T', ' ').substring(0,16)}</span>
                 </div>
                 <div class="score-inputs">
-                    <input type="number" class="home-inp" data-id="${m.id}" value="${pred[0]}" ${isLocked ? 'disabled' : ''}>
+                    <input type="number" class="home-team" data-id="${match.id}" value="${savedHome}" ${isMatchLocked ? 'disabled' : ''} oninput="autoTab(this)">
                     <span>:</span>
-                    <input type="number" class="away-inp" data-id="${m.id}" value="${pred[1]}" ${isLocked ? 'disabled' : ''}>
+                    <input type="number" class="away-team" data-id="${match.id}" value="${savedAway}" ${isMatchLocked ? 'disabled' : ''} oninput="autoTab(this)">
                 </div>
             `;
             container.appendChild(div);
         });
+    }
+
+    function autoTab(input) {
+        if (input.value.length >= 1) {
+            const inputs = Array.from(document.querySelectorAll('.score-inputs input:not([disabled])'));
+            const currentIndex = inputs.indexOf(input);
+            if (currentIndex >= 0 && currentIndex < inputs.length - 1) {
+                inputs[currentIndex + 1].focus();
+                inputs[currentIndex + 1].select();
+            }
+        }
+    }
+
+    async function fetchUserPredictions() {
+        const nick = localStorage.getItem('typerNick');
+        const currentRound = roundsOrder[currentRoundIndex];
+        try {
+            const res = await fetch(`${API_URL}?action=getUserPredictions&gracz=${encodeURIComponent(nick)}&kolejka=${encodeURIComponent(currentRound)}`);
+            const data = await res.json();
+            if (data && Object.keys(data).length > 0) {
+                currentUserHasSubmittedRound = true;
+                allMatches.filter(m => m.round === currentRound).forEach(m => {
+                    if (data[m.id]) {
+                        const p = data[m.id].toString().split(':');
+                        if (p.length === 2) {
+                            localDraftScores[`home-${m.id}`] = p[0];
+                            localDraftScores[`away-${m.id}`] = p[1];
+                        }
+                    }
+                });
+            }
+        } catch (e) {}
     }
 
     async function submitEntireRound() {
@@ -221,126 +343,123 @@
         const updateData = { "gracz": nick, "kolejka": currentRound };
 
         document.querySelectorAll('.match-row').forEach(row => {
-            const h = row.querySelector('.home-inp');
-            const a = row.querySelector('.away-inp');
+            const h = row.querySelector('.home-team');
+            const a = row.querySelector('.away-team');
             if (h && a && h.value !== "" && a.value !== "") {
                 updateData[h.getAttribute('data-id')] = `${h.value}:${a.value}`;
             }
         });
 
-        document.getElementById('save-btn').innerText = "Zapisywanie...";
-        await fetch(API_URL, { method: 'POST', body: JSON.stringify(updateData) });
-        document.getElementById('save-btn').innerText = "💾 Zapisz Typy";
-        await loadAllDataFromGoogle();
-        alert("Zapisano!");
+        try {
+            document.getElementById('quick-save-btn').innerText = "Zapisywanie...";
+            await fetch(API_URL, { method: 'POST', body: JSON.stringify(updateData) });
+            alert("Typy pomyślnie zapisane!");
+            location.reload();
+        } catch (e) {
+            alert("Błąd zapisu!");
+        }
     }
 
-    function renderAllPredsTable() {
+    async function loadAllPredictionsTable() {
         const currentRound = roundsOrder[currentRoundIndex];
-        const matches = allMatches.filter(m => m.round === currentRound);
-        const header = document.getElementById('all-preds-header');
+        const currentNick = localStorage.getItem('typerNick');
+        const headerRow = document.getElementById('all-preds-header');
         const tbody = document.getElementById('all-preds-body');
+        const roundMatches = allMatches.filter(m => m.round === currentRound);
         const now = new Date();
 
-        header.innerHTML = "<th>Gracz</th>";
-        matches.forEach(m => {
-            const score = dbData.results[m.id] || '?-?';
-            header.innerHTML += `<th>${getLogoHtml(m.t1)}${getLogoHtml(m.t2)}<br><small>(${score})</small></th>`;
+        headerRow.innerHTML = "<th>Gracz</th>";
+        roundMatches.forEach(m => {
+            headerRow.innerHTML += `
+                <th>
+                    <div class="table-logo-header">
+                        ${getTeamLogoHtml(m.t1)} ${m.t1.substring(0,3)} - ${getTeamLogoHtml(m.t2)} ${m.t2.substring(0,3)}
+                    </div>
+                    <small>(${m.realScore || '?-?'})</small>
+                </th>`;
         });
+        headerRow.innerHTML += "<th>Pkt (Runda)</th>";
 
-        tbody.innerHTML = "";
-        const roundData = dbData.predictions[currentRound] || {};
-        const players = Object.keys(roundData);
-
-        if (players.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="${matches.length + 1}">Brak typów.</td></tr>`;
+        if (!currentUserHasSubmittedRound) {
+            tbody.innerHTML = `<tr><td colspan="${roundMatches.length + 2}"><b>Obstaw i zapisz przynajmniej 1 mecz w tej kolejce, aby zobaczyć typy innych!</b></td></tr>`;
             return;
         }
 
-        players.forEach(p => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td><b>${p}</b></td>`;
-            
-            matches.forEach(m => {
-                const pred = roundData[p][m.id] || "-";
-                const real = dbData.results[m.id];
-                const isLocked = now >= new Date(m.lock);
-                let cls = "";
-                let display = pred;
+        try {
+            const res = await fetch(`${API_URL}?action=getAllPredictions&kolejka=${encodeURIComponent(currentRound)}`, { redirect: 'follow' });
+            const playersData = await res.json();
 
-                if (p !== localStorage.getItem('typerNick') && !isLocked) display = "🔒";
-
-                if (real && pred !== "-" && isLocked) {
-                    const pts = computePoints(pred, real);
-                    if (pts === 60) cls = "tag-exact";
-                    else if (pts === 25) cls = "tag-winner";
-                }
-
-                tr.innerHTML += `<td class="${cls}">${display}</td>`;
-            });
-            tbody.appendChild(tr);
-        });
-    }
-
-    function calculateAndRenderLeaderboard() {
-        const leaderboard = {};
-
-        // Przechodzimy przez wszystkie zakłady i mecze
-        for (let roundName in dbData.predictions) {
-            for (let player in dbData.predictions[roundName]) {
-                if (!leaderboard[player]) leaderboard[player] = 0;
-
-                for (let matchId in dbData.predictions[roundName][player]) {
-                    const pred = dbData.predictions[roundName][player][matchId];
-                    const real = dbData.results[matchId];
-
-                    if (pred && real) {
-                        leaderboard[player] += computePoints(pred, real);
-                    }
-                }
+            if (!playersData || playersData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${roundMatches.length + 2}">Brak zarejestrowanych typów.</td></tr>`;
+                return;
             }
+
+            tbody.innerHTML = "";
+            playersData.forEach(p => {
+                const tr = document.createElement('tr');
+                const isCurrentPlayer = (p.gracz === currentNick);
+                let cellsHtml = `<td style="font-weight:bold; text-align:left;">${p.gracz} ${isCurrentPlayer ? '(Ty)' : ''}</td>`;
+                let roundPoints = 0;
+
+                roundMatches.forEach(m => {
+                    const rawPred = p.typy[m.id] || "-";
+                    const isMatchStarted = (now >= new Date(m.lock));
+                    let matchClass = "";
+                    let displayPred = rawPred;
+
+                    if (!isCurrentPlayer && !isMatchStarted) {
+                        displayPred = "🔒";
+                    }
+
+                    if (isMatchStarted && m.realScore && rawPred !== "-") {
+                        const [rh, ra] = m.realScore.split(':').map(Number);
+                        const [ph, pa] = rawPred.split(':').map(Number);
+
+                        if (!isNaN(rh) && !isNaN(ra) && !isNaN(ph) && !isNaN(pa)) {
+                            // Dokładny wynik = 60 pkt
+                            if (rh === ph && ra === pa) {
+                                matchClass = "tag-exact";
+                                roundPoints += 60;
+                            } 
+                            // Trafiony zwycięzca / remis = 25 pkt
+                            else if ((rh > ra && ph > pa) || (rh < ra && ph < pa) || (rh === ra && ph === pa)) {
+                                matchClass = "tag-winner";
+                                roundPoints += 25;
+                            }
+                        }
+                    }
+
+                    cellsHtml += `<td class="${matchClass}">${displayPred}</td>`;
+                });
+
+                cellsHtml += `<td style="font-weight:bold; color:var(--accent); background:#38003c;">${roundPoints}</td>`;
+                tr.innerHTML = cellsHtml;
+                tbody.appendChild(tr);
+            });
+
+        } catch (e) {
+            tbody.innerHTML = `<tr><td colspan="${roundMatches.length + 2}">Nie udało się załadować tabeli typów.</td></tr>`;
         }
-
-        const sorted = Object.keys(leaderboard)
-            .map(p => ({ gracz: p, punkty: leaderboard[p] }))
-            .sort((a, b) => b.punkty - a.punkty);
-
-        const tbody = document.getElementById('leaderboard-body');
-        tbody.innerHTML = "";
-
-        if (sorted.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="3">Brak danych.</td></tr>`;
-            return;
-        }
-
-        sorted.forEach((row, i) => {
-            tbody.innerHTML += `
-                <tr>
-                    <td><b>${i + 1}</b></td>
-                    <td style="text-align:left; padding-left:10px;">${row.gracz}</td>
-                    <td style="font-weight:bold; color:#028a5a;">${row.punkty} pkt</td>
-                </tr>`;
-        });
     }
 
-    // Funkcja licząca punkty bezpośrednio w przeglądarce
-    function computePoints(pred, real) {
-        if (!pred || !real || pred.indexOf(':') === -1 || real.indexOf(':') === -1) return 0;
-        const p = pred.split(':').map(Number);
-        const r = real.split(':').map(Number);
-
-        if (isNaN(p[0]) || isNaN(p[1]) || isNaN(r[0]) || isNaN(r[1])) return 0;
-
-        // Trafiony idealny wynik = 60 pkt
-        if (p[0] === r[0] && p[1] === r[1]) return 60;
-
-        // Trafiony zwycięzca/remis = 25 pkt
-        const realWinner = r[0] > r[1] ? 1 : (r[0] < r[1] ? 2 : 0);
-        const predWinner = p[0] > p[1] ? 1 : (p[0] < p[1] ? 2 : 0);
-
-        if (realWinner === predWinner) return 25;
-
-        return 0;
+    async function loadLeaderboard() {
+        const tbody = document.getElementById('leaderboard-body');
+        try {
+            const res = await fetch(`${API_URL}?action=getLeaderboard`, { redirect: 'follow' });
+            const data = await res.json();
+            
+            tbody.innerHTML = "";
+            data.forEach((row, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><b>${idx + 1}</b></td>
+                        <td style="text-align: left; padding-left: 15px; font-weight: bold;">${row.gracz}</td>
+                        <td style="font-weight: bold; color: #028a5a;">${row.punkty} pkt</td>
+                    </tr>`;
+            });
+        } catch (e) {
+            tbody.innerHTML = `<tr><td colspan="3" style="color:red">Błąd ładowania klasyfikacji</td></tr>`;
+        }
     }
 </script>
 </body>
