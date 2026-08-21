@@ -175,7 +175,8 @@
 </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbyfD639ixNFql0ApKAtWPkSlnTfiQeRBgXSuq87eVBWFT739vGQvUuM9U5EaJRwdVUX7g/exec";
+    // ⚠️ TUTAJ WKLEJ SWÓJ URL WYGENEROWANY Z GOOGLE APPS SCRIPT
+    const API_URL = "PROSZE_TUTAJ_WKLEIC_URL_Z_GOOGLE_APPS_SCRIPT";
 
     const roundsOrder = ["Kolejka 1", "Kolejka 2", "Kolejka 3", "Kolejka 4", "Kolejka 5"];
     let currentRoundIndex = 0; 
@@ -230,16 +231,34 @@
         { id: "M1_7", round: "Kolejka 1", t1: "Brighton", t2: "Aston Villa", lock: "2026-08-21T21:00:00" },
         { id: "M1_8", round: "Kolejka 1", t1: "Manchester City", t2: "AFC Bournemouth", lock: "2026-08-21T21:00:00" },
         { id: "M1_9", round: "Kolejka 1", t1: "Newcastle United", t2: "Liverpool", lock: "2026-08-21T21:00:00" },
-        { id: "M1_10", round: "Kolejka 1", t1: "Fulham", t2: "Chelsea", lock: "2026-08-21T21:00:00" }
+        { id: "M1_10", round: "Kolejka 1", t1: "Fulham", t2: "Chelsea", lock: "2026-08-21T21:00:00" },
+
+        { id: "M2_1", round: "Kolejka 2", t1: "Sunderland", t2: "Arsenal", lock: "2026-08-29T16:00:00" },
+        { id: "M2_2", round: "Kolejka 2", t1: "Nottingham Forest", t2: "Tottenham Hotspur", lock: "2026-08-29T16:00:00" },
+        { id: "M2_3", round: "Kolejka 2", t1: "Newcastle United", t2: "Aston Villa", lock: "2026-08-29T16:00:00" },
+        { id: "M2_4", round: "Kolejka 2", t1: "Manchester United", t2: "AFC Bournemouth", lock: "2026-08-29T16:00:00" },
+        { id: "M2_5", round: "Kolejka 2", t1: "Manchester City", t2: "Brentford", lock: "2026-08-29T16:00:00" },
+        { id: "M2_6", round: "Kolejka 2", t1: "Liverpool", t2: "Brighton", lock: "2026-08-29T16:00:00" },
+        { id: "M2_7", round: "Kolejka 2", t1: "Leeds United", t2: "Chelsea", lock: "2026-08-29T16:00:00" },
+        { id: "M2_8", round: "Kolejka 2", t1: "Ipswich Town", t2: "Coventry City", lock: "2026-08-29T16:00:00" },
+        { id: "M2_9", round: "Kolejka 2", t1: "Hull City", t2: "Crystal Palace", lock: "2026-08-29T16:00:00" },
+        { id: "M2_10", round: "Kolejka 2", t1: "Fulham", t2: "Everton", lock: "2026-08-29T16:00:00" }
     ];
 
     function initApp() {
         initTheme(); 
         document.getElementById('loading-screen').classList.add('hidden');
-        localStorage.removeItem('typerNick');
         
         loadLeaderboard();
-        document.getElementById('login-screen').classList.remove('hidden');
+
+        // Pobranie z pamięci trwałej przeglądarki
+        const savedNick = localStorage.getItem('typerNick');
+        
+        if (savedNick) {
+            showApp(savedNick);
+        } else {
+            document.getElementById('login-screen').classList.remove('hidden');
+        }
     }
     window.onload = initApp;
 
@@ -248,13 +267,14 @@
         const nick = nickInput.value.trim();
         if (nick.length < 3) return alert('Nick musi mieć min. 3 znaki!');
         
-        sessionStorage.setItem('activeTyperNick', nick);
+        // Trwałe zapamiętanie nicku
+        localStorage.setItem('typerNick', nick);
         document.getElementById('login-screen').classList.add('hidden');
         showApp(nick);
     }
 
     function logoutUser() {
-        sessionStorage.removeItem('activeTyperNick');
+        localStorage.removeItem('typerNick');
         document.getElementById('app-screen').classList.add('hidden');
         document.getElementById('login-screen').classList.remove('hidden');
         document.getElementById('nick-input').value = "";
@@ -326,6 +346,7 @@
             const f1 = `<img src="${teamMeta[match.t1]?.logo || ''}" style="width:20px; height:20px; object-fit:contain; vertical-align:middle;">`;
             const f2 = `<img src="${teamMeta[match.t2]?.logo || ''}" style="width:20px; height:20px; object-fit:contain; vertical-align:middle;">`;
 
+            // Blokowanie wyłącznie pojedynczych meczów, które już wystartowały
             const matchLockTime = new Date(match.lock);
             const isMatchLocked = (now >= matchLockTime);
 
@@ -466,10 +487,10 @@
 
     async function submitEntireRound() {
         const currentRound = roundsOrder[currentRoundIndex];
-        const nick = sessionStorage.getItem('activeTyperNick');
+        const nick = localStorage.getItem('typerNick');
 
         if (!nick) {
-            alert('Sesja wygasła. Zaloguj się ponownie.');
+            alert('Nie znaleziono nicku. Zaloguj się ponownie.');
             return logoutUser();
         }
 
@@ -491,7 +512,7 @@
 
             await fetch(API_URL, { method: 'POST', body: JSON.stringify(updateData) });
 
-            alert(`Typy na ${currentRound} zostały zapisane! 🚀`);
+            alert(`Typy na ${currentRound} zostały pomyślnie zapisane! 🚀`);
             location.reload();
         } catch (error) {
             alert('Błąd zapisu: ' + error.message);
