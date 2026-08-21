@@ -46,6 +46,13 @@
         .header-banner { background: #38003c; color: var(--text-light); padding: 25px 20px 20px 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .header-banner h1 { color: var(--accent); margin: 0; font-size: 26px; }
         
+        .site-logo {
+            max-width: 140px;
+            height: auto;
+            display: block;
+            margin: 12px auto 0;
+        }
+
         .group-header-active { background: #38003c; color: var(--accent); font-weight: bold; padding: 12px; border-radius: 6px; margin: 15px 0; text-align: center; font-size: 18px; border: 2px solid var(--accent); }
         .card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; box-sizing: border-box; border: 1px solid var(--border); }
         
@@ -79,7 +86,7 @@
         .tag-exact { background-color: var(--exact-match) !important; color: var(--exact-text) !important; font-weight: bold; }
         .tag-winner { background-color: var(--winner-match) !important; color: var(--winner-text) !important; font-weight: bold; }
         
-        .legend { display: flex; gap: 15px; justify-content: center; font-size: 12px; margin-bottom: 10px; }
+        .legend { display: flex; gap: 15px; justify-content: center; font-size: 12px; margin-bottom: 10px; flex-wrap: wrap; }
         .legend-box { width: 15px; height: 15px; display: inline-block; vertical-align: middle; border-radius: 3px; }
     </style>
 </head>
@@ -90,6 +97,7 @@
 
     <div class="header-banner">
         <h1>🏆 TYPER PREMIER LEAGUE ⚽</h1>
+        <img src="https://i.ibb.co/C57KQHMd/Gemini-Generated-Image-q7hzv3q7hzv3q7hz.png" alt="Logo Typera" class="site-logo">
     </div>
 
     <div id="login-screen" class="card">
@@ -127,6 +135,7 @@
 
         <div class="card">
             <h2>🏆 Klasyfikacja Generalna</h2>
+            <p style="font-size: 11px; text-align: center; color: #888; margin-top: -5px;">Pkt z meczów + Bonusy za kolejki (1. msc: +150, 2. msc: +100, 3. msc: +50)</p>
             <div class="table-container">
                 <table>
                     <thead>
@@ -184,7 +193,6 @@
     let localDraftScores = {}; 
     let currentUserHasSubmittedRound = false;
 
-    // PEŁNY DOKŁADNY TERMINARZ 1 I 2 KOLEJKI
     const allMatches = [
         // KOLEJKA 1
         { id: "M1_1", round: "Kolejka 1", t1: "Arsenal", t2: "Coventry City", lock: "2026-08-21T21:00:00", realScore: "3:0" },
@@ -300,7 +308,6 @@
             const savedHome = localDraftScores[`home-${match.id}`] || "";
             const savedAway = localDraftScores[`away-${match.id}`] || "";
             
-            // MECZ ZABLOKOWANY PO SFORSOWANIU GODZINY ROZPOCZĘCIA
             const isMatchLocked = (now >= new Date(match.lock));
 
             div.innerHTML = `
@@ -417,7 +424,6 @@
                     let matchClass = "";
                     let displayPred = rawPred;
 
-                    // JEŚLI MATCH SIĘ NIE ZACZĄŁ I TO NIE SĄ TYPY LOGOWANEGO GRACZA - POKAZUJEMY KŁÓDKĘ 🔒
                     if (!isCurrentPlayer && !isMatchStarted) {
                         displayPred = "🔒";
                     }
@@ -462,12 +468,15 @@
                 return;
             }
 
-            const scores = {};
+            const totalScores = {};
 
             Object.keys(data.predictions).forEach(kolejkaName => {
                 const roundPlayers = data.predictions[kolejkaName];
+                const roundScores = {};
+
                 Object.keys(roundPlayers).forEach(player => {
-                    if (!scores[player]) scores[player] = 0;
+                    if (!totalScores[player]) totalScores[player] = 0;
+                    if (!roundScores[player]) roundScores[player] = 0;
                     
                     const playerPreds = roundPlayers[player];
                     Object.keys(playerPreds).forEach(matchId => {
@@ -479,19 +488,42 @@
                             const [ph, pa] = pred.split(':').map(Number);
 
                             if (!isNaN(rh) && !isNaN(ra) && !isNaN(ph) && !isNaN(pa)) {
-                                if (rh === ph && ra === pa) {
-                                    scores[player] += 60;
-                                } else if ((rh > ra && ph > pa) || (rh < ra && ph < pa) || (rh === ra && ph === pa)) {
-                                    scores[player] += 25;
-                                }
+                                let matchPts = 0;
+                                if (rh === ph && ra === pa) matchPts = 60;
+                                else if ((rh > ra && ph > pa) || (rh < ra && ph < pa) || (rh === ra && ph === pa)) matchPts = 25;
+                                
+                                roundScores[player] += matchPts;
+                                totalScores[player] += matchPts;
                             }
                         }
                     });
                 });
+
+                // NALICZANIE BONUSÓW ZA KOLEJKĘ (150 / 100 / 50 PKT)
+                const sortedRound = Object.keys(roundScores)
+                    .map(p => ({ player: p, score: roundScores[p] }))
+                    .sort((a, b) => b.score - a.score);
+
+                if (sortedRound.length > 0 && sortedRound[0].score > 0) {
+                    const topScore = sortedRound[0].score;
+                    sortedRound.filter(p => p.score === topScore).forEach(p => totalScores[p.player] += 150);
+
+                    const secondCandidates = sortedRound.filter(p => p.score < topScore);
+                    if (secondCandidates.length > 0 && secondCandidates[0].score > 0) {
+                        const secondScore = secondCandidates[0].score;
+                        secondCandidates.filter(p => p.score === secondScore).forEach(p => totalScores[p.player] += 100);
+
+                        const thirdCandidates = secondCandidates.filter(p => p.score < secondScore);
+                        if (thirdCandidates.length > 0 && thirdCandidates[0].score > 0) {
+                            const thirdScore = thirdCandidates[0].score;
+                            thirdCandidates.filter(p => p.score === thirdScore).forEach(p => totalScores[p.player] += 50);
+                        }
+                    }
+                }
             });
 
-            const sortedList = Object.keys(scores)
-                .map(p => ({ gracz: p, punkty: scores[p] }))
+            const sortedList = Object.keys(totalScores)
+                .map(p => ({ gracz: p, punkty: totalScores[p] }))
                 .sort((a, b) => b.punkty - a.punkty);
 
             if (sortedList.length === 0) {
