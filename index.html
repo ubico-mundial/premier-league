@@ -148,7 +148,8 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbyfD639ixNFql0ApKAtWPkSlnTfiQeRBgXSuq87eVBWFT739vGQvUuM9U5EaJRwdVUX7g/exec";
 
-    const GITHUB_LOGOS_URL = "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/logos/";
+    // Użycie szybkiej sieci CDN dla serwisów z GitHub (rozwiązuje błędy braku dostępu i CORS)
+    const GITHUB_LOGOS_URL = "https://cdn.jsdelivr.net/gh/ubico-mundial/premier-league@main/logos/";
 
     const TEAM_LOGOS = {
         "Arsenal": GITHUB_LOGOS_URL + "england_arsenal_64x64.football-logos.cc.png",
@@ -332,7 +333,9 @@
                     }
                 });
             }
-        } catch (e) {}
+        } catch (e) {
+            console.error("Błąd pobierania typów użytkownika:", e);
+        }
     }
 
     async function submitEntireRound() {
@@ -383,7 +386,7 @@
         }
 
         try {
-            const res = await fetch(`${API_URL}?action=getAllPredictions&kolejka=${encodeURIComponent(currentRound)}`, { redirect: 'follow' });
+            const res = await fetch(`${API_URL}?action=getAllPredictions&kolejka=${encodeURIComponent(currentRound)}`);
             const playersData = await res.json();
 
             if (!playersData || playersData.length === 0) {
@@ -433,7 +436,7 @@
     async function loadLeaderboard() {
         const tbody = document.getElementById('leaderboard-body');
         try {
-            const res = await fetch(`${API_URL}?action=getLeaderboard`, { redirect: 'follow' });
+            const res = await fetch(`${API_URL}?action=getLeaderboard`);
             const data = await res.json();
             
             tbody.innerHTML = "";
