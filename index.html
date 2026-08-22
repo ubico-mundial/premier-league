@@ -149,7 +149,7 @@
 
         <div class="card">
             <h2>🏆 Klasyfikacja Generalna</h2>
-            <p style="font-size: 11px; text-align: center; color: #888; margin-top: -5px;">Pkt z meczów + Bonusy za zakończone kolejki (1. msc: +150, 2. msc: +100, 3. msc: +50)</p>
+            <p style="font-size: 11px; text-align: center; color: #888; margin-top: -5px;">Pkt z meczów + Bonusy za zakończone kolejki (1. msc: +25,)</p>
             <div class="table-container">
                 <table>
                     <thead>
@@ -211,7 +211,7 @@
         // KOLEJKA 1
         { id: "M1_1", round: "Kolejka 1", t1: "Arsenal", t2: "Coventry City", lock: "2026-08-21T21:00:00", realScore: "3:0" },
         { id: "M1_2", round: "Kolejka 1", t1: "Hull City", t2: "Manchester United", lock: "2026-08-22T13:30:00", realScore: "2:0" },
-        { id: "M1_3", round: "Kolejka 1", t1: "Everton", t2: "Crystal Palace", lock: "2026-08-22T16:00:00", realScore: "1:0" },
+        { id: "M1_3", round: "Kolejka 1", t1: "Everton", t2: "Crystal Palace", lock: "2026-08-22T16:00:00", realScore: "2:0" },
         { id: "M1_4", round: "Kolejka 1", t1: "Ipswich Town", t2: "Sunderland", lock: "2026-08-22T16:00:00", realScore: "1:1" },
         { id: "M1_5", round: "Kolejka 1", t1: "Nottingham Forest", t2: "Leeds United", lock: "2026-08-22T16:00:00", realScore: "0:0" },
         { id: "M1_6", round: "Kolejka 1", t1: "Brentford", t2: "Tottenham Hotspur", lock: "2026-08-22T18:30:00", realScore: "" },
@@ -528,17 +528,17 @@
 
                     if (sortedRound.length > 0 && sortedRound[0].score > 0) {
                         const topScore = sortedRound[0].score;
-                        sortedRound.filter(p => p.score === topScore).forEach(p => totalScores[p.player] += 150);
+                        sortedRound.filter(p => p.score === topScore).forEach(p => totalScores[p.player] += 25);
 
                         const secondCandidates = sortedRound.filter(p => p.score < topScore);
                         if (secondCandidates.length > 0 && secondCandidates[0].score > 0) {
                             const secondScore = secondCandidates[0].score;
-                            secondCandidates.filter(p => p.score === secondScore).forEach(p => totalScores[p.player] += 100);
+                            secondCandidates.filter(p => p.score === secondScore).forEach(p => totalScores[p.player] += 0);
 
                             const thirdCandidates = secondCandidates.filter(p => p.score < secondScore);
                             if (thirdCandidates.length > 0 && thirdCandidates[0].score > 0) {
                                 const thirdScore = thirdCandidates[0].score;
-                                thirdCandidates.filter(p => p.score === thirdScore).forEach(p => totalScores[p.player] += 50);
+                                thirdCandidates.filter(p => p.score === thirdScore).forEach(p => totalScores[p.player] += 0);
                             }
                         }
                     }
