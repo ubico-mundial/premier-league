@@ -129,7 +129,9 @@
             <div id="group-title" class="group-header-active"></div>
             
             <div id="matches-list">Pobieranie meczów...</div>
-            <button id="quick-save-btn" onclick="submitEntireRound()" style="background:#028a5a; color:white; margin-top:15px;">💾 Zapisz swoje typy</button>
+            
+            <button id="randomize-scores-btn" onclick="randomizeAllScores()" style="background:#5c2d91; color:white; margin-top:15px;">🎲 Losuj typy</button>
+            <button id="quick-save-btn" onclick="submitEntireRound()" style="background:#028a5a; color:white; margin-top:10px;">💾 Zapisz swoje typy</button>
         </div>
 
         <div class="card">
@@ -366,6 +368,29 @@
         });
     }
 
+    function randomizeAllScores() {
+        // Realistyczne prawdopodobieństwo bramek (najwięcej 1 i 2, najmniej 4)
+        const possibleGoals = [0, 1, 1, 1, 2, 2, 2, 3, 3, 4];
+
+        document.querySelectorAll('.match-row').forEach(row => {
+            const h = row.querySelector('.home-team');
+            const a = row.querySelector('.away-team');
+            
+            if (h && a && !h.disabled) {
+                const randomHome = possibleGoals[Math.floor(Math.random() * possibleGoals.length)];
+                const randomAway = possibleGoals[Math.floor(Math.random() * possibleGoals.length)];
+
+                h.value = randomHome;
+                a.value = randomAway;
+
+                // Aktualizujemy dane w pamięci podręcznej
+                const matchId = h.getAttribute('data-id');
+                localDraftScores[`home-${matchId}`] = randomHome;
+                localDraftScores[`away-${matchId}`] = randomAway;
+            }
+        });
+    }
+
     function autoTab(input) {
         if (input.value.length >= 1) {
             const inputs = Array.from(document.querySelectorAll('.score-inputs input:not([disabled])'));
@@ -556,7 +581,7 @@
                             const secondScore = secondCandidates[0].score;
                             secondCandidates.filter(p => p.score === secondScore).forEach(p => totalScores[p.player] += 0);
 
-                            const thirdCandidates = secondCandidates.filter(p => p.score < secondScore);
+                            const thirdCandidates = secondCandidates.filter(p => p.score < thirdScore);
                             if (thirdCandidates.length > 0 && thirdCandidates[0].score > 0) {
                                 const thirdScore = thirdCandidates[0].score;
                                 thirdCandidates.filter(p => p.score === thirdScore).forEach(p => totalScores[p.player] += 0);
@@ -592,4 +617,3 @@
 </script>
 </body>
 </html>
-
