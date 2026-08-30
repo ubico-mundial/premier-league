@@ -116,7 +116,7 @@
         .chat-msg { font-size: 13px; line-height: 1.4; word-break: break-word; }
         .chat-msg .nick { font-weight: bold; color: var(--accent); }
         body:not(.dark-mode) .chat-msg .nick { color: #38003c; }
-        .chat-msg .time { font-size: 10px; color: #888; margin-left: 5px; }
+        .chat-msg .time { font-size: 11px; color: #888; margin-right: 4px; }
         .chat-input-container { display: flex; gap: 8px; }
         .chat-input-container input { margin-top: 0; text-align: left; border: 1px solid var(--border); }
         .chat-input-container button { margin-top: 0; width: auto; white-space: nowrap; padding: 0 20px; }
@@ -680,7 +680,6 @@
         }
     }
 
-    /* POPRAWIONA OBSŁUGA CZATU */
     async function loadChat() {
         try {
             const res = await fetch(`${API_URL}?action=getChat`);
@@ -692,12 +691,27 @@
                 return;
             }
 
-            box.innerHTML = messages.map(m => `
-                <div class="chat-msg">
-                    <span class="nick">${m.gracz}</span><span class="time">(${m.timestamp || ''})</span>:
-                    <span>${m.wiadomosc}</span>
-                </div>
-            `).join('');
+            box.innerHTML = messages.map(m => {
+                let formattedTime = "";
+                if (m.timestamp) {
+                    const d = new Date(m.timestamp);
+                    if (!isNaN(d)) {
+                        const day = String(d.getDate()).padStart(2, '0');
+                        const month = String(d.getMonth() + 1).padStart(2, '0');
+                        const hours = String(d.getHours()).padStart(2, '0');
+                        const minutes = String(d.getMinutes()).padStart(2, '0');
+                        formattedTime = `${day}.${month}, ${hours}:${minutes}`;
+                    }
+                }
+
+                return `
+                    <div class="chat-msg">
+                        <span class="time">${formattedTime ? '[' + formattedTime + ']' : ''}</span>
+                        <span class="nick">${m.gracz}</span>:
+                        <span>${m.wiadomosc}</span>
+                    </div>
+                `;
+            }).join('');
             box.scrollTop = box.scrollHeight;
         } catch(e) {
             console.error("Błąd pobierania wiadomości czatu:", e);
