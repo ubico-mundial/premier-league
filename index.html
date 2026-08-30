@@ -121,7 +121,6 @@
         .chat-input-container input { margin-top: 0; text-align: left; border: 1px solid var(--border); }
         .chat-input-container button { margin-top: 0; width: auto; white-space: nowrap; padding: 0 15px; }
 
-        /* SEKCJA DLA EMOTEK */
         .chat-img-emote {
             width: 20px;
             height: 20px;
@@ -246,10 +245,8 @@
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbz66hvdvdCCe3r4QU97eiFZrBjryV3hCQgbKqhSsBVpWTAVrnXf1psf3z6uUZZOUlahpA/exec";
-
     const GITHUB_LOGOS_URL = "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/logos/";
 
-    /* SŁOWNIK EMOTEK - Podmień linki PNG na własne! */
     const EMOTES = {
         ":smile:": "https://cdn-icons-png.flaticon.com/512/742/742751.png",
         ":fire:": "https://cdn-icons-png.flaticon.com/512/785/785116.png",
@@ -257,7 +254,7 @@
         ":ball:": "https://cdn-icons-png.flaticon.com/512/53/53283.png",
         ":cry:": "https://cdn-icons-png.flaticon.com/512/742/742784.png",
         ":thumbsup:": "https://cdn-icons-png.flaticon.com/512/889/889221.png"
-        "biblethump": "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/emotki/biblethump.png"
+        "biblethump": "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/emotki/biblethump.png",
     };
 
     const TEAM_LOGOS = {
@@ -393,7 +390,7 @@
     function windowInit() {
         applySavedTheme();
         currentRoundIndex = determineActiveRoundIndex();
-        renderEmotePicker();
+        
         const savedNick = localStorage.getItem('typerNick');
         if (savedNick) {
             showApp(savedNick);
@@ -418,14 +415,18 @@
         }
     }
 
-    async function showApp(nick) {
+    function showApp(nick) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-screen').style.display = 'block';
         document.getElementById('user-display').innerText = nick;
+        
         renderProgressBar();
-        await fetchUserPredictions();
+        renderEmotePicker();
         renderActiveRound();
-        await loadAllPredictionsTable();
+
+        // Asynchroniczne ładowanie danych w tle
+        fetchUserPredictions().then(() => renderActiveRound());
+        loadAllPredictionsTable();
         calculateLeaderboardFromAllData();
         
         loadChat();
@@ -450,6 +451,8 @@
         localDraftScores = {};
         currentUserHasSubmittedRound = false;
         renderProgressBar();
+        renderActiveRound();
+        
         await fetchUserPredictions();
         renderActiveRound();
         await loadAllPredictionsTable();
@@ -739,9 +742,9 @@
         }
     }
 
-    /* FUNKCJE DLA EMOTEK */
     function renderEmotePicker() {
         const picker = document.getElementById('emote-picker');
+        if (!picker) return;
         picker.innerHTML = "";
         Object.keys(EMOTES).forEach(code => {
             const img = document.createElement('img');
@@ -755,7 +758,7 @@
     function toggleEmotePicker(event) {
         event.stopPropagation();
         const picker = document.getElementById('emote-picker');
-        picker.classList.toggle('hidden');
+        if (picker) picker.classList.toggle('hidden');
     }
 
     function insertEmote(code) {
@@ -783,7 +786,6 @@
         return parsedText;
     }
 
-    /* OBSŁUGA CZATU */
     async function loadChat() {
         try {
             const res = await fetch(`${API_URL}?action=getChat`);
