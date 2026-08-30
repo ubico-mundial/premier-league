@@ -189,7 +189,7 @@
             <div class="progress-bar" id="steps-bar"></div>
             <div id="group-title" class="group-header-active"></div>
             
-            <div id="matches-list">Pobieranie meczów...</div>
+            <div id="matches-list">Ładowanie meczów...</div>
             
             <button id="randomize-scores-btn" onclick="randomizeAllScores()" style="background:#5c2d91; color:white; margin-top:15px;">🎲 Losuj typy</button>
             <button id="quick-save-btn" onclick="submitEntireRound()" style="background:#028a5a; color:white; margin-top:10px;">💾 Zapisz swoje typy</button>
@@ -253,18 +253,7 @@
         ":trophy:": "https://cdn-icons-png.flaticon.com/512/3112/3112946.png",
         ":ball:": "https://cdn-icons-png.flaticon.com/512/53/53283.png",
         ":cry:": "https://cdn-icons-png.flaticon.com/512/742/742784.png",
-        ":thumbsup:": "https://cdn-icons-png.flaticon.com/512/889/889221.png",
-        "biblethump": "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/emotki/biblethump.png",
-        "duckPls": "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/emotki/duckPls.gif",
-        "zjeb": "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/emotki/KEKW.png",
-        "KEKW": "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/emotki/KEKW2.gif",
-        "pogchamp": "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/emotki/pogchamp.png",
-        "pogu": "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/emotki/Pogchamp2.png",
-        "sadKEK": "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/emotki/sadKEK.png",
-        "arsenal": GITHUB_LOGOS_URL + "england_arsenal_64x64.football-logos.cc.png",
-        "manu": GITHUB_LOGOS_URL + "england_manchester-united_64x64.football-logos.cc.png",
-        "Liverpool": GITHUB_LOGOS_URL + "england_liverpool_64x64.football-logos.cc.png",
-        "mancity": GITHUB_LOGOS_URL + "england_manchester-city_64x64.football-logos.cc.png"
+        ":thumbsup:": "https://cdn-icons-png.flaticon.com/512/889/889221.png"
     };
 
     const TEAM_LOGOS = {
@@ -307,7 +296,6 @@
     const roundsOrder = ["Kolejka 1", "Kolejka 2", "Kolejka 3", "Kolejka 4", "Kolejka 5"];
     let currentRoundIndex = 0; 
     let localDraftScores = {}; 
-    let currentUserHasSubmittedRound = false;
     let chatInterval = null;
 
     const allMatches = [
@@ -332,7 +320,7 @@
         { id: "M2_6", round: "Kolejka 2", t1: "Chelsea", t2: "Brighton", lock: "2026-08-30T15:00:00", realScore: "4:3" },
         { id: "M2_7", round: "Kolejka 2", t1: "Leeds United", t2: "Brentford", lock: "2026-08-30T15:00:00", realScore: "1:1" },
         { id: "M2_8", round: "Kolejka 2", t1: "Sunderland", t2: "Fulham", lock: "2026-08-30T15:00:00", realScore: "1:0" },
-        { id: "M2_9", round: "Kolejka 2", t1: "Manchester United", t2: "Ipswich Town", lock: "2026-08-30T17:30:00", realScore: "5:2" },
+        { id: "M2_9", round: "Kolejka 2", t1: "Manchester United", t2: "Ipswich Town", lock: "2026-08-30T17:30:00", realScore: "" },
         { id: "M2_10", round: "Kolejka 2", t1: "Aston Villa", t2: "Arsenal", lock: "2026-08-31T21:00:00", realScore: "" },
 
         // KOLEJKA 3
@@ -345,19 +333,7 @@
         { id: "M3_7", round: "Kolejka 3", t1: "Nottingham Forest", t2: "Tottenham Hotspur", lock: "2026-09-05T16:00:00", realScore: "" },
         { id: "M3_8", round: "Kolejka 3", t1: "Hull City", t2: "Aston Villa", lock: "2026-09-05T18:30:00", realScore: "" },
         { id: "M3_9", round: "Kolejka 3", t1: "Everton FC", t2: "Manchester United", lock: "2026-09-06T15:00:00", realScore: "" },
-        { id: "M3_10", round: "Kolejka 3", t1: "Arsenal FC", t2: "Chelsea FC", lock: "2026-09-06T17:30:00", realScore: "" },
-
-        // KOLEJKA 4
-        { id: "M4_1", round: "Kolejka 4", t1: "AFC Bournemouth", t2: "Brentford FC", lock: "2026-09-12T16:00:00", realScore: "" },
-        { id: "M4_2", round: "Kolejka 4", t1: "Aston Villa", t2: "Nottingham Forest", lock: "2026-09-12T16:00:00", realScore: "" },
-        { id: "M4_3", round: "Kolejka 4", t1: "Chelsea FC", t2: "Hull City", lock: "2026-09-12T16:00:00", realScore: "" },
-        { id: "M4_4", round: "Kolejka 4", t1: "Crystal Palace", t2: "Ipswich Town", lock: "2026-09-12T16:00:00", realScore: "" },
-        { id: "M4_5", round: "Kolejka 4", t1: "Liverpool FC", t2: "Fulham FC", lock: "2026-09-12T16:00:00", realScore: "" },
-        { id: "M4_6", round: "Kolejka 4", t1: "Tottenham Hotspur", t2: "Everton FC", lock: "2026-09-12T18:30:00", realScore: "" },
-        { id: "M4_7", round: "Kolejka 4", t1: "Sunderland AFC", t2: "Arsenal FC", lock: "2026-09-12T21:00:00", realScore: "" },
-        { id: "M4_8", round: "Kolejka 4", t1: "Coventry City", t2: "Brighton & Hove Albion", lock: "2026-09-13T15:00:00", realScore: "" },
-        { id: "M4_9", round: "Kolejka 4", t1: "Manchester United", t2: "Manchester City", lock: "2026-09-13T17:30:00", realScore: "" },
-        { id: "M4_10", round: "Kolejka 4", t1: "Leeds United", t2: "Newcastle United", lock: "2026-09-14T21:00:00", realScore: "" }
+        { id: "M3_10", round: "Kolejka 3", t1: "Arsenal FC", t2: "Chelsea FC", lock: "2026-09-06T17:30:00", realScore: "" }
     ];
 
     function determineActiveRoundIndex() {
@@ -371,9 +347,7 @@
             const maxLockTime = Math.max(...lockTimes);
             const roundEndTime = maxLockTime + (24 * 60 * 60 * 1000);
 
-            if (now.getTime() < roundEndTime) {
-                return i;
-            }
+            if (now.getTime() < roundEndTime) return i;
         }
         return roundsOrder.length - 1;
     }
@@ -432,16 +406,18 @@
         
         renderProgressBar();
         renderEmotePicker();
+
+        // 1. Wczytaj zapisane dane z pamieci lokalnej dla natychmiastowego efektu
+        loadCachedData();
         renderActiveRound();
 
-        // Asynchroniczne ładowanie danych w tle
-        fetchUserPredictions().then(() => renderActiveRound());
-        loadAllPredictionsTable();
-        calculateLeaderboardFromAllData();
-        
+        // 2. Pobierz najnowsze dane RÓWNOLEGLE z API
+        refreshAllData();
+
+        // Czat uruchamia sie osobno
         loadChat();
         if (chatInterval) clearInterval(chatInterval);
-        chatInterval = setInterval(loadChat, 5000);
+        chatInterval = setInterval(loadChat, 6000);
     }
 
     function renderProgressBar() {
@@ -456,17 +432,15 @@
         });
     }
 
-    async function changeRound(idx) {
+    function changeRound(idx) {
         currentRoundIndex = idx;
         localDraftScores = {};
-        currentUserHasSubmittedRound = false;
         renderProgressBar();
+        
+        loadCachedData();
         renderActiveRound();
         
-        await fetchUserPredictions();
-        renderActiveRound();
-        await loadAllPredictionsTable();
-        calculateLeaderboardFromAllData();
+        refreshAllData();
     }
 
     function renderActiveRound() {
@@ -488,7 +462,6 @@
             div.className = "match-row";
             const savedHome = localDraftScores[`home-${match.id}`] || "";
             const savedAway = localDraftScores[`away-${match.id}`] || "";
-            
             const isMatchLocked = (now >= new Date(match.lock));
 
             div.innerHTML = `
@@ -510,18 +483,14 @@
 
     function randomizeAllScores() {
         const possibleGoals = [0, 1, 1, 1, 2, 2, 2, 3, 3, 4];
-
         document.querySelectorAll('.match-row').forEach(row => {
             const h = row.querySelector('.home-team');
             const a = row.querySelector('.away-team');
-            
             if (h && a && !h.disabled) {
                 const randomHome = possibleGoals[Math.floor(Math.random() * possibleGoals.length)];
                 const randomAway = possibleGoals[Math.floor(Math.random() * possibleGoals.length)];
-
                 h.value = randomHome;
                 a.value = randomAway;
-
                 const matchId = h.getAttribute('data-id');
                 localDraftScores[`home-${matchId}`] = randomHome;
                 localDraftScores[`away-${matchId}`] = randomAway;
@@ -540,25 +509,80 @@
         }
     }
 
-    async function fetchUserPredictions() {
-        const nick = localStorage.getItem('typerNick');
+    // Ładowanie szybkich danych z pamięci podręcznej (Cache)
+    function loadCachedData() {
         const currentRound = roundsOrder[currentRoundIndex];
+        const nick = localStorage.getItem('typerNick');
+
+        // Typy użytkownika z cache
+        const cachedUserPreds = localStorage.getItem(`userPreds_${nick}_${currentRound}`);
+        if (cachedUserPreds) {
+            const data = JSON.parse(cachedUserPreds);
+            allMatches.filter(m => m.round === currentRound).forEach(m => {
+                if (data[m.id]) {
+                    const p = data[m.id].toString().split(':');
+                    if (p.length === 2) {
+                        localDraftScores[`home-${m.id}`] = p[0];
+                        localDraftScores[`away-${m.id}`] = p[1];
+                    }
+                }
+            });
+        }
+
+        // Tabela typów z cache
+        const cachedAllPreds = localStorage.getItem(`allPreds_${currentRound}`);
+        if (cachedAllPreds) {
+            renderAllPredictionsTable(JSON.parse(cachedAllPreds));
+        }
+
+        // Klasyfikacja z cache
+        const cachedData = localStorage.getItem(`allData_cache`);
+        if (cachedData) {
+            processAndRenderLeaderboard(JSON.parse(cachedData));
+        }
+    }
+
+    // Pobieranie RÓWNOLEGŁE wszystkich zapytan w 1 momencie (Ultra-Szybkie)
+    async function refreshAllData() {
+        const currentRound = roundsOrder[currentRoundIndex];
+        const nick = localStorage.getItem('typerNick');
+
         try {
-            const res = await fetch(`${API_URL}?action=getUserPredictions&gracz=${encodeURIComponent(nick)}&kolejka=${encodeURIComponent(currentRound)}`);
-            const data = await res.json();
-            if (data && Object.keys(data).length > 0) {
-                currentUserHasSubmittedRound = true;
+            const [userPredsRes, allPredsRes, allDataRes] = await Promise.all([
+                fetch(`${API_URL}?action=getUserPredictions&gracz=${encodeURIComponent(nick)}&kolejka=${encodeURIComponent(currentRound)}`),
+                fetch(`${API_URL}?action=getAllPredictions&kolejka=${encodeURIComponent(currentRound)}`),
+                fetch(`${API_URL}?action=getAllData`)
+            ]);
+
+            const userPreds = await userPredsRes.json();
+            const allPreds = await allPredsRes.json();
+            const allData = await allDataRes.json();
+
+            // Zapisz w Cache
+            localStorage.setItem(`userPreds_${nick}_${currentRound}`, JSON.stringify(userPreds));
+            localStorage.setItem(`allPreds_${currentRound}`, JSON.stringify(allPreds));
+            localStorage.setItem(`allData_cache`, JSON.stringify(allData));
+
+            // Zaktualizuj widok
+            if (userPreds && Object.keys(userPreds).length > 0) {
                 allMatches.filter(m => m.round === currentRound).forEach(m => {
-                    if (data[m.id]) {
-                        const p = data[m.id].toString().split(':');
+                    if (userPreds[m.id]) {
+                        const p = userPreds[m.id].toString().split(':');
                         if (p.length === 2) {
                             localDraftScores[`home-${m.id}`] = p[0];
                             localDraftScores[`away-${m.id}`] = p[1];
                         }
                     }
                 });
+                renderActiveRound();
             }
-        } catch (e) {}
+
+            renderAllPredictionsTable(allPreds);
+            processAndRenderLeaderboard(allData);
+
+        } catch (e) {
+            console.error("Błąd podczas równoległego odświeżania:", e);
+        }
     }
 
     async function submitEntireRound() {
@@ -579,19 +603,17 @@
 
         try {
             document.getElementById('quick-save-btn').innerText = "Zapisywanie...";
-            await fetch(API_URL, { 
-                method: 'POST', 
-                body: payload 
-            });
+            await fetch(API_URL, { method: 'POST', body: payload });
             alert("Typy pomyślnie zapisane!");
-            location.reload();
+            refreshAllData();
+            document.getElementById('quick-save-btn').innerText = "💾 Zapisz swoje typy";
         } catch (e) {
             alert("Błąd zapisu!");
             document.getElementById('quick-save-btn').innerText = "💾 Zapisz swoje typy";
         }
     }
 
-    async function loadAllPredictionsTable() {
+    function renderAllPredictionsTable(playersData) {
         const currentRound = roundsOrder[currentRoundIndex];
         const currentNick = localStorage.getItem('typerNick');
         const headerRow = document.getElementById('all-preds-header');
@@ -611,145 +633,123 @@
         });
         headerRow.innerHTML += "<th>Pkt (Runda)</th>";
 
-        try {
-            const res = await fetch(`${API_URL}?action=getAllPredictions&kolejka=${encodeURIComponent(currentRound)}`);
-            const playersData = await res.json();
-
-            if (!playersData || playersData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="${roundMatches.length + 2}">Brak zarejestrowanych typów.</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = "";
-            playersData.forEach(p => {
-                const tr = document.createElement('tr');
-                const isCurrentPlayer = (p.gracz === currentNick);
-                let cellsHtml = `<td style="font-weight:bold; text-align:left;">${p.gracz} ${isCurrentPlayer ? '(Ty)' : ''}</td>`;
-                let roundPoints = 0;
-
-                roundMatches.forEach(m => {
-                    const rawPred = p.typy[m.id] || "-";
-                    const isMatchStarted = (now >= new Date(m.lock));
-                    let matchClass = "";
-                    let displayPred = rawPred;
-
-                    if (!isCurrentPlayer && !isMatchStarted) {
-                        displayPred = "🔒";
-                    }
-
-                    if (m.realScore && rawPred !== "-") {
-                        const [rh, ra] = m.realScore.split(':').map(Number);
-                        const [ph, pa] = rawPred.split(':').map(Number);
-
-                        if (!isNaN(rh) && !isNaN(ra) && !isNaN(ph) && !isNaN(pa)) {
-                            if (rh === ph && ra === pa) {
-                                matchClass = "tag-exact";
-                                roundPoints += 60;
-                            } 
-                            else if ((rh > ra && ph > pa) || (rh < ra && ph < pa) || (rh === ra && ph === pa)) {
-                                matchClass = "tag-winner";
-                                roundPoints += 25;
-                            }
-                        }
-                    }
-
-                    cellsHtml += `<td class="${matchClass}">${displayPred}</td>`;
-                });
-
-                cellsHtml += `<td style="font-weight:bold; color:var(--accent); background:#38003c;">${roundPoints}</td>`;
-                tr.innerHTML = cellsHtml;
-                tbody.appendChild(tr);
-            });
-
-        } catch (e) {
-            tbody.innerHTML = `<tr><td colspan="${roundMatches.length + 2}">Nie udało się załadować tabeli typów.</td></tr>`;
+        if (!playersData || playersData.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="${roundMatches.length + 2}">Brak zarejestrowanych typów.</td></tr>`;
+            return;
         }
-    }
 
-    async function calculateLeaderboardFromAllData() {
-        const tbody = document.getElementById('leaderboard-body');
-        try {
-            const res = await fetch(`${API_URL}?action=getAllData`);
-            
-            if (!res.ok) throw new Error("Błąd pobierania danych");
+        tbody.innerHTML = "";
+        playersData.forEach(p => {
+            const tr = document.createElement('tr');
+            const isCurrentPlayer = (p.gracz === currentNick);
+            let cellsHtml = `<td style="font-weight:bold; text-align:left;">${p.gracz} ${isCurrentPlayer ? '(Ty)' : ''}</td>`;
+            let roundPoints = 0;
 
-            const data = await res.json();
-            
-            if (!data || !data.predictions) {
-                tbody.innerHTML = `<tr><td colspan="3">Brak danych w bazie</td></tr>`;
-                return;
-            }
+            roundMatches.forEach(m => {
+                const rawPred = p.typy[m.id] || "-";
+                const isMatchStarted = (now >= new Date(m.lock));
+                let matchClass = "";
+                let displayPred = rawPred;
 
-            const totalScores = {};
-            const now = new Date();
+                if (!isCurrentPlayer && !isMatchStarted) displayPred = "🔒";
 
-            Object.keys(data.predictions).forEach(kolejkaName => {
-                const roundPlayers = data.predictions[kolejkaName];
-                const roundScores = {};
+                if (m.realScore && rawPred !== "-") {
+                    const [rh, ra] = m.realScore.split(':').map(Number);
+                    const [ph, pa] = rawPred.split(':').map(Number);
 
-                Object.keys(roundPlayers).forEach(player => {
-                    if (!totalScores[player]) totalScores[player] = 0;
-                    if (!roundScores[player]) roundScores[player] = 0;
-                    
-                    const playerPreds = roundPlayers[player];
-                    Object.keys(playerPreds).forEach(matchId => {
-                        const match = allMatches.find(m => m.id === matchId);
-                        const pred = playerPreds[matchId];
-                        
-                        if (match && match.realScore && pred && pred !== "-") {
-                            const [rh, ra] = match.realScore.split(':').map(Number);
-                            const [ph, pa] = pred.split(':').map(Number);
-
-                            if (!isNaN(rh) && !isNaN(ra) && !isNaN(ph) && !isNaN(pa)) {
-                                let matchPts = 0;
-                                if (rh === ph && ra === pa) matchPts = 60;
-                                else if ((rh > ra && ph > pa) || (rh < ra && ph < pa) || (rh === ra && ph === pa)) matchPts = 25;
-                                
-                                roundScores[player] += matchPts;
-                                totalScores[player] += matchPts;
-                            }
+                    if (!isNaN(rh) && !isNaN(ra) && !isNaN(ph) && !isNaN(pa)) {
+                        if (rh === ph && ra === pa) {
+                            matchClass = "tag-exact";
+                            roundPoints += 60;
+                        } 
+                        else if ((rh > ra && ph > pa) || (rh < ra && ph < pa) || (rh === ra && ph === pa)) {
+                            matchClass = "tag-winner";
+                            roundPoints += 25;
                         }
-                    });
-                });
-
-                const roundMatches = allMatches.filter(m => m.round === kolejkaName);
-                const isRoundFinished = roundMatches.length > 0 && roundMatches.every(m => now >= new Date(m.lock));
-
-                if (isRoundFinished) {
-                    const sortedRound = Object.keys(roundScores)
-                        .map(p => ({ player: p, score: roundScores[p] }))
-                        .sort((a, b) => b.score - a.score);
-
-                    if (sortedRound.length > 0 && sortedRound[0].score > 0) {
-                        const topScore = sortedRound[0].score;
-                        sortedRound.filter(p => p.score === topScore).forEach(p => totalScores[p.player] += 25);
                     }
                 }
+
+                cellsHtml += `<td class="${matchClass}">${displayPred}</td>`;
             });
 
-            const sortedList = Object.keys(totalScores)
-                .map(p => ({ gracz: p, punkty: totalScores[p] }))
-                .sort((a, b) => b.punkty - a.punkty);
+            cellsHtml += `<td style="font-weight:bold; color:var(--accent); background:#38003c;">${roundPoints}</td>`;
+            tr.innerHTML = cellsHtml;
+            tbody.appendChild(tr);
+        });
+    }
 
-            if (sortedList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3">Brak wpisanych typów w klasyfikacji.</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = "";
-            sortedList.forEach((row, idx) => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td><b>${idx + 1}</b></td>
-                        <td style="text-align: left; padding-left: 15px; font-weight: bold;">${row.gracz}</td>
-                        <td style="font-weight: bold; color: #028a5a;">${row.punkty} pkt</td>
-                    </tr>`;
-            });
-
-        } catch (e) {
-            console.error("Błąd przeliczania klasyfikacji:", e);
-            tbody.innerHTML = `<tr><td colspan="3" style="color:red">Błąd obliczania klasyfikacji</td></tr>`;
+    function processAndRenderLeaderboard(data) {
+        const tbody = document.getElementById('leaderboard-body');
+        if (!data || !data.predictions) {
+            tbody.innerHTML = `<tr><td colspan="3">Brak danych w bazie</td></tr>`;
+            return;
         }
+
+        const totalScores = {};
+        const now = new Date();
+
+        Object.keys(data.predictions).forEach(kolejkaName => {
+            const roundPlayers = data.predictions[kolejkaName];
+            const roundScores = {};
+
+            Object.keys(roundPlayers).forEach(player => {
+                if (!totalScores[player]) totalScores[player] = 0;
+                if (!roundScores[player]) roundScores[player] = 0;
+                
+                const playerPreds = roundPlayers[player];
+                Object.keys(playerPreds).forEach(matchId => {
+                    const match = allMatches.find(m => m.id === matchId);
+                    const pred = playerPreds[matchId];
+                    
+                    if (match && match.realScore && pred && pred !== "-") {
+                        const [rh, ra] = match.realScore.split(':').map(Number);
+                        const [ph, pa] = pred.split(':').map(Number);
+
+                        if (!isNaN(rh) && !isNaN(ra) && !isNaN(ph) && !isNaN(pa)) {
+                            let matchPts = 0;
+                            if (rh === ph && ra === pa) matchPts = 60;
+                            else if ((rh > ra && ph > pa) || (rh < ra && ph < pa) || (rh === ra && ph === pa)) matchPts = 25;
+                            
+                            roundScores[player] += matchPts;
+                            totalScores[player] += matchPts;
+                        }
+                    }
+                });
+            });
+
+            const roundMatches = allMatches.filter(m => m.round === kolejkaName);
+            const isRoundFinished = roundMatches.length > 0 && roundMatches.every(m => now >= new Date(m.lock));
+
+            if (isRoundFinished) {
+                const sortedRound = Object.keys(roundScores)
+                    .map(p => ({ player: p, score: roundScores[p] }))
+                    .sort((a, b) => b.score - a.score);
+
+                if (sortedRound.length > 0 && sortedRound[0].score > 0) {
+                    const topScore = sortedRound[0].score;
+                    sortedRound.filter(p => p.score === topScore).forEach(p => totalScores[p.player] += 25);
+                }
+            }
+        });
+
+        const sortedList = Object.keys(totalScores)
+            .map(p => ({ gracz: p, punkty: totalScores[p] }))
+            .sort((a, b) => b.punkty - a.punkty);
+
+        if (sortedList.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="3">Brak wpisanych typów w klasyfikacji.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = "";
+        sortedList.forEach((row, idx) => {
+            tbody.innerHTML += `
+                <tr>
+                    <td><b>${idx + 1}</b></td>
+                    <td style="text-align: left; padding-left: 15px; font-weight: bold;">${row.gracz}</td>
+                    <td style="font-weight: bold; color: #028a5a;">${row.punkty} pkt</td>
+                </tr>`;
+        });
     }
 
     function renderEmotePicker() {
@@ -829,9 +829,7 @@
                 `;
             }).join('');
             box.scrollTop = box.scrollHeight;
-        } catch(e) {
-            console.error("Błąd pobierania wiadomości czatu:", e);
-        }
+        } catch(e) {}
     }
 
     async function sendChatMessage() {
@@ -848,10 +846,7 @@
         payload.append("wiadomosc", text);
 
         try {
-            await fetch(API_URL, {
-                method: 'POST',
-                body: payload
-            });
+            await fetch(API_URL, { method: 'POST', body: payload });
             loadChat();
         } catch(e) {
             alert("Nie udało się wysłać wiadomości.");
