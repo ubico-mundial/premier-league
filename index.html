@@ -6,7 +6,6 @@
     <title>Typer Premier League</title>
     <link rel="icon" type="image/jpeg" href="https://i.ibb.co/Qv1dF627/ubc.png">
     
-    <!-- Zapobiegamy mruganiu ekranu logowania przed załadowaniem JS -->
     <script>
         (function() {
             const savedTheme = localStorage.getItem('typerTheme');
@@ -74,7 +73,6 @@
         button { background: #38003c; color: var(--accent); font-weight: bold; cursor: pointer; font-size: 16px; border: 1px solid var(--accent); }
         .btn-change-nick { width: auto; padding: 4px 8px; font-size: 12px; display: inline-block; margin-left: 10px; background: transparent; color: var(--danger); border: 1px solid var(--danger); }
         
-        /* Domyślnie ukrywamy oba ekrany, aby uniknąć mrugania */
         #login-screen, #app-screen { display: none; }
         .hidden { display: none !important; }
         
@@ -103,7 +101,6 @@
         .legend { display: flex; gap: 15px; justify-content: center; font-size: 12px; margin-bottom: 10px; flex-wrap: wrap; }
         .legend-box { width: 15px; height: 15px; display: inline-block; vertical-align: middle; border-radius: 3px; }
 
-        /* Styl Czatu */
         .chat-messages {
             height: 220px;
             overflow-y: auto;
@@ -155,7 +152,6 @@
             <button id="quick-save-btn" onclick="submitEntireRound()" style="background:#028a5a; color:white; margin-top:10px;">💾 Zapisz swoje typy</button>
         </div>
 
-        <!-- SEKCJA CZATU SPOŁECZNOŚCI -->
         <div class="card">
             <h3>💬 CZAT SPOŁECZNOŚCI</h3>
             <div id="chat-box" class="chat-messages">Ładowanie wiadomości...</div>
@@ -308,8 +304,6 @@
 
             const lockTimes = roundMatches.map(m => new Date(m.lock).getTime());
             const maxLockTime = Math.max(...lockTimes);
-            
-            // Koniec kolejki uznajemy za 1 dzień (24h) po zablokowaniu ostatniego meczu
             const roundEndTime = maxLockTime + (24 * 60 * 60 * 1000);
 
             if (now.getTime() < roundEndTime) {
@@ -375,7 +369,6 @@
         await loadAllPredictionsTable();
         calculateLeaderboardFromAllData();
         
-        // Czat - załadowanie i start automatycznego odświeżania co 5 sek
         loadChat();
         if (chatInterval) clearInterval(chatInterval);
         chatInterval = setInterval(loadChat, 5000);
@@ -499,23 +492,30 @@
     async function submitEntireRound() {
         const nick = localStorage.getItem('typerNick');
         const currentRound = roundsOrder[currentRoundIndex];
-        const updateData = { "gracz": nick, "kolejka": currentRound };
+        
+        const payload = new URLSearchParams();
+        payload.append("gracz", nick);
+        payload.append("kolejka", currentRound);
 
         document.querySelectorAll('.match-row').forEach(row => {
             const h = row.querySelector('.home-team');
             const a = row.querySelector('.away-team');
             if (h && a && h.value !== "" && a.value !== "" && !h.disabled) {
-                updateData[h.getAttribute('data-id')] = `${h.value}:${a.value}`;
+                payload.append(h.getAttribute('data-id'), `${h.value}:${a.value}`);
             }
         });
 
         try {
             document.getElementById('quick-save-btn').innerText = "Zapisywanie...";
-            await fetch(API_URL, { method: 'POST', body: JSON.stringify(updateData) });
+            await fetch(API_URL, { 
+                method: 'POST', 
+                body: payload 
+            });
             alert("Typy pomyślnie zapisane!");
             location.reload();
         } catch (e) {
             alert("Błąd zapisu!");
+            document.getElementById('quick-save-btn').innerText = "💾 Zapisz swoje typy";
         }
     }
 
@@ -540,7 +540,7 @@
         headerRow.innerHTML += "<th>Pkt (Runda)</th>";
 
         try {
-            const res = await fetch(`${API_URL}?action=getAllPredictions&kolejka=${encodeURIComponent(currentRound)}`, { redirect: 'follow' });
+            const res = await fetch(`${API_URL}?action=getAllPredictions&kolejka=${encodeURIComponent(currentRound)}`);
             const playersData = await res.json();
 
             if (!playersData || playersData.length === 0) {
@@ -597,11 +597,9 @@
     async function calculateLeaderboardFromAllData() {
         const tbody = document.getElementById('leaderboard-body');
         try {
-            const res = await fetch(`${API_URL}?action=getAllData`, { redirect: 'follow' });
+            const res = await fetch(`${API_URL}?action=getAllData`);
             
-            if (!res.ok) {
-                throw new Error("Błąd pobierania danych z serwera");
-            }
+            if (!res.ok) throw new Error("Błąd pobierania danych");
 
             const data = await res.json();
             
@@ -682,24 +680,28 @@
         }
     }
 
-    /* OBSŁUGA CZATU */
+    /* POPRAWIONA OBSŁUGA CZATU */
     async function loadChat() {
         try {
-            const res = await fetch(`${API_URL}?action=getChat`, { redirect: 'follow' });
+            const res = await fetch(`${API_URL}?action=getChat`);
             const messages = await res.json();
             const box = document.getElementById('chat-box');
+
             if (!messages || !Array.isArray(messages) || messages.length === 0) {
                 box.innerHTML = '<p style="color:#888; font-size:12px; text-align:center; margin:auto;">Brak wiadomości. Napisz coś jako pierwszy!</p>';
                 return;
             }
+
             box.innerHTML = messages.map(m => `
                 <div class="chat-msg">
-                    <span class="nick">${m.gracz}</span><span class="time">(${m.time})</span>:
-                    <span>${m.text}</span>
+                    <span class="nick">${m.gracz}</span><span class="time">(${m.timestamp || ''})</span>:
+                    <span>${m.wiadomosc}</span>
                 </div>
             `).join('');
             box.scrollTop = box.scrollHeight;
-        } catch(e) {}
+        } catch(e) {
+            console.error("Błąd pobierania wiadomości czatu:", e);
+        }
     }
 
     async function sendChatMessage() {
@@ -709,10 +711,16 @@
         if (!text) return;
 
         input.value = "";
+        
+        const payload = new URLSearchParams();
+        payload.append("action", "sendChat");
+        payload.append("gracz", nick);
+        payload.append("wiadomosc", text);
+
         try {
             await fetch(API_URL, {
                 method: 'POST',
-                body: JSON.stringify({ action: 'sendChat', gracz: nick, text: text })
+                body: payload
             });
             loadChat();
         } catch(e) {
