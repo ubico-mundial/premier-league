@@ -113,13 +113,57 @@
             flex-direction: column;
             gap: 8px;
         }
-        .chat-msg { font-size: 13px; line-height: 1.4; word-break: break-word; }
+        .chat-msg { font-size: 13px; line-height: 1.4; word-break: break-word; display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
         .chat-msg .nick { font-weight: bold; color: var(--accent); }
         body:not(.dark-mode) .chat-msg .nick { color: #38003c; }
         .chat-msg .time { font-size: 11px; color: #888; margin-right: 4px; }
-        .chat-input-container { display: flex; gap: 8px; }
+        .chat-input-container { display: flex; gap: 8px; position: relative; }
         .chat-input-container input { margin-top: 0; text-align: left; border: 1px solid var(--border); }
-        .chat-input-container button { margin-top: 0; width: auto; white-space: nowrap; padding: 0 20px; }
+        .chat-input-container button { margin-top: 0; width: auto; white-space: nowrap; padding: 0 15px; }
+
+        /* SEKCJA DLA EMOTEK */
+        .chat-img-emote {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+            vertical-align: middle;
+            display: inline-block;
+        }
+        .btn-emote-picker {
+            padding: 0 10px !important;
+            font-size: 18px;
+            background: var(--input-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .emote-picker-popover {
+            position: absolute;
+            bottom: 50px;
+            right: 80px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 10px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            z-index: 100;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .emote-picker-popover img {
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            object-fit: contain;
+            padding: 2px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .emote-picker-popover img:hover {
+            background: var(--border);
+        }
     </style>
 </head>
 <body>
@@ -157,7 +201,10 @@
             <div id="chat-box" class="chat-messages">Ładowanie wiadomości...</div>
             <div class="chat-input-container">
                 <input type="text" id="chat-input" placeholder="Napisz coś na czacie..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+                <button class="btn-emote-picker" onclick="toggleEmotePicker(event)">😀</button>
                 <button onclick="sendChatMessage()">Wyślij</button>
+
+                <div id="emote-picker" class="emote-picker-popover hidden"></div>
             </div>
         </div>
 
@@ -201,6 +248,16 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbz66hvdvdCCe3r4QU97eiFZrBjryV3hCQgbKqhSsBVpWTAVrnXf1psf3z6uUZZOUlahpA/exec";
 
     const GITHUB_LOGOS_URL = "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/logos/";
+
+    /* SŁOWNIK EMOTEK - Podmień linki PNG na własne! */
+    const EMOTES = {
+        ":smile:": "https://cdn-icons-png.flaticon.com/512/742/742751.png",
+        ":fire:": "https://cdn-icons-png.flaticon.com/512/785/785116.png",
+        ":trophy:": "https://cdn-icons-png.flaticon.com/512/3112/3112946.png",
+        ":ball:": "https://cdn-icons-png.flaticon.com/512/53/53283.png",
+        ":cry:": "https://cdn-icons-png.flaticon.com/512/742/742784.png",
+        ":thumbsup:": "https://cdn-icons-png.flaticon.com/512/889/889221.png"
+    };
 
     const TEAM_LOGOS = {
         "Arsenal": GITHUB_LOGOS_URL + "england_arsenal_64x64.football-logos.cc.png",
@@ -335,6 +392,7 @@
     function windowInit() {
         applySavedTheme();
         currentRoundIndex = determineActiveRoundIndex();
+        renderEmotePicker();
         const savedNick = localStorage.getItem('typerNick');
         if (savedNick) {
             showApp(savedNick);
@@ -680,6 +738,51 @@
         }
     }
 
+    /* FUNKCJE DLA EMOTEK */
+    function renderEmotePicker() {
+        const picker = document.getElementById('emote-picker');
+        picker.innerHTML = "";
+        Object.keys(EMOTES).forEach(code => {
+            const img = document.createElement('img');
+            img.src = EMOTES[code];
+            img.title = code;
+            img.onclick = () => insertEmote(code);
+            picker.appendChild(img);
+        });
+    }
+
+    function toggleEmotePicker(event) {
+        event.stopPropagation();
+        const picker = document.getElementById('emote-picker');
+        picker.classList.toggle('hidden');
+    }
+
+    function insertEmote(code) {
+        const input = document.getElementById('chat-input');
+        input.value += ` ${code} `;
+        input.focus();
+        document.getElementById('emote-picker').classList.add('hidden');
+    }
+
+    document.addEventListener('click', (e) => {
+        const picker = document.getElementById('emote-picker');
+        const btn = document.querySelector('.btn-emote-picker');
+        if (picker && !picker.contains(e.target) && e.target !== btn) {
+            picker.classList.add('hidden');
+        }
+    });
+
+    function parseEmotes(text) {
+        if (!text) return "";
+        let parsedText = text;
+        Object.keys(EMOTES).forEach(code => {
+            const imgHtml = `<img src="${EMOTES[code]}" class="chat-img-emote" alt="${code}">`;
+            parsedText = parsedText.split(code).join(imgHtml);
+        });
+        return parsedText;
+    }
+
+    /* OBSŁUGA CZATU */
     async function loadChat() {
         try {
             const res = await fetch(`${API_URL}?action=getChat`);
@@ -708,7 +811,7 @@
                     <div class="chat-msg">
                         <span class="time">${formattedTime ? '[' + formattedTime + ']' : ''}</span>
                         <span class="nick">${m.gracz}</span>:
-                        <span>${m.wiadomosc}</span>
+                        <span>${parseEmotes(m.wiadomosc)}</span>
                     </div>
                 `;
             }).join('');
