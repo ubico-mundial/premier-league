@@ -102,6 +102,27 @@
         
         .legend { display: flex; gap: 15px; justify-content: center; font-size: 12px; margin-bottom: 10px; flex-wrap: wrap; }
         .legend-box { width: 15px; height: 15px; display: inline-block; vertical-align: middle; border-radius: 3px; }
+
+        /* Styl Czatu */
+        .chat-messages {
+            height: 220px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            padding: 10px;
+            border-radius: 6px;
+            background: var(--input-bg);
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .chat-msg { font-size: 13px; line-height: 1.4; word-break: break-word; }
+        .chat-msg .nick { font-weight: bold; color: var(--accent); }
+        body:not(.dark-mode) .chat-msg .nick { color: #38003c; }
+        .chat-msg .time { font-size: 10px; color: #888; margin-left: 5px; }
+        .chat-input-container { display: flex; gap: 8px; }
+        .chat-input-container input { margin-top: 0; text-align: left; border: 1px solid var(--border); }
+        .chat-input-container button { margin-top: 0; width: auto; white-space: nowrap; padding: 0 20px; }
     </style>
 </head>
 <body>
@@ -134,6 +155,16 @@
             <button id="quick-save-btn" onclick="submitEntireRound()" style="background:#028a5a; color:white; margin-top:10px;">💾 Zapisz swoje typy</button>
         </div>
 
+        <!-- SEKCJA CZATU SPOŁECZNOŚCI -->
+        <div class="card">
+            <h3>💬 CZAT SPOŁECZNOŚCI</h3>
+            <div id="chat-box" class="chat-messages">Ładowanie wiadomości...</div>
+            <div class="chat-input-container">
+                <input type="text" id="chat-input" placeholder="Napisz coś na czacie..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+                <button onclick="sendChatMessage()">Wyślij</button>
+            </div>
+        </div>
+
         <div class="card">
             <h3>📊 PODGLĄD TYPÓW GRACZY</h3>
             <p style="font-size: 12px; text-align: center; color: #888;">Typy innych pojawiają się dopiero po rozpoczęciu danego meczu.</p>
@@ -151,7 +182,7 @@
 
         <div class="card">
             <h2>🏆 Klasyfikacja Generalna</h2>
-            <p style="font-size: 11px; text-align: center; color: #888; margin-top: -5px;">Pkt z meczów + Bonusy za zakończone kolejki (1. msc: +25,)</p>
+            <p style="font-size: 11px; text-align: center; color: #888; margin-top: -5px;">Pkt z meczów + Bonusy za zakończone kolejki (1. msc: +25)</p>
             <div class="table-container">
                 <table>
                     <thead>
@@ -177,25 +208,33 @@
 
     const TEAM_LOGOS = {
         "Arsenal": GITHUB_LOGOS_URL + "england_arsenal_64x64.football-logos.cc.png",
+        "Arsenal FC": GITHUB_LOGOS_URL + "england_arsenal_64x64.football-logos.cc.png",
         "Coventry City": GITHUB_LOGOS_URL + "england_coventry-city_64x64.football-logos.cc.png",
         "Hull City": GITHUB_LOGOS_URL + "england_hull-city_64x64.football-logos.cc.png",
         "Manchester United": GITHUB_LOGOS_URL + "england_manchester-united_64x64.football-logos.cc.png",
         "Everton": GITHUB_LOGOS_URL + "england_everton_64x64.football-logos.cc.png",
+        "Everton FC": GITHUB_LOGOS_URL + "england_everton_64x64.football-logos.cc.png",
         "Crystal Palace": GITHUB_LOGOS_URL + "england_crystal-palace_64x64.football-logos.cc.png",
         "Ipswich Town": GITHUB_LOGOS_URL + "england_ipswich_64x64.football-logos.cc.png",
         "Sunderland": GITHUB_LOGOS_URL + "england_sunderland_64x64.football-logos.cc.png",
+        "Sunderland AFC": GITHUB_LOGOS_URL + "england_sunderland_64x64.football-logos.cc.png",
         "Nottingham Forest": GITHUB_LOGOS_URL + "england_nottingham-forest_64x64.football-logos.cc.png",
         "Leeds United": GITHUB_LOGOS_URL + "england_leeds-united_64x64.football-logos.cc.png",
         "Brentford": GITHUB_LOGOS_URL + "england_brentford_64x64.football-logos.cc.png",
+        "Brentford FC": GITHUB_LOGOS_URL + "england_brentford_64x64.football-logos.cc.png",
         "Tottenham Hotspur": GITHUB_LOGOS_URL + "england_tottenham_64x64.football-logos.cc.png",
         "Brighton": GITHUB_LOGOS_URL + "england_brighton_64x64.football-logos.cc.png",
+        "Brighton & Hove Albion": GITHUB_LOGOS_URL + "england_brighton_64x64.football-logos.cc.png",
         "Aston Villa": GITHUB_LOGOS_URL + "england_aston-villa_64x64.football-logos.cc.png",
         "Manchester City": GITHUB_LOGOS_URL + "england_manchester-city_64x64.football-logos.cc.png",
         "AFC Bournemouth": GITHUB_LOGOS_URL + "england_bournemouth_64x64.football-logos.cc.png",
         "Newcastle United": GITHUB_LOGOS_URL + "england_newcastle_64x64.football-logos.cc.png",
         "Liverpool": GITHUB_LOGOS_URL + "england_liverpool_64x64.football-logos.cc.png",
+        "Liverpool FC": GITHUB_LOGOS_URL + "england_liverpool_64x64.football-logos.cc.png",
         "Fulham": GITHUB_LOGOS_URL + "england_fulham_64x64.football-logos.cc.png",
-        "Chelsea": GITHUB_LOGOS_URL + "england_chelsea_64x64.football-logos.cc.png"
+        "Fulham FC": GITHUB_LOGOS_URL + "england_fulham_64x64.football-logos.cc.png",
+        "Chelsea": GITHUB_LOGOS_URL + "england_chelsea_64x64.football-logos.cc.png",
+        "Chelsea FC": GITHUB_LOGOS_URL + "england_chelsea_64x64.football-logos.cc.png"
     };
 
     function getTeamLogoHtml(teamName) {
@@ -208,6 +247,7 @@
     let currentRoundIndex = 0; 
     let localDraftScores = {}; 
     let currentUserHasSubmittedRound = false;
+    let chatInterval = null;
 
     const allMatches = [
         // KOLEJKA 1
@@ -232,7 +272,31 @@
         { id: "M2_7", round: "Kolejka 2", t1: "Leeds United", t2: "Brentford", lock: "2026-08-30T15:00:00", realScore: "" },
         { id: "M2_8", round: "Kolejka 2", t1: "Sunderland", t2: "Fulham", lock: "2026-08-30T15:00:00", realScore: "" },
         { id: "M2_9", round: "Kolejka 2", t1: "Manchester United", t2: "Ipswich Town", lock: "2026-08-30T17:30:00", realScore: "" },
-        { id: "M2_10", round: "Kolejka 2", t1: "Aston Villa", t2: "Arsenal", lock: "2026-08-31T21:00:00", realScore: "" }
+        { id: "M2_10", round: "Kolejka 2", t1: "Aston Villa", t2: "Arsenal", lock: "2026-08-31T21:00:00", realScore: "" },
+
+        // KOLEJKA 3
+        { id: "M3_1", round: "Kolejka 3", t1: "Ipswich Town", t2: "Liverpool FC", lock: "2026-09-04T21:00:00", realScore: "" },
+        { id: "M3_2", round: "Kolejka 3", t1: "Newcastle United", t2: "AFC Bournemouth", lock: "2026-09-05T13:30:00", realScore: "" },
+        { id: "M3_3", round: "Kolejka 3", t1: "Brentford FC", t2: "Sunderland AFC", lock: "2026-09-05T16:00:00", realScore: "" },
+        { id: "M3_4", round: "Kolejka 3", t1: "Brighton & Hove Albion", t2: "Leeds United", lock: "2026-09-05T16:00:00", realScore: "" },
+        { id: "M3_5", round: "Kolejka 3", t1: "Fulham FC", t2: "Crystal Palace", lock: "2026-09-05T16:00:00", realScore: "" },
+        { id: "M3_6", round: "Kolejka 3", t1: "Manchester City", t2: "Coventry City", lock: "2026-09-05T16:00:00", realScore: "" },
+        { id: "M3_7", round: "Kolejka 3", t1: "Nottingham Forest", t2: "Tottenham Hotspur", lock: "2026-09-05T16:00:00", realScore: "" },
+        { id: "M3_8", round: "Kolejka 3", t1: "Hull City", t2: "Aston Villa", lock: "2026-09-05T18:30:00", realScore: "" },
+        { id: "M3_9", round: "Kolejka 3", t1: "Everton FC", t2: "Manchester United", lock: "2026-09-06T15:00:00", realScore: "" },
+        { id: "M3_10", round: "Kolejka 3", t1: "Arsenal FC", t2: "Chelsea FC", lock: "2026-09-06T17:30:00", realScore: "" },
+
+        // KOLEJKA 4
+        { id: "M4_1", round: "Kolejka 4", t1: "AFC Bournemouth", t2: "Brentford FC", lock: "2026-09-12T16:00:00", realScore: "" },
+        { id: "M4_2", round: "Kolejka 4", t1: "Aston Villa", t2: "Nottingham Forest", lock: "2026-09-12T16:00:00", realScore: "" },
+        { id: "M4_3", round: "Kolejka 4", t1: "Chelsea FC", t2: "Hull City", lock: "2026-09-12T16:00:00", realScore: "" },
+        { id: "M4_4", round: "Kolejka 4", t1: "Crystal Palace", t2: "Ipswich Town", lock: "2026-09-12T16:00:00", realScore: "" },
+        { id: "M4_5", round: "Kolejka 4", t1: "Liverpool FC", t2: "Fulham FC", lock: "2026-09-12T16:00:00", realScore: "" },
+        { id: "M4_6", round: "Kolejka 4", t1: "Tottenham Hotspur", t2: "Everton FC", lock: "2026-09-12T18:30:00", realScore: "" },
+        { id: "M4_7", round: "Kolejka 4", t1: "Sunderland AFC", t2: "Arsenal FC", lock: "2026-09-12T21:00:00", realScore: "" },
+        { id: "M4_8", round: "Kolejka 4", t1: "Coventry City", t2: "Brighton & Hove Albion", lock: "2026-09-13T15:00:00", realScore: "" },
+        { id: "M4_9", round: "Kolejka 4", t1: "Manchester United", t2: "Manchester City", lock: "2026-09-13T17:30:00", realScore: "" },
+        { id: "M4_10", round: "Kolejka 4", t1: "Leeds United", t2: "Newcastle United", lock: "2026-09-14T21:00:00", realScore: "" }
     ];
 
     function determineActiveRoundIndex() {
@@ -296,6 +360,7 @@
     function logoutUser() {
         if (confirm("Czy na pewno chcesz zmienić nick / wylogować się?")) {
             localStorage.removeItem('typerNick');
+            if (chatInterval) clearInterval(chatInterval);
             location.reload();
         }
     }
@@ -309,6 +374,11 @@
         renderActiveRound();
         await loadAllPredictionsTable();
         calculateLeaderboardFromAllData();
+        
+        // Czat - załadowanie i start automatycznego odświeżania co 5 sek
+        loadChat();
+        if (chatInterval) clearInterval(chatInterval);
+        chatInterval = setInterval(loadChat, 5000);
     }
 
     function renderProgressBar() {
@@ -342,6 +412,11 @@
         
         const roundMatches = allMatches.filter(m => m.round === currentRound);
         const now = new Date();
+
+        if (roundMatches.length === 0) {
+            container.innerHTML = "<p style='text-align:center; padding:20px;'>Brak meczów dla tej kolejki.</p>";
+            return;
+        }
 
         roundMatches.forEach((match) => {
             const div = document.createElement('div');
@@ -604,6 +679,44 @@
         } catch (e) {
             console.error("Błąd przeliczania klasyfikacji:", e);
             tbody.innerHTML = `<tr><td colspan="3" style="color:red">Błąd obliczania klasyfikacji</td></tr>`;
+        }
+    }
+
+    /* OBSŁUGA CZATU */
+    async function loadChat() {
+        try {
+            const res = await fetch(`${API_URL}?action=getChat`, { redirect: 'follow' });
+            const messages = await res.json();
+            const box = document.getElementById('chat-box');
+            if (!messages || !Array.isArray(messages) || messages.length === 0) {
+                box.innerHTML = '<p style="color:#888; font-size:12px; text-align:center; margin:auto;">Brak wiadomości. Napisz coś jako pierwszy!</p>';
+                return;
+            }
+            box.innerHTML = messages.map(m => `
+                <div class="chat-msg">
+                    <span class="nick">${m.gracz}</span><span class="time">(${m.time})</span>:
+                    <span>${m.text}</span>
+                </div>
+            `).join('');
+            box.scrollTop = box.scrollHeight;
+        } catch(e) {}
+    }
+
+    async function sendChatMessage() {
+        const input = document.getElementById('chat-input');
+        const text = input.value.trim();
+        const nick = localStorage.getItem('typerNick');
+        if (!text) return;
+
+        input.value = "";
+        try {
+            await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'sendChat', gracz: nick, text: text })
+            });
+            loadChat();
+        } catch(e) {
+            alert("Nie udało się wysłać wiadomości.");
         }
     }
 </script>
