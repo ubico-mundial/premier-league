@@ -248,12 +248,24 @@
     const GITHUB_LOGOS_URL = "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/logos/";
 
     const EMOTES = {
+
         ":smile:": "https://cdn-icons-png.flaticon.com/512/742/742751.png",
         ":fire:": "https://cdn-icons-png.flaticon.com/512/785/785116.png",
         ":trophy:": "https://cdn-icons-png.flaticon.com/512/3112/3112946.png",
         ":ball:": "https://cdn-icons-png.flaticon.com/512/53/53283.png",
         ":cry:": "https://cdn-icons-png.flaticon.com/512/742/742784.png",
-        ":thumbsup:": "https://cdn-icons-png.flaticon.com/512/889/889221.png"
+        ":thumbsup:": "https://cdn-icons-png.flaticon.com/512/889/889221.png",
+        "biblethump": "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/emotki/biblethump.png",
+        "duckPls": "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/emotki/duckPls.gif",
+        "zjeb": "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/emotki/KEKW.png",
+        "KEKW": "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/emotki/KEKW2.gif",
+        "pogchamp": "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/emotki/pogchamp.png",
+        "pogu": "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/emotki/Pogchamp2.png",
+        "sadKEK": "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/emotki/sadKEK.png",
+        "arsenal": GITHUB_LOGOS_URL + "england_arsenal_64x64.football-logos.cc.png",
+        "manu": GITHUB_LOGOS_URL + "england_manchester-united_64x64.football-logos.cc.png",
+        "Liverpool": GITHUB_LOGOS_URL + "england_liverpool_64x64.football-logos.cc.png",
+        "mancity": GITHUB_LOGOS_URL + "england_manchester-city_64x64.football-logos.cc.png"
     };
 
     const TEAM_LOGOS = {
@@ -407,14 +419,11 @@
         renderProgressBar();
         renderEmotePicker();
 
-        // 1. Wczytaj zapisane dane z pamieci lokalnej dla natychmiastowego efektu
+        // Ładowanie z cache + natychmiastowy pobór z serwera
         loadCachedData();
         renderActiveRound();
-
-        // 2. Pobierz najnowsze dane RÓWNOLEGLE z API
         refreshAllData();
 
-        // Czat uruchamia sie osobno
         loadChat();
         if (chatInterval) clearInterval(chatInterval);
         chatInterval = setInterval(loadChat, 6000);
@@ -436,10 +445,8 @@
         currentRoundIndex = idx;
         localDraftScores = {};
         renderProgressBar();
-        
         loadCachedData();
         renderActiveRound();
-        
         refreshAllData();
     }
 
@@ -460,8 +467,8 @@
         roundMatches.forEach((match) => {
             const div = document.createElement('div');
             div.className = "match-row";
-            const savedHome = localDraftScores[`home-${match.id}`] || "";
-            const savedAway = localDraftScores[`away-${match.id}`] || "";
+            const savedHome = localDraftScores[`home-${match.id}`] !== undefined ? localDraftScores[`home-${match.id}`] : "";
+            const savedAway = localDraftScores[`away-${match.id}`] !== undefined ? localDraftScores[`away-${match.id}`] : "";
             const isMatchLocked = (now >= new Date(match.lock));
 
             div.innerHTML = `
@@ -509,65 +516,56 @@
         }
     }
 
-    // Ładowanie szybkich danych z pamięci podręcznej (Cache)
     function loadCachedData() {
         const currentRound = roundsOrder[currentRoundIndex];
         const nick = localStorage.getItem('typerNick');
 
-        // Typy użytkownika z cache
         const cachedUserPreds = localStorage.getItem(`userPreds_${nick}_${currentRound}`);
         if (cachedUserPreds) {
-            const data = JSON.parse(cachedUserPreds);
-            allMatches.filter(m => m.round === currentRound).forEach(m => {
-                if (data[m.id]) {
-                    const p = data[m.id].toString().split(':');
-                    if (p.length === 2) {
-                        localDraftScores[`home-${m.id}`] = p[0];
-                        localDraftScores[`away-${m.id}`] = p[1];
+            try {
+                const data = JSON.parse(cachedUserPreds);
+                allMatches.filter(m => m.round === currentRound).forEach(m => {
+                    if (data[m.id]) {
+                        const p = data[m.id].toString().split(':');
+                        if (p.length === 2) {
+                            localDraftScores[`home-${m.id}`] = p[0];
+                            localDraftScores[`away-${m.id}`] = p[1];
+                        }
                     }
-                }
-            });
+                });
+            } catch(e) {}
         }
 
-        // Tabela typów z cache
         const cachedAllPreds = localStorage.getItem(`allPreds_${currentRound}`);
         if (cachedAllPreds) {
-            renderAllPredictionsTable(JSON.parse(cachedAllPreds));
+            try { renderAllPredictionsTable(JSON.parse(cachedAllPreds)); } catch(e) {}
         }
 
-        // Klasyfikacja z cache
         const cachedData = localStorage.getItem(`allData_cache`);
         if (cachedData) {
-            processAndRenderLeaderboard(JSON.parse(cachedData));
+            try { processAndRenderLeaderboard(JSON.parse(cachedData)); } catch(e) {}
         }
     }
 
-    // Pobieranie RÓWNOLEGŁE wszystkich zapytan w 1 momencie (Ultra-Szybkie)
     async function refreshAllData() {
         const currentRound = roundsOrder[currentRoundIndex];
         const nick = localStorage.getItem('typerNick');
 
         try {
             const [userPredsRes, allPredsRes, allDataRes] = await Promise.all([
-                fetch(`${API_URL}?action=getUserPredictions&gracz=${encodeURIComponent(nick)}&kolejka=${encodeURIComponent(currentRound)}`),
-                fetch(`${API_URL}?action=getAllPredictions&kolejka=${encodeURIComponent(currentRound)}`),
-                fetch(`${API_URL}?action=getAllData`)
+                fetch(`${API_URL}?action=getUserPredictions&gracz=${encodeURIComponent(nick)}&kolejka=${encodeURIComponent(currentRound)}`).then(r => r.json()),
+                fetch(`${API_URL}?action=getAllPredictions&kolejka=${encodeURIComponent(currentRound)}`).then(r => r.json()),
+                fetch(`${API_URL}?action=getAllData`).then(r => r.json())
             ]);
 
-            const userPreds = await userPredsRes.json();
-            const allPreds = await allPredsRes.json();
-            const allData = await allDataRes.json();
+            localStorage.setItem(`userPreds_${nick}_${currentRound}`, JSON.stringify(userPredsRes));
+            localStorage.setItem(`allPreds_${currentRound}`, JSON.stringify(allPredsRes));
+            localStorage.setItem(`allData_cache`, JSON.stringify(allDataRes));
 
-            // Zapisz w Cache
-            localStorage.setItem(`userPreds_${nick}_${currentRound}`, JSON.stringify(userPreds));
-            localStorage.setItem(`allPreds_${currentRound}`, JSON.stringify(allPreds));
-            localStorage.setItem(`allData_cache`, JSON.stringify(allData));
-
-            // Zaktualizuj widok
-            if (userPreds && Object.keys(userPreds).length > 0) {
+            if (userPredsRes && typeof userPredsRes === 'object') {
                 allMatches.filter(m => m.round === currentRound).forEach(m => {
-                    if (userPreds[m.id]) {
-                        const p = userPreds[m.id].toString().split(':');
+                    if (userPredsRes[m.id]) {
+                        const p = userPredsRes[m.id].toString().split(':');
                         if (p.length === 2) {
                             localDraftScores[`home-${m.id}`] = p[0];
                             localDraftScores[`away-${m.id}`] = p[1];
@@ -577,39 +575,52 @@
                 renderActiveRound();
             }
 
-            renderAllPredictionsTable(allPreds);
-            processAndRenderLeaderboard(allData);
+            renderAllPredictionsTable(allPredsRes);
+            processAndRenderLeaderboard(allDataRes);
 
         } catch (e) {
-            console.error("Błąd podczas równoległego odświeżania:", e);
+            console.error("Błąd pobierania z bazy danych:", e);
         }
     }
 
     async function submitEntireRound() {
         const nick = localStorage.getItem('typerNick');
         const currentRound = roundsOrder[currentRoundIndex];
-        
-        const payload = new URLSearchParams();
-        payload.append("gracz", nick);
-        payload.append("kolejka", currentRound);
+        const btn = document.getElementById('quick-save-btn');
 
+        const predictionsPayload = {};
         document.querySelectorAll('.match-row').forEach(row => {
             const h = row.querySelector('.home-team');
             const a = row.querySelector('.away-team');
             if (h && a && h.value !== "" && a.value !== "" && !h.disabled) {
-                payload.append(h.getAttribute('data-id'), `${h.value}:${a.value}`);
+                predictionsPayload[h.getAttribute('data-id')] = `${h.value}:${a.value}`;
             }
         });
 
+        const dataToSend = {
+            action: "savePredictions",
+            gracz: nick,
+            kolejka: currentRound,
+            predictions: predictionsPayload
+        };
+
         try {
-            document.getElementById('quick-save-btn').innerText = "Zapisywanie...";
-            await fetch(API_URL, { method: 'POST', body: payload });
-            alert("Typy pomyślnie zapisane!");
-            refreshAllData();
-            document.getElementById('quick-save-btn').innerText = "💾 Zapisz swoje typy";
+            btn.innerText = "Zapisywanie...";
+            
+            // Wymuszony zapis danych w formacie czytelnym dla Google Web App
+            await fetch(API_URL, { 
+                method: 'POST', 
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(dataToSend) 
+            });
+
+            alert("Typy zostały wysłane do bazy danych!");
+            btn.innerText = "💾 Zapisz swoje typy";
+            setTimeout(refreshAllData, 1000);
         } catch (e) {
-            alert("Błąd zapisu!");
-            document.getElementById('quick-save-btn').innerText = "💾 Zapisz swoje typy";
+            alert("Błąd połączenia z bazą!");
+            btn.innerText = "💾 Zapisz swoje typy";
         }
     }
 
@@ -633,8 +644,8 @@
         });
         headerRow.innerHTML += "<th>Pkt (Runda)</th>";
 
-        if (!playersData || playersData.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="${roundMatches.length + 2}">Brak zarejestrowanych typów.</td></tr>`;
+        if (!playersData || !Array.isArray(playersData) || playersData.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="${roundMatches.length + 2}">Brak typów w bazie dla tej kolejki.</td></tr>`;
             return;
         }
 
@@ -646,7 +657,7 @@
             let roundPoints = 0;
 
             roundMatches.forEach(m => {
-                const rawPred = p.typy[m.id] || "-";
+                const rawPred = p.typy ? (p.typy[m.id] || "-") : "-";
                 const isMatchStarted = (now >= new Date(m.lock));
                 let matchClass = "";
                 let displayPred = rawPred;
@@ -681,7 +692,7 @@
     function processAndRenderLeaderboard(data) {
         const tbody = document.getElementById('leaderboard-body');
         if (!data || !data.predictions) {
-            tbody.innerHTML = `<tr><td colspan="3">Brak danych w bazie</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="3">Brak danych w klasyfikacji.</td></tr>`;
             return;
         }
 
@@ -737,7 +748,7 @@
             .sort((a, b) => b.punkty - a.punkty);
 
         if (sortedList.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="3">Brak wpisanych typów w klasyfikacji.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="3">Brak wpisanych typów.</td></tr>`;
             return;
         }
 
@@ -839,18 +850,16 @@
         if (!text) return;
 
         input.value = "";
-        
-        const payload = new URLSearchParams();
-        payload.append("action", "sendChat");
-        payload.append("gracz", nick);
-        payload.append("wiadomosc", text);
 
         try {
-            await fetch(API_URL, { method: 'POST', body: payload });
-            loadChat();
-        } catch(e) {
-            alert("Nie udało się wysłać wiadomości.");
-        }
+            await fetch(API_URL, { 
+                method: 'POST', 
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: "sendChat", gracz: nick, wiadomosc: text }) 
+            });
+            setTimeout(loadChat, 500);
+        } catch(e) {}
     }
 </script>
 </body>
