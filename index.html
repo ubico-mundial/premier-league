@@ -248,7 +248,6 @@
     const GITHUB_LOGOS_URL = "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/logos/";
 
     const EMOTES = {
-
         ":smile:": "https://cdn-icons-png.flaticon.com/512/742/742751.png",
         ":fire:": "https://cdn-icons-png.flaticon.com/512/785/785116.png",
         ":trophy:": "https://cdn-icons-png.flaticon.com/512/3112/3112946.png",
@@ -345,7 +344,19 @@
         { id: "M3_7", round: "Kolejka 3", t1: "Nottingham Forest", t2: "Tottenham Hotspur", lock: "2026-09-05T16:00:00", realScore: "" },
         { id: "M3_8", round: "Kolejka 3", t1: "Hull City", t2: "Aston Villa", lock: "2026-09-05T18:30:00", realScore: "" },
         { id: "M3_9", round: "Kolejka 3", t1: "Everton FC", t2: "Manchester United", lock: "2026-09-06T15:00:00", realScore: "" },
-        { id: "M3_10", round: "Kolejka 3", t1: "Arsenal FC", t2: "Chelsea FC", lock: "2026-09-06T17:30:00", realScore: "" }
+        { id: "M3_10", round: "Kolejka 3", t1: "Arsenal FC", t2: "Chelsea FC", lock: "2026-09-06T17:30:00", realScore: "" },
+
+        // KOLEJKA 4
+        { id: "M4_1", round: "Kolejka 4", t1: "AFC Bournemouth", t2: "Brentford FC", lock: "2026-09-12T16:00:00", realScore: "" },
+        { id: "M4_2", round: "Kolejka 4", t1: "Aston Villa", t2: "Nottingham Forest", lock: "2026-09-12T16:00:00", realScore: "" },
+        { id: "M4_3", round: "Kolejka 4", t1: "Chelsea FC", t2: "Hull City", lock: "2026-09-12T16:00:00", realScore: "" },
+        { id: "M4_4", round: "Kolejka 4", t1: "Crystal Palace", t2: "Ipswich Town", lock: "2026-09-12T16:00:00", realScore: "" },
+        { id: "M4_5", round: "Kolejka 4", t1: "Liverpool FC", t2: "Fulham FC", lock: "2026-09-12T16:00:00", realScore: "" },
+        { id: "M4_6", round: "Kolejka 4", t1: "Tottenham Hotspur", t2: "Everton FC", lock: "2026-09-12T18:30:00", realScore: "" },
+        { id: "M4_7", round: "Kolejka 4", t1: "Sunderland AFC", t2: "Arsenal FC", lock: "2026-09-12T21:00:00", realScore: "" },
+        { id: "M4_8", round: "Kolejka 4", t1: "Coventry City", t2: "Brighton & Hove Albion", lock: "2026-09-13T15:00:00", realScore: "" },
+        { id: "M4_9", round: "Kolejka 4", t1: "Manchester United", t2: "Manchester City", lock: "2026-09-13T17:30:00", realScore: "" },
+        { id: "M4_10", round: "Kolejka 4", t1: "Leeds United", t2: "Newcastle United", lock: "2026-09-14T21:00:00", realScore: "" }
     ];
 
     function determineActiveRoundIndex() {
@@ -355,11 +366,23 @@
             const roundMatches = allMatches.filter(m => m.round === roundName);
             if (roundMatches.length === 0) continue;
 
+            // Wyszukiwanie najpóźniejszego czasu rozpoczęcia w danej kolejce
             const lockTimes = roundMatches.map(m => new Date(m.lock).getTime());
             const maxLockTime = Math.max(...lockTimes);
-            const roundEndTime = maxLockTime + (24 * 60 * 60 * 1000);
+            
+            // Szacowany czas zakończenia ostatniego meczu (np. start + 2 godziny)
+            const matchFinishedTime = new Date(maxLockTime + (2 * 60 * 60 * 1000));
 
-            if (now.getTime() < roundEndTime) return i;
+            // Przejście na kolejną kolejkę następuje po północy dnia następującego po zakończeniu meczu
+            const dayAfterFinished = new Date(
+                matchFinishedTime.getFullYear(),
+                matchFinishedTime.getMonth(),
+                matchFinishedTime.getDate() + 1,
+                0, 0, 0
+            ).getTime();
+
+            // Jeśli obecny czas jest przed rozpoczęciem kolejnego dnia po ostatnim meczu, zwracamy tę kolejkę
+            if (now.getTime() < dayAfterFinished) return i;
         }
         return roundsOrder.length - 1;
     }
@@ -607,7 +630,6 @@
         try {
             btn.innerText = "Zapisywanie...";
             
-            // Wymuszony zapis danych w formacie czytelnym dla Google Web App
             await fetch(API_URL, { 
                 method: 'POST', 
                 mode: 'no-cors',
