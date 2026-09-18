@@ -271,12 +271,16 @@
         "Arsenal": GITHUB_LOGOS_URL + "england_arsenal_64x64.football-logos.cc.png",
         "Arsenal FC": GITHUB_LOGOS_URL + "england_arsenal_64x64.football-logos.cc.png",
         "Coventry City": GITHUB_LOGOS_URL + "england_coventry-city_64x64.football-logos.cc.png",
+        "Coventry City FC": GITHUB_LOGOS_URL + "england_coventry-city_64x64.football-logos.cc.png",
         "Hull City": GITHUB_LOGOS_URL + "england_hull-city_64x64.football-logos.cc.png",
+        "Hull City AFC": GITHUB_LOGOS_URL + "england_hull-city_64x64.football-logos.cc.png",
         "Manchester United": GITHUB_LOGOS_URL + "england_manchester-united_64x64.football-logos.cc.png",
         "Everton": GITHUB_LOGOS_URL + "england_everton_64x64.football-logos.cc.png",
         "Everton FC": GITHUB_LOGOS_URL + "england_everton_64x64.football-logos.cc.png",
         "Crystal Palace": GITHUB_LOGOS_URL + "england_crystal-palace_64x64.football-logos.cc.png",
+        "Crystal Palace FC": GITHUB_LOGOS_URL + "england_crystal-palace_64x64.football-logos.cc.png",
         "Ipswich Town": GITHUB_LOGOS_URL + "england_ipswich_64x64.football-logos.cc.png",
+        "Ipswich Town FC": GITHUB_LOGOS_URL + "england_ipswich_64x64.football-logos.cc.png",
         "Sunderland": GITHUB_LOGOS_URL + "england_sunderland_64x64.football-logos.cc.png",
         "Sunderland AFC": GITHUB_LOGOS_URL + "england_sunderland_64x64.football-logos.cc.png",
         "Nottingham Forest": GITHUB_LOGOS_URL + "england_nottingham-forest_64x64.football-logos.cc.png",
@@ -287,6 +291,7 @@
         "Brighton": GITHUB_LOGOS_URL + "england_brighton_64x64.football-logos.cc.png",
         "Brighton & Hove Albion": GITHUB_LOGOS_URL + "england_brighton_64x64.football-logos.cc.png",
         "Aston Villa": GITHUB_LOGOS_URL + "england_aston-villa_64x64.football-logos.cc.png",
+        "Aston Villa FC": GITHUB_LOGOS_URL + "england_aston-villa_64x64.football-logos.cc.png",
         "Manchester City": GITHUB_LOGOS_URL + "england_manchester-city_64x64.football-logos.cc.png",
         "AFC Bournemouth": GITHUB_LOGOS_URL + "england_bournemouth_64x64.football-logos.cc.png",
         "Newcastle United": GITHUB_LOGOS_URL + "england_newcastle_64x64.football-logos.cc.png",
@@ -356,7 +361,19 @@
         { id: "M4_7", round: "Kolejka 4", t1: "Sunderland AFC", t2: "Arsenal FC", lock: "2026-09-12T21:00:00", realScore: "0:2" },
         { id: "M4_8", round: "Kolejka 4", t1: "Coventry City", t2: "Brighton & Hove Albion", lock: "2026-09-13T15:00:00", realScore: "0:5" },
         { id: "M4_9", round: "Kolejka 4", t1: "Manchester United", t2: "Manchester City", lock: "2026-09-13T17:30:00", realScore: "0:1" },
-        { id: "M4_10", round: "Kolejka 4", t1: "Leeds United", t2: "Newcastle United", lock: "2026-09-14T21:00:00", realScore: "4:1" }
+        { id: "M4_10", round: "Kolejka 4", t1: "Leeds United", t2: "Newcastle United", lock: "2026-09-14T21:00:00", realScore: "4:1" },
+
+        // KOLEJKA 5
+        { id: "M5_1", round: "Kolejka 5", t1: "Brentford FC", t2: "Chelsea FC", lock: "2026-09-18T21:00:00", realScore: "" },
+        { id: "M5_2", round: "Kolejka 5", t1: "Tottenham Hotspur", t2: "Aston Villa FC", lock: "2026-09-19T13:30:00", realScore: "" },
+        { id: "M5_3", round: "Kolejka 5", t1: "Brighton & Hove Albion", t2: "Arsenal FC", lock: "2026-09-19T16:00:00", realScore: "" },
+        { id: "M5_4", round: "Kolejka 5", t1: "Everton FC", t2: "Ipswich Town FC", lock: "2026-09-19T16:00:00", realScore: "" },
+        { id: "M5_5", round: "Kolejka 5", t1: "Newcastle United", t2: "Hull City AFC", lock: "2026-09-19T16:00:00", realScore: "" },
+        { id: "M5_6", round: "Kolejka 5", t1: "Nottingham Forest", t2: "Coventry City FC", lock: "2026-09-19T18:30:00", realScore: "" },
+        { id: "M5_7", round: "Kolejka 5", t1: "AFC Bournemouth", t2: "Liverpool FC", lock: "2026-09-20T15:00:00", realScore: "" },
+        { id: "M5_8", round: "Kolejka 5", t1: "Leeds United", t2: "Crystal Palace FC", lock: "2026-09-20T15:00:00", realScore: "" },
+        { id: "M5_9", round: "Kolejka 5", t1: "Manchester City", t2: "Sunderland AFC", lock: "2026-09-20T15:00:00", realScore: "" },
+        { id: "M5_10", round: "Kolejka 5", t1: "Fulham FC", t2: "Manchester United", lock: "2026-09-20T17:30:00", realScore: "" }
     ];
 
     function determineActiveRoundIndex() {
@@ -366,14 +383,11 @@
             const roundMatches = allMatches.filter(m => m.round === roundName);
             if (roundMatches.length === 0) continue;
 
-            // Wyszukiwanie najpóźniejszego czasu rozpoczęcia w danej kolejce
             const lockTimes = roundMatches.map(m => new Date(m.lock).getTime());
             const maxLockTime = Math.max(...lockTimes);
             
-            // Szacowany czas zakończenia ostatniego meczu (np. start + 2 godziny)
             const matchFinishedTime = new Date(maxLockTime + (2 * 60 * 60 * 1000));
 
-            // Przejście na kolejną kolejkę następuje po północy dnia następującego po zakończeniu meczu
             const dayAfterFinished = new Date(
                 matchFinishedTime.getFullYear(),
                 matchFinishedTime.getMonth(),
@@ -381,7 +395,6 @@
                 0, 0, 0
             ).getTime();
 
-            // Jeśli obecny czas jest przed rozpoczęciem kolejnego dnia po ostatnim meczu, zwracamy tę kolejkę
             if (now.getTime() < dayAfterFinished) return i;
         }
         return roundsOrder.length - 1;
@@ -442,7 +455,6 @@
         renderProgressBar();
         renderEmotePicker();
 
-        // Ładowanie z cache + natychmiastowy pobór z serwera
         loadCachedData();
         renderActiveRound();
         refreshAllData();
@@ -886,3 +898,4 @@
 </script>
 </body>
 </html>
+
