@@ -220,7 +220,7 @@
             <button id="quick-save-btn" onclick="submitEntireRound()" style="background:#028a5a; color:white; margin-top:10px;">💾 Zapisz swoje typy</button>
         </div>
 
-        <!-- SEKCJA WYNIKÓW NA ŻYWO (FOOTBALL-DATA.ORG) -->
+        <!-- SEKCJA WYNIKÓW NA ŻYWO -->
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <h3 style="margin: 0;">🔴 WYNIKI NA ŻYWO</h3>
@@ -280,11 +280,6 @@
 </div>
 
 <script>
-    // ========================================================
-    // TUTAJ WKLEJ SWÓJ TOKEN Z FOOTBALL-DATA.ORG:
-    const FOOTBALL_DATA_API_KEY = "ac31105c62c744a99da49e6bb0dc22de"; 
-    // ========================================================
-
     const API_URL = "https://script.google.com/macros/s/AKfycbz66hvdvdCCe3r4QU97eiFZrBjryV3hCQgbKqhSsBVpWTAVrnXf1psf3z6uUZZOUlahpA/exec";
     const GITHUB_LOGOS_URL = "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/logos/";
 
@@ -472,7 +467,6 @@
 
             const lockTimes = roundMatches.map(m => new Date(m.lock).getTime());
             const maxLockTime = Math.max(...lockTimes);
-            
             const autoSwitchTime = maxLockTime + (26 * 60 * 60 * 1000);
 
             if (now.getTime() < autoSwitchTime) return i;
@@ -547,31 +541,24 @@
         setInterval(loadLiveScoresFromAPI, 60000);
     }
 
-    // FUNKCJA POBIERAJĄCA DANE Z FOOTBALL-DATA.ORG Z CORS PROXY
+    // FUNKCJA POBIERAJĄCA DANE Z TWÓJEGO BACKENDU APPS SCRIPT
     async function loadLiveScoresFromAPI() {
         const box = document.getElementById('live-scores-box');
-        if (!FOOTBALL_DATA_API_KEY || FOOTBALL_DATA_API_KEY === "TUTAJ_WKLEJ_SWOJ_TOKEN") {
-            box.innerHTML = "<p style='color:var(--danger);'>Uzupełnij klucz FOOTBALL_DATA_API_KEY w kodzie strony!</p>";
-            return;
-        }
 
         try {
-            const targetUrl = "https://api.football-data.org/v4/competitions/PL/matches?status=IN_PLAY,PAUSED";
-            const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(targetUrl);
-
-            const res = await fetch(proxyUrl, {
-                headers: { "X-Auth-Token": FOOTBALL_DATA_API_KEY }
-            });
-            
+            const res = await fetch(`${API_URL}?action=getLiveScores`);
             if (!res.ok) throw new Error("API Error");
             const data = await res.json();
 
-            if (!data.matches || data.matches.length === 0) {
+            // Filtrujemy mecze będące w trakcie gry lub w przerwie
+            const liveMatches = (data.matches || []).filter(m => m.status === 'IN_PLAY' || m.status === 'PAUSED');
+
+            if (liveMatches.length === 0) {
                 box.innerHTML = "<p style='color:#888; padding: 10px 0;'>Brak meczów rozgrywanych w tej chwili.</p>";
                 return;
             }
 
-            box.innerHTML = data.matches.map(m => {
+            box.innerHTML = liveMatches.map(m => {
                 const home = m.homeTeam.name;
                 const away = m.awayTeam.name;
                 const scoreHome = m.score.fullTime.home ?? m.score.halfTime.home ?? 0;
@@ -591,7 +578,7 @@
             }).join('');
 
         } catch(e) {
-            box.innerHTML = "<p style='color:#888;'>Brak meczów na żywo lub błąd połączenia z API.</p>";
+            box.innerHTML = "<p style='color:#888;'>Brak meczów na żywo lub błąd połączenia z serwerem.</p>";
         }
     }
 
