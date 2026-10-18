@@ -85,7 +85,6 @@
         .score-inputs { display: flex; gap: 8px; align-items: center; }
         .score-inputs input { width: 42px; text-align: center; margin: 0; padding: 6px; background: var(--input-bg); color: var(--input-text); border: 1px solid var(--border); border-radius: 4px; font-size: 16px; font-weight: bold; }
         
-        /* Zaktualizowany układ paska na 5 w rzędzie + kolejne pod spodem */
         .progress-bar { display: flex; flex-wrap: wrap; gap: 6px; background: #38003c; padding: 8px; border-radius: 6px; margin-bottom: 15px; }
         .progress-step { flex: 1 1 calc(20% - 6px); min-width: 120px; color: #fff; background: rgba(255,255,255,0.1); cursor: pointer; padding: 10px 0; border-radius: 4px; text-align: center; font-size: 13px; font-weight: bold; box-sizing: border-box; }
         .progress-step.active { color: #38003c; background: var(--accent); }
@@ -474,7 +473,6 @@
             const lockTimes = roundMatches.map(m => new Date(m.lock).getTime());
             const maxLockTime = Math.max(...lockTimes);
             
-            // Zakładamy, że mecz trwa ~2 godziny + 24 godziny po nim przeskakujemy na kolejną kolejkę
             const autoSwitchTime = maxLockTime + (26 * 60 * 60 * 1000);
 
             if (now.getTime() < autoSwitchTime) return i;
@@ -545,13 +543,11 @@
         if (chatInterval) clearInterval(chatInterval);
         chatInterval = setInterval(loadChat, 6000);
 
-        // Pobierz mecze live przy wejściu do aplikacji
         loadLiveScoresFromAPI();
-        // Automatyczne odświeżanie wyników live co 60 sekund
         setInterval(loadLiveScoresFromAPI, 60000);
     }
 
-    // FUNKCJA POBIERAJĄCA DANE Z FOOTBALL-DATA.ORG
+    // FUNKCJA POBIERAJĄCA DANE Z FOOTBALL-DATA.ORG Z CORS PROXY
     async function loadLiveScoresFromAPI() {
         const box = document.getElementById('live-scores-box');
         if (!FOOTBALL_DATA_API_KEY || FOOTBALL_DATA_API_KEY === "TUTAJ_WKLEJ_SWOJ_TOKEN") {
@@ -560,8 +556,10 @@
         }
 
         try {
-            // Pobieramy aktualne mecze Premier League (kod PL)
-            const res = await fetch("https://api.football-data.org/v4/competitions/PL/matches?status=IN_PLAY,PAUSED", {
+            const targetUrl = "https://api.football-data.org/v4/competitions/PL/matches?status=IN_PLAY,PAUSED";
+            const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(targetUrl);
+
+            const res = await fetch(proxyUrl, {
                 headers: { "X-Auth-Token": FOOTBALL_DATA_API_KEY }
             });
             
@@ -593,7 +591,7 @@
             }).join('');
 
         } catch(e) {
-            box.innerHTML = "<p style='color:#888;'>Nie udało się połączyć z API wyników na żywo.</p>";
+            box.innerHTML = "<p style='color:#888;'>Brak meczów na żywo lub błąd połączenia z API.</p>";
         }
     }
 
