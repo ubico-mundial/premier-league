@@ -164,6 +164,31 @@
         .emote-picker-popover img:hover {
             background: var(--border);
         }
+
+        /* Style dla modułu Wyników Live */
+        .live-score-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        .live-score-item:last-child { border-bottom: none; }
+        .live-badge {
+            background: var(--danger);
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -194,6 +219,17 @@
             
             <button id="randomize-scores-btn" onclick="randomizeAllScores()" style="background:#5c2d91; color:white; margin-top:15px;">🎲 Losuj typy</button>
             <button id="quick-save-btn" onclick="submitEntireRound()" style="background:#028a5a; color:white; margin-top:10px;">💾 Zapisz swoje typy</button>
+        </div>
+
+        <!-- SEKCJA WYNIKÓW NA ŻYWO (FOOTBALL-DATA.ORG) -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h3 style="margin: 0;">🔴 WYNIKI NA ŻYWO</h3>
+                <button onclick="loadLiveScoresFromAPI()" style="width: auto; padding: 4px 10px; font-size: 11px; margin-top: 0;">🔄 Odśwież</button>
+            </div>
+            <div id="live-scores-box" style="min-height: 50px; text-align: center; color: #888; font-size: 13px;">
+                Ładowanie aktualnych wyników...
+            </div>
         </div>
 
         <div class="card">
@@ -245,6 +281,11 @@
 </div>
 
 <script>
+    // ========================================================
+    // TUTAJ WKLEJ SWÓJ TOKEN Z FOOTBALL-DATA.ORG:
+    const FOOTBALL_DATA_API_KEY = "ac31105c62c744a99da49e6bb0dc22de"; 
+    // ========================================================
+
     const API_URL = "https://script.google.com/macros/s/AKfycbz66hvdvdCCe3r4QU97eiFZrBjryV3hCQgbKqhSsBVpWTAVrnXf1psf3z6uUZZOUlahpA/exec";
     const GITHUB_LOGOS_URL = "https://raw.githubusercontent.com/ubico-mundial/premier-league/main/logos/";
 
@@ -503,6 +544,57 @@
         loadChat();
         if (chatInterval) clearInterval(chatInterval);
         chatInterval = setInterval(loadChat, 6000);
+
+        // Pobierz mecze live przy wejściu do aplikacji
+        loadLiveScoresFromAPI();
+        // Automatyczne odświeżanie wyników live co 60 sekund
+        setInterval(loadLiveScoresFromAPI, 60000);
+    }
+
+    // FUNKCJA POBIERAJĄCA DANE Z FOOTBALL-DATA.ORG
+    async function loadLiveScoresFromAPI() {
+        const box = document.getElementById('live-scores-box');
+        if (!FOOTBALL_DATA_API_KEY || FOOTBALL_DATA_API_KEY === "TUTAJ_WKLEJ_SWOJ_TOKEN") {
+            box.innerHTML = "<p style='color:var(--danger);'>Uzupełnij klucz FOOTBALL_DATA_API_KEY w kodzie strony!</p>";
+            return;
+        }
+
+        try {
+            // Pobieramy aktualne mecze Premier League (kod PL)
+            const res = await fetch("https://api.football-data.org/v4/competitions/PL/matches?status=IN_PLAY,PAUSED", {
+                headers: { "X-Auth-Token": FOOTBALL_DATA_API_KEY }
+            });
+            
+            if (!res.ok) throw new Error("API Error");
+            const data = await res.json();
+
+            if (!data.matches || data.matches.length === 0) {
+                box.innerHTML = "<p style='color:#888; padding: 10px 0;'>Brak meczów rozgrywanych w tej chwili.</p>";
+                return;
+            }
+
+            box.innerHTML = data.matches.map(m => {
+                const home = m.homeTeam.name;
+                const away = m.awayTeam.name;
+                const scoreHome = m.score.fullTime.home ?? m.score.halfTime.home ?? 0;
+                const scoreAway = m.score.fullTime.away ?? m.score.halfTime.away ?? 0;
+                const minute = m.status === 'PAUSED' ? 'Przerwa' : 'LIVE';
+
+                return `
+                    <div class="live-score-item">
+                        <span style="font-weight:bold; display:flex; align-items:center; gap:6px;">
+                            ${getTeamLogoHtml(home)} ${home} 
+                            <span style="color:var(--accent); background:#38003c; padding:2px 8px; border-radius:4px;">${scoreHome} : ${scoreAway}</span> 
+                            ${getTeamLogoHtml(away)} ${away}
+                        </span>
+                        <span class="live-badge">${minute}</span>
+                    </div>
+                `;
+            }).join('');
+
+        } catch(e) {
+            box.innerHTML = "<p style='color:#888;'>Nie udało się połączyć z API wyników na żywo.</p>";
+        }
     }
 
     function renderProgressBar() {
@@ -806,7 +898,6 @@
             const roundMatches = allMatches.filter(m => m.round === kolejkaName);
             const isRoundFinished = roundMatches.length > 0 && roundMatches.every(m => now >= new Date(m.lock));
 
-            // Jeśli cała kolejka jest zakończona, szukamy lidera/liderów i przyznajemy po +25 pkt bonusu
             if (isRoundFinished) {
                 const sortedRound = Object.keys(roundScores)
                     .map(p => ({ player: p, score: roundScores[p] }))
@@ -814,7 +905,6 @@
 
                 if (sortedRound.length > 0 && sortedRound[0].score > 0) {
                     const topScore = sortedRound[0].score;
-                    // Jeśli kilku graczy miało tyle samo punktów na 1. miejscu, wszyscy dostają po +25 pkt
                     sortedRound.filter(p => p.score === topScore).forEach(p => totalScores[p.player] += 25);
                 }
             }
