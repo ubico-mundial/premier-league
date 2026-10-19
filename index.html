@@ -164,7 +164,6 @@
             background: var(--border);
         }
 
-        /* Style dla modułu Wyników Live */
         .live-score-item {
             display: flex;
             align-items: center;
@@ -220,7 +219,6 @@
             <button id="quick-save-btn" onclick="submitEntireRound()" style="background:#028a5a; color:white; margin-top:10px;">💾 Zapisz swoje typy</button>
         </div>
 
-        <!-- SEKCJA WYNIKÓW NA ŻYWO -->
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <h3 style="margin: 0;">🔴 WYNIKI NA ŻYWO</h3>
@@ -541,7 +539,6 @@
         setInterval(loadLiveScoresFromAPI, 60000);
     }
 
-    // FUNKCJA POBIERAJĄCA DANE Z TWÓJEGO BACKENDU APPS SCRIPT
     async function loadLiveScoresFromAPI() {
         const box = document.getElementById('live-scores-box');
 
@@ -550,7 +547,6 @@
             if (!res.ok) throw new Error("API Error");
             const data = await res.json();
 
-            // Filtrujemy mecze będące w trakcie gry lub w przerwie
             const liveMatches = (data.matches || []).filter(m => m.status === 'IN_PLAY' || m.status === 'PAUSED');
 
             if (liveMatches.length === 0) {
@@ -851,8 +847,12 @@
         const totalScores = {};
         const now = new Date();
 
-        Object.keys(data.predictions).forEach(kolejkaName => {
+        // ITERUJEMY TYLKO DO KOLEJKI, KTÓRĄ AKTUALNIE PRZEGLĄDAMY (currentRoundIndex włącznie)
+        for (let i = 0; i <= currentRoundIndex; i++) {
+            const kolejkaName = roundsOrder[i];
             const roundPlayers = data.predictions[kolejkaName];
+            if (!roundPlayers) continue;
+
             const roundScores = {};
 
             Object.keys(roundPlayers).forEach(player => {
@@ -893,7 +893,7 @@
                     sortedRound.filter(p => p.score === topScore).forEach(p => totalScores[p.player] += 25);
                 }
             }
-        });
+        }
 
         const sortedList = Object.keys(totalScores)
             .map(p => ({ gracz: p, punkty: totalScores[p] }))
