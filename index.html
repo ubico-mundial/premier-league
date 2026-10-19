@@ -86,7 +86,7 @@
         .score-inputs input { width: 42px; text-align: center; margin: 0; padding: 6px; background: var(--input-bg); color: var(--input-text); border: 1px solid var(--border); border-radius: 4px; font-size: 16px; font-weight: bold; }
         
         .progress-bar { display: flex; flex-wrap: wrap; gap: 6px; background: #38003c; padding: 8px; border-radius: 6px; margin-bottom: 15px; }
-        .progress-step { flex: 1 1 calc(20% - 6px); min-width: 120px; color: #fff; background: rgba(255,255,255,0.1); cursor: pointer; padding: 10px 0; border-radius: 4px; text-align: center; font-size: 13px; font-weight: bold; box-sizing: border-box; }
+        .progress-step { flex: 1 1 calc(20% - 6px); min-width: 100px; color: #fff; background: rgba(255,255,255,0.1); cursor: pointer; padding: 10px 0; border-radius: 4px; text-align: center; font-size: 13px; font-weight: bold; box-sizing: border-box; }
         .progress-step.active { color: #38003c; background: var(--accent); }
 
         .table-container { overflow-x: auto; }
@@ -365,7 +365,7 @@
         return `<img src="${logoUrl}" alt="${teamName}" title="${teamName}" class="team-logo" onerror="this.style.display='none'">`;
     }
 
-    const roundsOrder = ["Kolejka 1", "Kolejka 2", "Kolejka 3", "Kolejka 4", "Kolejka 5", "Kolejka 6", "Kolejka 7"];
+    const roundsOrder = ["Kolejka 1", "Kolejka 2", "Kolejka 3", "Kolejka 4", "Kolejka 5", "Kolejka 6", "Kolejka 7", "Kolejka 8", "Kolejka 9"];
     let currentRoundIndex = 0; 
     let localDraftScores = {}; 
     let chatInterval = null;
@@ -396,64 +396,88 @@
         { id: "M2_10", round: "Kolejka 2", t1: "Aston Villa", t2: "Arsenal", lock: "2026-08-31T21:00:00", realScore: "0:1" },
 
         // KOLEJKA 3
-        { id: "M3_1", round: "Kolejka 3", t1: "Ipswich Town", t2: "Liverpool FC", lock: "2026-09-04T21:00:00", realScore: "0:2" },
+        { id: "M3_1", round: "Kolejka 3", t1: "Ipswich Town", t2: "Liverpool", lock: "2026-09-04T21:00:00", realScore: "0:2" },
         { id: "M3_2", round: "Kolejka 3", t1: "Newcastle United", t2: "AFC Bournemouth", lock: "2026-09-05T13:30:00", realScore: "2:2" },
-        { id: "M3_3", round: "Kolejka 3", t1: "Brentford FC", t2: "Sunderland AFC", lock: "2026-09-05T16:00:00", realScore: "1:1" },
-        { id: "M3_4", round: "Kolejka 3", t1: "Brighton & Hove Albion", t2: "Leeds United", lock: "2026-09-05T16:00:00", realScore: "1:1" },
-        { id: "M3_5", round: "Kolejka 3", t1: "Fulham FC", t2: "Crystal Palace", lock: "2026-09-05T16:00:00", realScore: "2:3" },
+        { id: "M3_3", round: "Kolejka 3", t1: "Brentford", t2: "Sunderland", lock: "2026-09-05T16:00:00", realScore: "1:1" },
+        { id: "M3_4", round: "Kolejka 3", t1: "Brighton", t2: "Leeds United", lock: "2026-09-05T16:00:00", realScore: "1:1" },
+        { id: "M3_5", round: "Kolejka 3", t1: "Fulham", t2: "Crystal Palace", lock: "2026-09-05T16:00:00", realScore: "2:3" },
         { id: "M3_6", round: "Kolejka 3", t1: "Manchester City", t2: "Coventry City", lock: "2026-09-05T16:00:00", realScore: "1:0" },
         { id: "M3_7", round: "Kolejka 3", t1: "Nottingham Forest", t2: "Tottenham Hotspur", lock: "2026-09-05T16:00:00", realScore: "0:0" },
         { id: "M3_8", round: "Kolejka 3", t1: "Hull City", t2: "Aston Villa", lock: "2026-09-05T18:30:00", realScore: "0:0" },
-        { id: "M3_9", round: "Kolejka 3", t1: "Everton FC", t2: "Manchester United", lock: "2026-09-06T15:00:00", realScore: "2:2" },
-        { id: "M3_10", round: "Kolejka 3", t1: "Arsenal FC", t2: "Chelsea FC", lock: "2026-09-06T17:30:00", realScore: "2:1" },
+        { id: "M3_9", round: "Kolejka 3", t1: "Everton", t2: "Manchester United", lock: "2026-09-06T15:00:00", realScore: "2:2" },
+        { id: "M3_10", round: "Kolejka 3", t1: "Arsenal", t2: "Chelsea", lock: "2026-09-06T17:30:00", realScore: "2:1" },
 
         // KOLEJKA 4
-        { id: "M4_1", round: "Kolejka 4", t1: "AFC Bournemouth", t2: "Brentford FC", lock: "2026-09-12T16:00:00", realScore: "2:2" },
+        { id: "M4_1", round: "Kolejka 4", t1: "AFC Bournemouth", t2: "Brentford", lock: "2026-09-12T16:00:00", realScore: "2:2" },
         { id: "M4_2", round: "Kolejka 4", t1: "Aston Villa", t2: "Nottingham Forest", lock: "2026-09-12T16:00:00", realScore: "1:2" },
-        { id: "M4_3", round: "Kolejka 4", t1: "Chelsea FC", t2: "Hull City", lock: "2026-09-12T16:00:00", realScore: "2:2" },
+        { id: "M4_3", round: "Kolejka 4", t1: "Chelsea", t2: "Hull City", lock: "2026-09-12T16:00:00", realScore: "2:2" },
         { id: "M4_4", round: "Kolejka 4", t1: "Crystal Palace", t2: "Ipswich Town", lock: "2026-09-12T16:00:00", realScore: "2:3" },
-        { id: "M4_5", round: "Kolejka 4", t1: "Liverpool FC", t2: "Fulham FC", lock: "2026-09-12T16:00:00", realScore: "0:0" },
-        { id: "M4_6", round: "Kolejka 4", t1: "Tottenham Hotspur", t2: "Everton FC", lock: "2026-09-12T18:30:00", realScore: "0:0" },
-        { id: "M4_7", round: "Kolejka 4", t1: "Sunderland AFC", t2: "Arsenal FC", lock: "2026-09-12T21:00:00", realScore: "0:2" },
-        { id: "M4_8", round: "Kolejka 4", t1: "Coventry City", t2: "Brighton & Hove Albion", lock: "2026-09-13T15:00:00", realScore: "0:5" },
+        { id: "M4_5", round: "Kolejka 4", t1: "Liverpool", t2: "Fulham", lock: "2026-09-12T16:00:00", realScore: "0:0" },
+        { id: "M4_6", round: "Kolejka 4", t1: "Tottenham Hotspur", t2: "Everton", lock: "2026-09-12T18:30:00", realScore: "0:0" },
+        { id: "M4_7", round: "Kolejka 4", t1: "Sunderland", t2: "Arsenal", lock: "2026-09-12T21:00:00", realScore: "0:2" },
+        { id: "M4_8", round: "Kolejka 4", t1: "Coventry City", t2: "Brighton", lock: "2026-09-13T15:00:00", realScore: "0:5" },
         { id: "M4_9", round: "Kolejka 4", t1: "Manchester United", t2: "Manchester City", lock: "2026-09-13T17:30:00", realScore: "0:1" },
         { id: "M4_10", round: "Kolejka 4", t1: "Leeds United", t2: "Newcastle United", lock: "2026-09-14T21:00:00", realScore: "4:1" },
 
         // KOLEJKA 5
-        { id: "M5_1", round: "Kolejka 5", t1: "Brentford FC", t2: "Chelsea FC", lock: "2026-09-18T21:00:00", realScore: "3:0" },
-        { id: "M5_2", round: "Kolejka 5", t1: "Tottenham Hotspur", t2: "Aston Villa FC", lock: "2026-09-19T13:30:00", realScore: "2:3" },
-        { id: "M5_3", round: "Kolejka 5", t1: "Brighton & Hove Albion", t2: "Arsenal FC", lock: "2026-09-19T16:00:00", realScore: "3:0" },
-        { id: "M5_4", round: "Kolejka 5", t1: "Everton FC", t2: "Ipswich Town FC", lock: "2026-09-19T16:00:00", realScore: "1:0" },
-        { id: "M5_5", round: "Kolejka 5", t1: "Newcastle United", t2: "Hull City AFC", lock: "2026-09-19T16:00:00", realScore: "2:1" },
-        { id: "M5_6", round: "Kolejka 5", t1: "Nottingham Forest", t2: "Coventry City FC", lock: "2026-09-19T18:30:00", realScore: "0:1" },
-        { id: "M5_7", round: "Kolejka 5", t1: "AFC Bournemouth", t2: "Liverpool FC", lock: "2026-09-20T15:00:00", realScore: "0:1" },
-        { id: "M5_8", round: "Kolejka 5", t1: "Leeds United", t2: "Crystal Palace FC", lock: "2026-09-20T15:00:00", realScore: "0:0" },
-        { id: "M5_9", round: "Kolejka 5", t1: "Manchester City", t2: "Sunderland AFC", lock: "2026-09-20T15:00:00", realScore: "5:3" },
-        { id: "M5_10", round: "Kolejka 5", t1: "Fulham FC", t2: "Manchester United", lock: "2026-09-20T17:30:00", realScore: "1:1" },
+        { id: "M5_1", round: "Kolejka 5", t1: "Brentford", t2: "Chelsea", lock: "2026-09-18T21:00:00", realScore: "3:0" },
+        { id: "M5_2", round: "Kolejka 5", t1: "Tottenham Hotspur", t2: "Aston Villa", lock: "2026-09-19T13:30:00", realScore: "2:3" },
+        { id: "M5_3", round: "Kolejka 5", t1: "Brighton", t2: "Arsenal", lock: "2026-09-19T16:00:00", realScore: "3:0" },
+        { id: "M5_4", round: "Kolejka 5", t1: "Everton", t2: "Ipswich Town", lock: "2026-09-19T16:00:00", realScore: "1:0" },
+        { id: "M5_5", round: "Kolejka 5", t1: "Newcastle United", t2: "Hull City", lock: "2026-09-19T16:00:00", realScore: "2:1" },
+        { id: "M5_6", round: "Kolejka 5", t1: "Nottingham Forest", t2: "Coventry City", lock: "2026-09-19T18:30:00", realScore: "0:1" },
+        { id: "M5_7", round: "Kolejka 5", t1: "AFC Bournemouth", t2: "Liverpool", lock: "2026-09-20T15:00:00", realScore: "0:1" },
+        { id: "M5_8", round: "Kolejka 5", t1: "Leeds United", t2: "Crystal Palace", lock: "2026-09-20T15:00:00", realScore: "0:0" },
+        { id: "M5_9", round: "Kolejka 5", t1: "Manchester City", t2: "Sunderland", lock: "2026-09-20T15:00:00", realScore: "5:3" },
+        { id: "M5_10", round: "Kolejka 5", t1: "Fulham", t2: "Manchester United", lock: "2026-09-20T17:30:00", realScore: "1:1" },
 
         // KOLEJKA 6
-        { id: "M6_1", round: "Kolejka 6", t1: "Arsenal F.C.", t2: "Leeds United F.C.", lock: "2026-10-10T13:30:00", realScore: "2:1" },
-        { id: "M6_2", round: "Kolejka 6", t1: "Aston Villa F.C.", t2: "Brentford F.C.", lock: "2026-10-10T16:00:00", realScore: "2:2" },
-        { id: "M6_3", round: "Kolejka 6", t1: "Chelsea F.C.", t2: "A.F.C. Bournemouth", lock: "2026-10-10T16:00:00", realScore: "5:1" },
-        { id: "M6_4", round: "Kolejka 6", t1: "Ipswich Town F.C.", t2: "Fulham F.C.", lock: "2026-10-10T16:00:00", realScore: "2:1" },
-        { id: "M6_5", round: "Kolejka 6", t1: "Sunderland A.F.C.", t2: "Brighton & Hove Albion F.C.", lock: "2026-10-10T16:00:00", realScore: "0:2" },
-        { id: "M6_6", round: "Kolejka 6", t1: "Manchester United F.C.", t2: "Tottenham Hotspur F.C.", lock: "2026-10-10T18:30:00", realScore: "1:1" },
-        { id: "M6_7", round: "Kolejka 6", t1: "Crystal Palace F.C.", t2: "Nottingham Forest F.C.", lock: "2026-10-11T15:00:00", realScore: "3:1" },
-        { id: "M6_8", round: "Kolejka 6", t1: "Hull City A.F.C.", t2: "Everton F.C.", lock: "2026-10-11T15:00:00", realScore: "2:2" },
-        { id: "M6_9", round: "Kolejka 6", t1: "Liverpool F.C.", t2: "Manchester City F.C.", lock: "2026-10-11T17:30:00", realScore: "0:3" },
-        { id: "M6_10", round: "Kolejka 6", t1: "Coventry City F.C.", t2: "Newcastle United F.C.", lock: "2026-10-12T21:00:00", realScore: "4:1" },
+        { id: "M6_1", round: "Kolejka 6", t1: "Arsenal", t2: "Leeds United", lock: "2026-10-10T13:30:00", realScore: "2:1" },
+        { id: "M6_2", round: "Kolejka 6", t1: "Aston Villa", t2: "Brentford", lock: "2026-10-10T16:00:00", realScore: "2:2" },
+        { id: "M6_3", round: "Kolejka 6", t1: "Chelsea", t2: "AFC Bournemouth", lock: "2026-10-10T16:00:00", realScore: "5:1" },
+        { id: "M6_4", round: "Kolejka 6", t1: "Ipswich Town", t2: "Fulham", lock: "2026-10-10T16:00:00", realScore: "2:1" },
+        { id: "M6_5", round: "Kolejka 6", t1: "Sunderland", t2: "Brighton", lock: "2026-10-10T16:00:00", realScore: "0:2" },
+        { id: "M6_6", round: "Kolejka 6", t1: "Manchester United", t2: "Tottenham Hotspur", lock: "2026-10-10T18:30:00", realScore: "1:1" },
+        { id: "M6_7", round: "Kolejka 6", t1: "Crystal Palace", t2: "Nottingham Forest", lock: "2026-10-11T15:00:00", realScore: "3:1" },
+        { id: "M6_8", round: "Kolejka 6", t1: "Hull City", t2: "Everton", lock: "2026-10-11T15:00:00", realScore: "2:2" },
+        { id: "M6_9", round: "Kolejka 6", t1: "Liverpool", t2: "Manchester City", lock: "2026-10-11T17:30:00", realScore: "0:3" },
+        { id: "M6_10", round: "Kolejka 6", t1: "Coventry City", t2: "Newcastle United", lock: "2026-10-12T21:00:00", realScore: "4:1" },
 
         // KOLEJKA 7
-        { id: "M7_1", round: "Kolejka 7", t1: "Everton F.C.", t2: "Chelsea F.C.", lock: "2026-10-17T13:30:00", realScore: "0:2" },
-        { id: "M7_2", round: "Kolejka 7", t1: "Brentford F.C.", t2: "Liverpool F.C.", lock: "2026-10-17T16:00:00", realScore: "1:2" },
-        { id: "M7_3", round: "Kolejka 7", t1: "Fulham F.C.", t2: "Hull City A.F.C.", lock: "2026-10-17T16:00:00", realScore: "1:0" },
-        { id: "M7_4", round: "Kolejka 7", t1: "Manchester City F.C.", t2: "Ipswich Town F.C.", lock: "2026-10-17T16:00:00", realScore: "3:2" },
-        { id: "M7_5", round: "Kolejka 7", t1: "Newcastle United F.C.", t2: "Aston Villa F.C.", lock: "2026-10-17T18:30:00", realScore: "0:1" },
-        { id: "M7_6", round: "Kolejka 7", t1: "A.F.C. Bournemouth", t2: "Sunderland A.F.C.", lock: "2026-10-18T15:00:00", realScore: "2:0" },
-        { id: "M7_7", round: "Kolejka 7", t1: "Brighton & Hove Albion F.C.", t2: "Crystal Palace F.C.", lock: "2026-10-18T15:00:00", realScore: "5:0" },
-        { id: "M7_8", round: "Kolejka 7", t1: "Leeds United F.C.", t2: "Manchester United F.C.", lock: "2026-10-18T15:00:00", realScore: "1:1" },
-        { id: "M7_9", round: "Kolejka 7", t1: "Nottingham Forest F.C.", t2: "Arsenal F.C.", lock: "2026-10-18T17:30:00", realScore: "0:1" },
-        { id: "M7_10", round: "Kolejka 7", t1: "Tottenham Hotspur F.C.", t2: "Coventry City F.C.", lock: "2026-10-19T21:00:00", realScore: "3:1" }
+        { id: "M7_1", round: "Kolejka 7", t1: "Everton", t2: "Chelsea", lock: "2026-10-17T13:30:00", realScore: "0:2" },
+        { id: "M7_2", round: "Kolejka 7", t1: "Brentford", t2: "Liverpool", lock: "2026-10-17T16:00:00", realScore: "1:2" },
+        { id: "M7_3", round: "Kolejka 7", t1: "Fulham", t2: "Hull City", lock: "2026-10-17T16:00:00", realScore: "1:0" },
+        { id: "M7_4", round: "Kolejka 7", t1: "Manchester City", t2: "Ipswich Town", lock: "2026-10-17T16:00:00", realScore: "3:2" },
+        { id: "M7_5", round: "Kolejka 7", t1: "Newcastle United", t2: "Aston Villa", lock: "2026-10-17T18:30:00", realScore: "0:1" },
+        { id: "M7_6", round: "Kolejka 7", t1: "AFC Bournemouth", t2: "Sunderland", lock: "2026-10-18T15:00:00", realScore: "2:0" },
+        { id: "M7_7", round: "Kolejka 7", t1: "Brighton", t2: "Crystal Palace", lock: "2026-10-18T15:00:00", realScore: "5:0" },
+        { id: "M7_8", round: "Kolejka 7", t1: "Leeds United", t2: "Manchester United", lock: "2026-10-18T15:00:00", realScore: "1:1" },
+        { id: "M7_9", round: "Kolejka 7", t1: "Nottingham Forest", t2: "Arsenal", lock: "2026-10-18T17:30:00", realScore: "0:1" },
+        { id: "M7_10", round: "Kolejka 7", t1: "Tottenham Hotspur", t2: "Coventry City", lock: "2026-10-19T21:00:00", realScore: "3:1" },
+
+        // KOLEJKA 8
+        { id: "M8_1", round: "Kolejka 8", t1: "Ipswich Town", t2: "Nottingham Forest", lock: "2026-10-23T21:00:00", realScore: "" },
+        { id: "M8_2", round: "Kolejka 8", t1: "Aston Villa", t2: "Manchester City", lock: "2026-10-24T13:30:00", realScore: "" },
+        { id: "M8_3", round: "Kolejka 8", t1: "Arsenal", t2: "Everton", lock: "2026-10-24T16:00:00", realScore: "" },
+        { id: "M8_4", round: "Kolejka 8", t1: "Coventry City", t2: "Fulham", lock: "2026-10-24T16:00:00", realScore: "" },
+        { id: "M8_5", round: "Kolejka 8", t1: "Chelsea", t2: "Tottenham Hotspur", lock: "2026-10-24T18:30:00", realScore: "" },
+        { id: "M8_6", round: "Kolejka 8", t1: "Crystal Palace", t2: "Newcastle United", lock: "2026-10-25T15:00:00", realScore: "" },
+        { id: "M8_7", round: "Kolejka 8", t1: "Hull City", t2: "Brentford", lock: "2026-10-25T15:00:00", realScore: "" },
+        { id: "M8_8", round: "Kolejka 8", t1: "Liverpool", t2: "Brighton", lock: "2026-10-25T15:00:00", realScore: "" },
+        { id: "M8_9", round: "Kolejka 8", t1: "Manchester United", t2: "AFC Bournemouth", lock: "2026-10-25T15:00:00", realScore: "" },
+        { id: "M8_10", round: "Kolejka 8", t1: "Sunderland", t2: "Leeds United", lock: "2026-10-25T17:30:00", realScore: "" },
+
+        // KOLEJKA 9
+        { id: "M9_1", round: "Kolejka 9", t1: "Chelsea", t2: "Manchester United", lock: "2026-10-31T13:30:00", realScore: "" },
+        { id: "M9_2", round: "Kolejka 9", t1: "AFC Bournemouth", t2: "Leeds United", lock: "2026-10-31T16:00:00", realScore: "" },
+        { id: "M9_3", round: "Kolejka 9", t1: "Brentford", t2: "Nottingham Forest", lock: "2026-10-31T16:00:00", realScore: "" },
+        { id: "M9_4", round: "Kolejka 9", t1: "Coventry City", t2: "Sunderland", lock: "2026-10-31T16:00:00", realScore: "" },
+        { id: "M9_5", round: "Kolejka 9", t1: "Hull City", t2: "Ipswich Town", lock: "2026-10-31T16:00:00", realScore: "" },
+        { id: "M9_6", round: "Kolejka 9", t1: "Manchester City", t2: "Brighton", lock: "2026-10-31T16:00:00", realScore: "" },
+        { id: "M9_7", round: "Kolejka 9", t1: "Tottenham Hotspur", t2: "Crystal Palace", lock: "2026-10-31T18:30:00", realScore: "" },
+        { id: "M9_8", round: "Kolejka 9", t1: "Aston Villa", t2: "Fulham", lock: "2026-10-31T21:00:00", realScore: "" },
+        { id: "M9_9", round: "Kolejka 9", t1: "Liverpool", t2: "Arsenal", lock: "2026-11-01T17:30:00", realScore: "" },
+        { id: "M9_10", round: "Kolejka 9", t1: "Newcastle United", t2: "Everton", lock: "2026-11-02T21:00:00", realScore: "" }
     ];
 
     function determineActiveRoundIndex() {
@@ -847,7 +871,6 @@
         const totalScores = {};
         const now = new Date();
 
-        // ITERUJEMY TYLKO DO KOLEJKI, KTÓRĄ AKTUALNIE PRZEGLĄDAMY (currentRoundIndex włącznie)
         for (let i = 0; i <= currentRoundIndex; i++) {
             const kolejkaName = roundsOrder[i];
             const roundPlayers = data.predictions[kolejkaName];
