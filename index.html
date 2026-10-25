@@ -221,7 +221,7 @@
 
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <h3 style="margin: 0;">🔴 WYNIKI NA ŻYWO</h3>
+                <h3 style="margin: 0;">🔴 WYNIKI NA ŻYWO I DZISIEJSZE MECZE</h3>
                 <button onclick="loadLiveScoresFromAPI()" style="width: auto; padding: 4px 10px; font-size: 11px; margin-top: 0;">🔄 Odśwież</button>
             </div>
             <div id="live-scores-box" style="min-height: 50px; text-align: center; color: #888; font-size: 13px;">
@@ -243,10 +243,10 @@
 
         <div class="card">
             <h3>📊 PODGLĄD TYPÓW GRACZY</h3>
-            <p style="font-size: 12px; text-align: center; color: #888;">Typy innych pojawiają się dopiero po rozpoczęciu danego meczu.</p>
+            <p style="font-size: 12px; text-align: center; color: #888;">Typy innych pojawiają się dopiero po rozpoczęciu danego meczu[cite: 1].</p>
             <div class="legend">
-                <span><span class="legend-box" style="background:var(--exact-match)"></span> Dokładny wynik (60 pkt)</span>
-                <span><span class="legend-box" style="background:var(--winner-match)"></span> Trafiony zwycięzca (25 pkt)</span>
+                <span><span class="legend-box" style="background:var(--exact-match)"></span> Dokładny wynik (60 pkt)[cite: 1]</span>
+                <span><span class="legend-box" style="background:var(--winner-match)"></span> Trafiony zwycięzca (25 pkt)[cite: 1]</span>
             </div>
             <div class="table-container">
                 <table id="all-predictions-table">
@@ -258,7 +258,7 @@
 
         <div class="card">
             <h2>🏆 Klasyfikacja Generalna</h2>
-            <p style="font-size: 11px; text-align: center; color: #888; margin-top: -5px;">Pkt z meczów + Bonusy za zakończone kolejki (1. msc: +25)</p>
+            <p style="font-size: 11px; text-align: center; color: #888; margin-top: -5px;">Pkt z meczów + Bonusy za zakończone kolejki (1. msc: +25)[cite: 1]</p>
             <div class="table-container">
                 <table>
                     <thead>
@@ -571,28 +571,48 @@
             if (!res.ok) throw new Error("API Error");
             const data = await res.json();
 
-            const liveMatches = (data.matches || []).filter(m => m.status === 'IN_PLAY' || m.status === 'PAUSED');
+            const todayStr = new Date().toISOString().split('T')[0];
 
-            if (liveMatches.length === 0) {
-                box.innerHTML = "<p style='color:#888; padding: 10px 0;'>Brak meczów rozgrywanych w tej chwili.</p>";
+            // Filtrujemy mecze: trwające (LIVE/PAUSED) lub dzisiejsze zaplanowane
+            const relevantMatches = (data.matches || []).filter(m => {
+                const isLive = m.status === 'IN_PLAY' || m.status === 'PAUSED';
+                const matchDateStr = m.utcDate ? m.utcDate.split('T')[0] : "";
+                const isTodayScheduled = (m.status === 'SCHEDULED' || m.status === 'TIMED') && matchDateStr === todayStr;
+                
+                return isLive || isTodayScheduled;
+            });
+
+            if (relevantMatches.length === 0) {
+                box.innerHTML = "<p style='color:#888; padding: 10px 0;'>Brak meczów rozgrywanych dzisiaj lub w tej chwili.</p>";
                 return;
             }
 
-            box.innerHTML = liveMatches.map(m => {
+            box.innerHTML = relevantMatches.map(m => {
                 const home = m.homeTeam.name;
                 const away = m.awayTeam.name;
-                const scoreHome = m.score.fullTime.home ?? m.score.halfTime.home ?? 0;
-                const scoreAway = m.score.fullTime.away ?? m.score.halfTime.away ?? 0;
-                const minute = m.status === 'PAUSED' ? 'Przerwa' : 'LIVE';
+                const isLive = m.status === 'IN_PLAY' || m.status === 'PAUSED';
+
+                const scoreHome = m.score?.fullTime?.home ?? m.score?.halfTime?.home ?? 0;
+                const scoreAway = m.score?.fullTime?.away ?? m.score?.halfTime?.away ?? 0;
+                
+                const matchTime = new Date(m.utcDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                const scoreOrTimeDisplay = isLive 
+                    ? `<span style="color:var(--accent); background:#38003c; padding:2px 8px; border-radius:4px;">${scoreHome} : ${scoreAway}</span>`
+                    : `<span style="color:#aaa; background:#2a2a2a; padding:2px 8px; border-radius:4px; font-size:12px;">⏰ ${matchTime}</span>`;
+
+                const badgeDisplay = isLive 
+                    ? `<span class="live-badge">${m.status === 'PAUSED' ? 'PRZERWA' : 'LIVE'}</span>`
+                    : `<span style="background:#555; color:white; font-size:10px; padding:2px 6px; border-radius:10px;">Zaplanowany</span>`;
 
                 return `
                     <div class="live-score-item">
                         <span style="font-weight:bold; display:flex; align-items:center; gap:6px;">
                             ${getTeamLogoHtml(home)} ${home} 
-                            <span style="color:var(--accent); background:#38003c; padding:2px 8px; border-radius:4px;">${scoreHome} : ${scoreAway}</span> 
+                            ${scoreOrTimeDisplay} 
                             ${getTeamLogoHtml(away)} ${away}
                         </span>
-                        <span class="live-badge">${minute}</span>
+                        ${badgeDisplay}
                     </div>
                 `;
             }).join('');
