@@ -229,19 +229,11 @@
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- KARTA: TRANSMISJA NA ŻYWO                   -->
-        <!-- ========================================== -->
+        <!-- KARTA TRANSMISJI NA ŻYWO -->
         <div class="card">
-            <h3 style="margin-top: 0; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                📺 TRANSMISJA NA ŻYWO
-            </h3>
-            
-            <!-- Kontener na odtwarzacz / iframe -->
+            <h3 style="color: var(--accent); margin-top: 0; margin-bottom: 15px; text-align: left;">📺 TRANSMISJA NA ŻYWO</h3>
             <div style="position: relative; width: 100%; height: 450px; background-color: #000; border-radius: 8px; overflow: hidden; display: flex; justify-content: center; align-items: center;">
-                
-                <!-- Wklej poniżej swój odtwarzacz / link do transmisji w znaczniku src -->
-                <iframe src="https://ehgembxe.cfd/e140nj0j-9150" 
+                <iframe src="TUTAJ_WKLEJ_LINK_DO_TRANSMISJI" 
                         width="100%" 
                         height="100%" 
                         frameborder="0" 
@@ -250,7 +242,6 @@
                         allowfullscreen 
                         style="border: none;">
                 </iframe>
-
             </div>
         </div>
 
@@ -268,10 +259,10 @@
 
         <div class="card">
             <h3>📊 PODGLĄD TYPÓW GRACZY</h3>
-            <p style="font-size: 12px; text-align: center; color: #888;">Typy innych pojawiają się dopiero po rozpoczęciu danego meczu.</p>
+            <p style="font-size: 12px; text-align: center; color: #888;">Typy innych pojawiają się dopiero po rozpoczęciu danego meczu[cite: 1]. Wyniki aktualizują się automatycznie z API.</p>
             <div class="legend">
-                <span><span class="legend-box" style="background:var(--exact-match)"></span> Dokładny wynik (60 pkt)</span>
-                <span><span class="legend-box" style="background:var(--winner-match)"></span> Trafiony zwycięzca (25 pkt)</span>
+                <span><span class="legend-box" style="background:var(--exact-match)"></span> Dokładny wynik (60 pkt)[cite: 1]</span>
+                <span><span class="legend-box" style="background:var(--winner-match)"></span> Trafiony zwycięzca (25 pkt)[cite: 1]</span>
             </div>
             <div class="table-container">
                 <table id="all-predictions-table">
@@ -283,7 +274,7 @@
 
         <div class="card">
             <h2>🏆 Klasyfikacja Generalna</h2>
-            <p style="font-size: 11px; text-align: center; color: #888; margin-top: -5px;">Pkt z meczów + Bonusy za zakończone kolejki (1. msc: +25)</p>
+            <p style="font-size: 11px; text-align: center; color: #888; margin-top: -5px;">Pkt z meczów + Bonusy za zakończone kolejki (1. msc: +25)[cite: 1]</p>
             <div class="table-container">
                 <table>
                     <thead>
@@ -331,61 +322,31 @@
     const TEAM_LOGOS = {
         "Arsenal": GITHUB_LOGOS_URL + "england_arsenal_64x64.football-logos.cc.png",
         "Arsenal FC": GITHUB_LOGOS_URL + "england_arsenal_64x64.football-logos.cc.png",
-        "Arsenal F.C.": GITHUB_LOGOS_URL + "england_arsenal_64x64.football-logos.cc.png",
         "Coventry City": GITHUB_LOGOS_URL + "england_coventry-city_64x64.football-logos.cc.png",
-        "Coventry City FC": GITHUB_LOGOS_URL + "england_coventry-city_64x64.football-logos.cc.png",
-        "Coventry City F.C.": GITHUB_LOGOS_URL + "england_coventry-city_64x64.football-logos.cc.png",
         "Hull City": GITHUB_LOGOS_URL + "england_hull-city_64x64.football-logos.cc.png",
-        "Hull City AFC": GITHUB_LOGOS_URL + "england_hull-city_64x64.football-logos.cc.png",
-        "Hull City A.F.C.": GITHUB_LOGOS_URL + "england_hull-city_64x64.football-logos.cc.png",
         "Manchester United": GITHUB_LOGOS_URL + "england_manchester-united_64x64.football-logos.cc.png",
-        "Manchester United F.C.": GITHUB_LOGOS_URL + "england_manchester-united_64x64.football-logos.cc.png",
         "Everton": GITHUB_LOGOS_URL + "england_everton_64x64.football-logos.cc.png",
-        "Everton FC": GITHUB_LOGOS_URL + "england_everton_64x64.football-logos.cc.png",
-        "Everton F.C.": GITHUB_LOGOS_URL + "england_everton_64x64.football-logos.cc.png",
         "Crystal Palace": GITHUB_LOGOS_URL + "england_crystal-palace_64x64.football-logos.cc.png",
-        "Crystal Palace FC": GITHUB_LOGOS_URL + "england_crystal-palace_64x64.football-logos.cc.png",
-        "Crystal Palace F.C.": GITHUB_LOGOS_URL + "england_crystal-palace_64x64.football-logos.cc.png",
         "Ipswich Town": GITHUB_LOGOS_URL + "england_ipswich_64x64.football-logos.cc.png",
-        "Ipswich Town FC": GITHUB_LOGOS_URL + "england_ipswich_64x64.football-logos.cc.png",
-        "Ipswich Town F.C.": GITHUB_LOGOS_URL + "england_ipswich_64x64.football-logos.cc.png",
         "Sunderland": GITHUB_LOGOS_URL + "england_sunderland_64x64.football-logos.cc.png",
-        "Sunderland AFC": GITHUB_LOGOS_URL + "england_sunderland_64x64.football-logos.cc.png",
-        "Sunderland A.F.C.": GITHUB_LOGOS_URL + "england_sunderland_64x64.football-logos.cc.png",
         "Nottingham Forest": GITHUB_LOGOS_URL + "england_nottingham-forest_64x64.football-logos.cc.png",
-        "Nottingham Forest F.C.": GITHUB_LOGOS_URL + "england_nottingham-forest_64x64.football-logos.cc.png",
         "Leeds United": GITHUB_LOGOS_URL + "england_leeds-united_64x64.football-logos.cc.png",
-        "Leeds United F.C.": GITHUB_LOGOS_URL + "england_leeds-united_64x64.football-logos.cc.png",
         "Brentford": GITHUB_LOGOS_URL + "england_brentford_64x64.football-logos.cc.png",
-        "Brentford FC": GITHUB_LOGOS_URL + "england_brentford_64x64.football-logos.cc.png",
-        "Brentford F.C.": GITHUB_LOGOS_URL + "england_brentford_64x64.football-logos.cc.png",
         "Tottenham Hotspur": GITHUB_LOGOS_URL + "england_tottenham_64x64.football-logos.cc.png",
-        "Tottenham Hotspur F.C.": GITHUB_LOGOS_URL + "england_tottenham_64x64.football-logos.cc.png",
         "Brighton": GITHUB_LOGOS_URL + "england_brighton_64x64.football-logos.cc.png",
-        "Brighton & Hove Albion": GITHUB_LOGOS_URL + "england_brighton_64x64.football-logos.cc.png",
-        "Brighton & Hove Albion F.C.": GITHUB_LOGOS_URL + "england_brighton_64x64.football-logos.cc.png",
         "Aston Villa": GITHUB_LOGOS_URL + "england_aston-villa_64x64.football-logos.cc.png",
-        "Aston Villa FC": GITHUB_LOGOS_URL + "england_aston-villa_64x64.football-logos.cc.png",
-        "Aston Villa F.C.": GITHUB_LOGOS_URL + "england_aston-villa_64x64.football-logos.cc.png",
         "Manchester City": GITHUB_LOGOS_URL + "england_manchester-city_64x64.football-logos.cc.png",
-        "Manchester City F.C.": GITHUB_LOGOS_URL + "england_manchester-city_64x64.football-logos.cc.png",
         "AFC Bournemouth": GITHUB_LOGOS_URL + "england_bournemouth_64x64.football-logos.cc.png",
-        "A.F.C. Bournemouth": GITHUB_LOGOS_URL + "england_bournemouth_64x64.football-logos.cc.png",
         "Newcastle United": GITHUB_LOGOS_URL + "england_newcastle_64x64.football-logos.cc.png",
-        "Newcastle United F.C.": GITHUB_LOGOS_URL + "england_newcastle_64x64.football-logos.cc.png",
         "Liverpool": GITHUB_LOGOS_URL + "england_liverpool_64x64.football-logos.cc.png",
-        "Liverpool FC": GITHUB_LOGOS_URL + "england_liverpool_64x64.football-logos.cc.png",
-        "Liverpool F.C.": GITHUB_LOGOS_URL + "england_liverpool_64x64.football-logos.cc.png",
         "Fulham": GITHUB_LOGOS_URL + "england_fulham_64x64.football-logos.cc.png",
-        "Fulham FC": GITHUB_LOGOS_URL + "england_fulham_64x64.football-logos.cc.png",
-        "Fulham F.C.": GITHUB_LOGOS_URL + "england_fulham_64x64.football-logos.cc.png",
-        "Chelsea": GITHUB_LOGOS_URL + "england_chelsea_64x64.football-logos.cc.png",
-        "Chelsea FC": GITHUB_LOGOS_URL + "england_chelsea_64x64.football-logos.cc.png",
-        "Chelsea F.C.": GITHUB_LOGOS_URL + "england_chelsea_64x64.football-logos.cc.png"
+        "Chelsea": GITHUB_LOGOS_URL + "england_chelsea_64x64.football-logos.cc.png"
     };
 
     function getTeamLogoHtml(teamName) {
-        const logoUrl = TEAM_LOGOS[teamName];
+        if (!teamName) return "";
+        const cleanName = Object.keys(TEAM_LOGOS).find(k => teamName.toLowerCase().includes(k.toLowerCase())) || teamName;
+        const logoUrl = TEAM_LOGOS[cleanName];
         if (!logoUrl) return "";
         return `<img src="${logoUrl}" alt="${teamName}" title="${teamName}" class="team-logo" onerror="this.style.display='none'">`;
     }
@@ -395,7 +356,7 @@
     let localDraftScores = {}; 
     let chatInterval = null;
 
-    const allMatches = [
+    let allMatches = [
         // KOLEJKA 1
         { id: "M1_1", round: "Kolejka 1", t1: "Arsenal", t2: "Coventry City", lock: "2026-08-21T21:00:00", realScore: "3:0" },
         { id: "M1_2", round: "Kolejka 1", t1: "Hull City", t2: "Manchester United", lock: "2026-08-22T13:30:00", realScore: "2:0" },
@@ -481,15 +442,15 @@
         { id: "M7_10", round: "Kolejka 7", t1: "Tottenham Hotspur", t2: "Coventry City", lock: "2026-10-19T21:00:00", realScore: "3:1" },
 
         // KOLEJKA 8
-        { id: "M8_1", round: "Kolejka 8", t1: "Ipswich Town", t2: "Nottingham Forest", lock: "2026-10-23T21:00:00", realScore: "1:1" },
-        { id: "M8_2", round: "Kolejka 8", t1: "Aston Villa", t2: "Manchester City", lock: "2026-10-24T13:30:00", realScore: "2:1" },
-        { id: "M8_3", round: "Kolejka 8", t1: "Arsenal", t2: "Everton", lock: "2026-10-24T16:00:00", realScore: "2:0" },
-        { id: "M8_4", round: "Kolejka 8", t1: "Coventry City", t2: "Fulham", lock: "2026-10-24T16:00:00", realScore: "0:1" },
-        { id: "M8_5", round: "Kolejka 8", t1: "Chelsea", t2: "Tottenham Hotspur", lock: "2026-10-24T18:30:00", realScore: "0:2" },
-        { id: "M8_6", round: "Kolejka 8", t1: "Crystal Palace", t2: "Newcastle United", lock: "2026-10-25T15:00:00", realScore: "0:2" },
-        { id: "M8_7", round: "Kolejka 8", t1: "Hull City", t2: "Brentford", lock: "2026-10-25T15:00:00", realScore: "1:1" },
-        { id: "M8_8", round: "Kolejka 8", t1: "Liverpool", t2: "Brighton", lock: "2026-10-25T15:00:00", realScore: "2:0" },
-        { id: "M8_9", round: "Kolejka 8", t1: "Manchester United", t2: "AFC Bournemouth", lock: "2026-10-25T15:00:00", realScore: "0:3" },
+        { id: "M8_1", round: "Kolejka 8", t1: "Ipswich Town", t2: "Nottingham Forest", lock: "2026-10-23T21:00:00", realScore: "" },
+        { id: "M8_2", round: "Kolejka 8", t1: "Aston Villa", t2: "Manchester City", lock: "2026-10-24T13:30:00", realScore: "" },
+        { id: "M8_3", round: "Kolejka 8", t1: "Arsenal", t2: "Everton", lock: "2026-10-24T16:00:00", realScore: "" },
+        { id: "M8_4", round: "Kolejka 8", t1: "Coventry City", t2: "Fulham", lock: "2026-10-24T16:00:00", realScore: "" },
+        { id: "M8_5", round: "Kolejka 8", t1: "Chelsea", t2: "Tottenham Hotspur", lock: "2026-10-24T18:30:00", realScore: "" },
+        { id: "M8_6", round: "Kolejka 8", t1: "Crystal Palace", t2: "Newcastle United", lock: "2026-10-25T15:00:00", realScore: "" },
+        { id: "M8_7", round: "Kolejka 8", t1: "Hull City", t2: "Brentford", lock: "2026-10-25T15:00:00", realScore: "" },
+        { id: "M8_8", round: "Kolejka 8", t1: "Liverpool", t2: "Brighton", lock: "2026-10-25T15:00:00", realScore: "" },
+        { id: "M8_9", round: "Kolejka 8", t1: "Manchester United", t2: "AFC Bournemouth", lock: "2026-10-25T15:00:00", realScore: "" },
         { id: "M8_10", round: "Kolejka 8", t1: "Sunderland", t2: "Leeds United", lock: "2026-10-25T17:30:00", realScore: "" },
 
         // KOLEJKA 9
@@ -588,6 +549,31 @@
         setInterval(loadLiveScoresFromAPI, 60000);
     }
 
+    // MAPOWANIE WYNIKÓW API Z MECZAMI W TYPERZE
+    function syncScoresFromApi(apiMatches) {
+        if (!apiMatches || !Array.isArray(apiMatches)) return;
+
+        apiMatches.forEach(apiMatch => {
+            const hName = apiMatch.homeTeam?.name || "";
+            const aName = apiMatch.awayTeam?.name || "";
+
+            const matchedLocal = allMatches.find(m => {
+                const matchH = hName.toLowerCase().includes(m.t1.toLowerCase());
+                const matchA = aName.toLowerCase().includes(m.t2.toLowerCase());
+                return matchH && matchA;
+            });
+
+            if (matchedLocal && apiMatch.score?.fullTime) {
+                const homeGoals = apiMatch.score.fullTime.home;
+                const awayGoals = apiMatch.score.fullTime.away;
+                
+                if (homeGoals !== null && awayGoals !== null && (apiMatch.status === 'FINISHED' || apiMatch.status === 'IN_PLAY' || apiMatch.status === 'PAUSED')) {
+                    matchedLocal.realScore = `${homeGoals}:${awayGoals}`;
+                }
+            }
+        });
+    }
+
     async function loadLiveScoresFromAPI() {
         const box = document.getElementById('live-scores-box');
 
@@ -595,6 +581,13 @@
             const res = await fetch(`${API_URL}?action=getLiveScores`);
             if (!res.ok) throw new Error("API Error");
             const data = await res.json();
+
+            // Synchronizacja wyników z tabelą typowania
+            if (data.matches) {
+                syncScoresFromApi(data.matches);
+                // Ponowne przeliczenie podglądu i klasyfikacji generalnej
+                refreshAllData();
+            }
 
             const todayStr = new Date().toISOString().split('T')[0];
 
@@ -796,7 +789,7 @@
             processAndRenderLeaderboard(allDataRes);
 
         } catch (e) {
-            console.error("Błąd pobierania z bazy danych:", e);
+            console.error("Błąd pobierania danych z bazy:", e);
         }
     }
 
