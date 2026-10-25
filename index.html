@@ -243,10 +243,10 @@
 
         <div class="card">
             <h3>📊 PODGLĄD TYPÓW GRACZY</h3>
-            <p style="font-size: 12px; text-align: center; color: #888;">Typy innych pojawiają się dopiero po rozpoczęciu danego meczu[cite: 1].</p>
+            <p style="font-size: 12px; text-align: center; color: #888;">Typy innych pojawiają się dopiero po rozpoczęciu danego meczu.</p>
             <div class="legend">
-                <span><span class="legend-box" style="background:var(--exact-match)"></span> Dokładny wynik (60 pkt)[cite: 1]</span>
-                <span><span class="legend-box" style="background:var(--winner-match)"></span> Trafiony zwycięzca (25 pkt)[cite: 1]</span>
+                <span><span class="legend-box" style="background:var(--exact-match)"></span> Dokładny wynik (60 pkt)</span>
+                <span><span class="legend-box" style="background:var(--winner-match)"></span> Trafiony zwycięzca (25 pkt)</span>
             </div>
             <div class="table-container">
                 <table id="all-predictions-table">
@@ -258,7 +258,7 @@
 
         <div class="card">
             <h2>🏆 Klasyfikacja Generalna</h2>
-            <p style="font-size: 11px; text-align: center; color: #888; margin-top: -5px;">Pkt z meczów + Bonusy za zakończone kolejki (1. msc: +25)[cite: 1]</p>
+            <p style="font-size: 11px; text-align: center; color: #888; margin-top: -5px;">Pkt z meczów + Bonusy za zakończone kolejki (1. msc: +25)</p>
             <div class="table-container">
                 <table>
                     <thead>
@@ -573,7 +573,6 @@
 
             const todayStr = new Date().toISOString().split('T')[0];
 
-            // Filtrujemy mecze: trwające (LIVE/PAUSED) lub dzisiejsze zaplanowane
             const relevantMatches = (data.matches || []).filter(m => {
                 const isLive = m.status === 'IN_PLAY' || m.status === 'PAUSED';
                 const matchDateStr = m.utcDate ? m.utcDate.split('T')[0] : "";
