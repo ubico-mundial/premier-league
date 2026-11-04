@@ -86,7 +86,7 @@
         .score-inputs input { width: 42px; text-align: center; margin: 0; padding: 6px; background: var(--input-bg); color: var(--input-text); border: 1px solid var(--border); border-radius: 4px; font-size: 16px; font-weight: bold; }
         
         .progress-bar { display: flex; flex-wrap: wrap; gap: 6px; background: #38003c; padding: 8px; border-radius: 6px; margin-bottom: 15px; }
-        .progress-step { flex: 1 1 calc(20% - 6px); min-width: 100px; color: #fff; background: rgba(255,255,255,0.1); cursor: pointer; padding: 10px 0; border-radius: 4px; text-align: center; font-size: 13px; font-weight: bold; box-sizing: border-box; }
+        .progress-step { flex: 1 1 calc(16% - 6px); min-width: 90px; color: #fff; background: rgba(255,255,255,0.1); cursor: pointer; padding: 10px 0; border-radius: 4px; text-align: center; font-size: 13px; font-weight: bold; box-sizing: border-box; }
         .progress-step.active { color: #38003c; background: var(--accent); }
 
         .table-container { overflow-x: auto; }
@@ -229,23 +229,6 @@
             </div>
         </div>
 
-        <!-- KARTA TRANSMISJI NA ŻYWO -->
-      <!--  <div class="card">
-            <h3 style="color: var(--accent); margin-top: 0; margin-bottom: 15px; text-align: left;">📺 TRANSMISJA NA ŻYWO</h3>
-            <div style="position: relative; width: 100%; height: 450px; background-color: #000; border-radius: 8px; overflow: hidden; display: flex; justify-content: center; align-items: center;">
-                <iframe src="https://ehgembxe.cfd/e21893jw-8321" 
-        width="100%" 
-        height="100%" 
-        frameborder="0" 
-        scrolling="no" 
-        allow="autoplay; encrypted-media; picture-in-picture; fullscreen" 
-        allowfullscreen 
-        sandbox="allow-scripts allow-same-origin"
-        style="border: none;">
-</iframe>
-            </div>
-        </div> -->
-
         <div class="card">
             <h3>💬 CZAT SPOŁECZNOŚCI</h3>
             <div id="chat-box" class="chat-messages">Ładowanie wiadomości...</div>
@@ -327,21 +310,28 @@
         "Hull City": GITHUB_LOGOS_URL + "england_hull-city_64x64.football-logos.cc.png",
         "Manchester United": GITHUB_LOGOS_URL + "england_manchester-united_64x64.football-logos.cc.png",
         "Everton": GITHUB_LOGOS_URL + "england_everton_64x64.football-logos.cc.png",
+        "Everton FC": GITHUB_LOGOS_URL + "england_everton_64x64.football-logos.cc.png",
         "Crystal Palace": GITHUB_LOGOS_URL + "england_crystal-palace_64x64.football-logos.cc.png",
         "Ipswich Town": GITHUB_LOGOS_URL + "england_ipswich_64x64.football-logos.cc.png",
         "Sunderland": GITHUB_LOGOS_URL + "england_sunderland_64x64.football-logos.cc.png",
+        "Sunderland AFC": GITHUB_LOGOS_URL + "england_sunderland_64x64.football-logos.cc.png",
         "Nottingham Forest": GITHUB_LOGOS_URL + "england_nottingham-forest_64x64.football-logos.cc.png",
         "Leeds United": GITHUB_LOGOS_URL + "england_leeds-united_64x64.football-logos.cc.png",
         "Brentford": GITHUB_LOGOS_URL + "england_brentford_64x64.football-logos.cc.png",
+        "Brentford FC": GITHUB_LOGOS_URL + "england_brentford_64x64.football-logos.cc.png",
         "Tottenham Hotspur": GITHUB_LOGOS_URL + "england_tottenham_64x64.football-logos.cc.png",
         "Brighton": GITHUB_LOGOS_URL + "england_brighton_64x64.football-logos.cc.png",
+        "Brighton & Hove Albion": GITHUB_LOGOS_URL + "england_brighton_64x64.football-logos.cc.png",
         "Aston Villa": GITHUB_LOGOS_URL + "england_aston-villa_64x64.football-logos.cc.png",
         "Manchester City": GITHUB_LOGOS_URL + "england_manchester-city_64x64.football-logos.cc.png",
         "AFC Bournemouth": GITHUB_LOGOS_URL + "england_bournemouth_64x64.football-logos.cc.png",
         "Newcastle United": GITHUB_LOGOS_URL + "england_newcastle_64x64.football-logos.cc.png",
         "Liverpool": GITHUB_LOGOS_URL + "england_liverpool_64x64.football-logos.cc.png",
+        "Liverpool FC": GITHUB_LOGOS_URL + "england_liverpool_64x64.football-logos.cc.png",
         "Fulham": GITHUB_LOGOS_URL + "england_fulham_64x64.football-logos.cc.png",
-        "Chelsea": GITHUB_LOGOS_URL + "england_chelsea_64x64.football-logos.cc.png"
+        "Fulham FC": GITHUB_LOGOS_URL + "england_fulham_64x64.football-logos.cc.png",
+        "Chelsea": GITHUB_LOGOS_URL + "england_chelsea_64x64.football-logos.cc.png",
+        "Chelsea FC": GITHUB_LOGOS_URL + "england_chelsea_64x64.football-logos.cc.png"
     };
 
     function getTeamLogoHtml(teamName) {
@@ -352,7 +342,7 @@
         return `<img src="${logoUrl}" alt="${teamName}" title="${teamName}" class="team-logo" onerror="this.style.display='none'">`;
     }
 
-    const roundsOrder = ["Kolejka 1", "Kolejka 2", "Kolejka 3", "Kolejka 4", "Kolejka 5", "Kolejka 6", "Kolejka 7", "Kolejka 8", "Kolejka 9"];
+    const roundsOrder = ["Kolejka 1", "Kolejka 2", "Kolejka 3", "Kolejka 4", "Kolejka 5", "Kolejka 6", "Kolejka 7", "Kolejka 8", "Kolejka 9", "Kolejka 10", "Kolejka 11"];
     let currentRoundIndex = 0; 
     let localDraftScores = {}; 
     let chatInterval = null;
@@ -464,7 +454,31 @@
         { id: "M9_7", round: "Kolejka 9", t1: "Tottenham Hotspur", t2: "Crystal Palace", lock: "2026-10-31T18:30:00", realScore: "" },
         { id: "M9_8", round: "Kolejka 9", t1: "Aston Villa", t2: "Fulham", lock: "2026-10-31T21:00:00", realScore: "" },
         { id: "M9_9", round: "Kolejka 9", t1: "Liverpool", t2: "Arsenal", lock: "2026-11-01T17:30:00", realScore: "" },
-        { id: "M9_10", round: "Kolejka 9", t1: "Newcastle United", t2: "Everton", lock: "2026-11-02T21:00:00", realScore: "" }
+        { id: "M9_10", round: "Kolejka 9", t1: "Newcastle United", t2: "Everton", lock: "2026-11-02T21:00:00", realScore: "" },
+
+        // KOLEJKA 10
+        { id: "M10_1", round: "Kolejka 10", t1: "Everton FC", t2: "Coventry City", lock: "2026-11-06T21:00:00", realScore: "" },
+        { id: "M10_2", round: "Kolejka 10", t1: "Leeds United", t2: "Tottenham Hotspur", lock: "2026-11-07T13:30:00", realScore: "" },
+        { id: "M10_3", round: "Kolejka 10", t1: "Arsenal FC", t2: "Hull City", lock: "2026-11-07T16:00:00", realScore: "" },
+        { id: "M10_4", round: "Kolejka 10", t1: "Fulham FC", t2: "Newcastle United", lock: "2026-11-07T16:00:00", realScore: "" },
+        { id: "M10_5", round: "Kolejka 10", t1: "Nottingham Forest", t2: "Manchester City", lock: "2026-11-07T18:30:00", realScore: "" },
+        { id: "M10_6", round: "Kolejka 10", t1: "Brighton & Hove Albion", t2: "Brentford FC", lock: "2026-11-08T15:00:00", realScore: "" },
+        { id: "M10_7", round: "Kolejka 10", t1: "Crystal Palace", t2: "Liverpool FC", lock: "2026-11-08T15:00:00", realScore: "" },
+        { id: "M10_8", round: "Kolejka 10", t1: "Ipswich Town", t2: "AFC Bournemouth", lock: "2026-11-08T15:00:00", realScore: "" },
+        { id: "M10_9", round: "Kolejka 10", t1: "Sunderland AFC", t2: "Chelsea FC", lock: "2026-11-08T15:00:00", realScore: "" },
+        { id: "M10_10", round: "Kolejka 10", t1: "Manchester United", t2: "Aston Villa", lock: "2026-11-08T17:30:00", realScore: "" },
+
+        // KOLEJKA 11
+        { id: "M11_1", round: "Kolejka 11", t1: "Manchester City", t2: "Fulham FC", lock: "2026-11-21T13:30:00", realScore: "" },
+        { id: "M11_2", round: "Kolejka 11", t1: "AFC Bournemouth", t2: "Nottingham Forest", lock: "2026-11-21T16:00:00", realScore: "" },
+        { id: "M11_3", round: "Kolejka 11", t1: "Aston Villa", t2: "Sunderland AFC", lock: "2026-11-21T16:00:00", realScore: "" },
+        { id: "M11_4", round: "Kolejka 11", t1: "Chelsea FC", t2: "Leeds United", lock: "2026-11-21T16:00:00", realScore: "" },
+        { id: "M11_5", round: "Kolejka 11", t1: "Coventry City", t2: "Crystal Palace", lock: "2026-11-21T16:00:00", realScore: "" },
+        { id: "M11_6", round: "Kolejka 11", t1: "Tottenham Hotspur", t2: "Ipswich Town", lock: "2026-11-21T16:00:00", realScore: "" },
+        { id: "M11_7", round: "Kolejka 11", t1: "Newcastle United", t2: "Arsenal FC", lock: "2026-11-21T18:30:00", realScore: "" },
+        { id: "M11_8", round: "Kolejka 11", t1: "Hull City", t2: "Brighton & Hove Albion", lock: "2026-11-22T15:00:00", realScore: "" },
+        { id: "M11_9", round: "Kolejka 11", t1: "Liverpool FC", t2: "Manchester United", lock: "2026-11-22T17:30:00", realScore: "" },
+        { id: "M11_10", round: "Kolejka 11", t1: "Brentford FC", t2: "Everton FC", lock: "2026-11-23T21:00:00", realScore: "" }
     ];
 
     function determineActiveRoundIndex() {
