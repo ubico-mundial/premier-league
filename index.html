@@ -564,7 +564,6 @@
         setInterval(loadLiveScoresFromAPI, 60000);
     }
 
-    // MAPOWANIE WYNIKÓW API Z MECZAMI W TYPERZE
     function syncScoresFromApi(apiMatches) {
         if (!apiMatches || !Array.isArray(apiMatches)) return;
 
@@ -597,10 +596,8 @@
             if (!res.ok) throw new Error("API Error");
             const data = await res.json();
 
-            // Synchronizacja wyników z tabelą typowania
             if (data.matches) {
                 syncScoresFromApi(data.matches);
-                // Ponowne przeliczenie podglądu i klasyfikacji generalnej
                 refreshAllData();
             }
 
@@ -675,7 +672,18 @@
         refreshAllData();
     }
 
+    function updateDraftScore(type, matchId, value) {
+        localDraftScores[`${type}-${matchId}`] = value;
+    }
+
     function renderActiveRound() {
+        const activeElem = document.activeElement;
+        const isEditing = activeElem && activeElem.classList && (activeElem.classList.contains('home-team') || activeElem.classList.contains('away-team'));
+        
+        if (isEditing) {
+            return; // Nie przerabiaj drzewa DOM gdy użytkownik aktualnie pisze
+        }
+
         const currentRound = roundsOrder[currentRoundIndex];
         document.getElementById('group-title').innerText = `⚽ RUNDA TYPOWANIA: ${currentRound.toUpperCase()}`;
         const container = document.getElementById('matches-list');
@@ -704,9 +712,9 @@
                     <span class="match-date">${isMatchLocked ? '🔒 Zablokowane' : '⏰ ' + match.lock.replace('T', ' ').substring(0,16)}</span>
                 </div>
                 <div class="score-inputs">
-                    <input type="number" class="home-team" data-id="${match.id}" value="${savedHome}" ${isMatchLocked ? 'disabled' : ''} oninput="autoTab(this)">
+                    <input type="number" class="home-team" data-id="${match.id}" value="${savedHome}" ${isMatchLocked ? 'disabled' : ''} oninput="updateDraftScore('home', '${match.id}', this.value); autoTab(this)">
                     <span>:</span>
-                    <input type="number" class="away-team" data-id="${match.id}" value="${savedAway}" ${isMatchLocked ? 'disabled' : ''} oninput="autoTab(this)">
+                    <input type="number" class="away-team" data-id="${match.id}" value="${savedAway}" ${isMatchLocked ? 'disabled' : ''} oninput="updateDraftScore('away', '${match.id}', this.value); autoTab(this)">
                 </div>
             `;
             container.appendChild(div);
@@ -750,7 +758,7 @@
             try {
                 const data = JSON.parse(cachedUserPreds);
                 allMatches.filter(m => m.round === currentRound).forEach(m => {
-                    if (data[m.id]) {
+                    if (data[m.id] && localDraftScores[`home-${m.id}`] === undefined) {
                         const p = data[m.id].toString().split(':');
                         if (p.length === 2) {
                             localDraftScores[`home-${m.id}`] = p[0];
@@ -789,7 +797,7 @@
 
             if (userPredsRes && typeof userPredsRes === 'object') {
                 allMatches.filter(m => m.round === currentRound).forEach(m => {
-                    if (userPredsRes[m.id]) {
+                    if (userPredsRes[m.id] && localDraftScores[`home-${m.id}`] === undefined) {
                         const p = userPredsRes[m.id].toString().split(':');
                         if (p.length === 2) {
                             localDraftScores[`home-${m.id}`] = p[0];
